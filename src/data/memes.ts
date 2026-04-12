@@ -1,6 +1,6 @@
 // ============================================================
 // CareerDojo Meme Cards — collectible scratch cards
-// Drop after lessons. Three rarities, three drop rates.
+// Inspired by Hedgefonds Henning, Arbitrage Andy, Finance Bro Memes
 // ============================================================
 
 export type MemeRarity = 'standard' | 'rare' | 'legendary';
@@ -13,7 +13,7 @@ export interface Meme {
   text: string;     // English
   textDe: string;   // German
   emoji: string;
-  dropRate: number; // 0..1 — bucket drop chance for the rarity tier
+  dropRate: number;
 }
 
 export const RARITY_DROP_RATE: Record<MemeRarity, number> = {
@@ -22,7 +22,6 @@ export const RARITY_DROP_RATE: Record<MemeRarity, number> = {
   legendary: 0.1,
 };
 
-// Color helper for the rarity badge
 export const RARITY_COLOR: Record<MemeRarity, string> = {
   standard: '#d0d0d0',
   rare: '#185FA5',
@@ -36,8 +35,7 @@ export const RARITY_LABEL: Record<MemeRarity, { en: string; de: string }> = {
 };
 
 // ============================================================
-// MEMES — 30 total, balanced ~60/30/10 across rarities
-// Uses recognizable meme formats with finance twist
+// MEMES — 30 total (Hedgefonds Henning / Finance Bro style)
 // ============================================================
 export const MEMES: Meme[] = [
   // ============================================================
@@ -47,8 +45,8 @@ export const MEMES: Meme[] = [
     id: 'ib-01',
     rarity: 'rare',
     track: 'ib',
-    text: 'Nobody:\nAbsolutely nobody:\nThe MD at 11pm: "Quick comment on page 47"',
-    textDe: 'Niemand:\nAbsolut niemand:\nDer MD um 23 Uhr: "Kurze Anmerkung zu Seite 47"',
+    text: '"What do you do for a living?"\n"I make PowerPoints."\n"...for €120k?"',
+    textDe: '"Was machst du beruflich?"\n"Ich mache PowerPoints."\n"...für 120k€?"',
     emoji: '💀',
     dropRate: RARITY_DROP_RATE.rare,
   },
@@ -56,8 +54,8 @@ export const MEMES: Meme[] = [
     id: 'ib-02',
     rarity: 'standard',
     track: 'ib',
-    text: 'Me: I should sleep\nThe model that doesn\'t tie: "No."',
-    textDe: 'Ich: Ich sollte schlafen\nDas Modell, das nicht aufgeht: "Nein."',
+    text: 'Analyst um 3 Uhr morgens:\n"Das Modell geht nicht auf."\n\nDas Modell: eine einzige falsche Zellreferenz in Zeile 4.738',
+    textDe: 'Analyst um 3 Uhr morgens:\n"Das Modell geht nicht auf."\n\nDas Modell: eine einzige falsche Zellreferenz in Zeile 4.738',
     emoji: '🧮',
     dropRate: RARITY_DROP_RATE.standard,
   },
@@ -65,8 +63,8 @@ export const MEMES: Meme[] = [
     id: 'ib-03',
     rarity: 'legendary',
     track: 'ib',
-    text: 'Pitch book: 147 slides.\nClient reads: cover page.\nBills: $2M.\nThis is fine. 🔥🐶🔥',
-    textDe: 'Pitch Book: 147 Folien.\nKunde liest: Deckblatt.\nRechnung: €2M.\nAlles gut. 🔥🐶🔥',
+    text: 'MD: "Ich brauche das Pitch Book bis morgen früh."\nUhrzeit: 23:47\nSeiten: 0 von 84\nKaffee: leer\nWille zu leben: auch leer\n\n"Jawohl, kein Problem."',
+    textDe: 'MD: "Ich brauche das Pitch Book bis morgen früh."\nUhrzeit: 23:47\nSeiten: 0 von 84\nKaffee: leer\nWille zu leben: auch leer\n\n"Jawohl, kein Problem."',
     emoji: '📚',
     dropRate: RARITY_DROP_RATE.legendary,
   },
@@ -74,62 +72,62 @@ export const MEMES: Meme[] = [
     id: 'ib-04',
     rarity: 'standard',
     track: 'ib',
-    text: 'Expectation: "Wolf of Wall Street"\nReality: CTRL+C, CTRL+V, CTRL+S at 3am',
-    textDe: 'Erwartung: "Wolf of Wall Street"\nRealität: STRG+C, STRG+V, STRG+S um 3 Uhr',
-    emoji: '☕',
+    text: 'Tinder Date: "And what do you do on weekends?"\nIBanker: "Weekends?"',
+    textDe: 'Tinder Date: "Und was machst du am Wochenende?"\nIBanker: "Wochenende?"',
+    emoji: '💔',
     dropRate: RARITY_DROP_RATE.standard,
   },
   {
     id: 'ib-05',
     rarity: 'rare',
     track: 'ib',
-    text: 'Staffer: "Are you free this weekend?"\nMe: *visible confusion*\n"Free? What is free?"',
-    textDe: 'Staffer: "Hast du am Wochenende Zeit?"\nIch: *sichtbare Verwirrung*\n"Zeit? Was ist Zeit?"',
-    emoji: '📞',
+    text: 'Mein Konto: +8.000€ Gehalt\nMein Konto 2 Tage später: -47€\n\nUber Eats wenn man 14h im Büro ist trifft anders',
+    textDe: 'Mein Konto: +8.000€ Gehalt\nMein Konto 2 Tage später: -47€\n\nUber Eats wenn man 14h im Büro ist trifft anders',
+    emoji: '💸',
     dropRate: RARITY_DROP_RATE.rare,
   },
   {
     id: 'ib-06',
     rarity: 'standard',
     track: 'ib',
-    text: '"It\'s not Comic Sans. It\'s Garamond 11."\n*Always has been* 🔫',
-    textDe: '"Das ist nicht Comic Sans. Das ist Garamond 11."\n*War es schon immer* 🔫',
-    emoji: '🔠',
+    text: 'Adjusted EBITDA be like:\nEchtes EBITDA: 2M\n+ CEO Gehalt rausrechnen\n+ "einmalige" Kosten (seit 5 Jahren)\n+ Wetter war schlecht\n\n= 15M EBITDA 📈',
+    textDe: 'Adjusted EBITDA be like:\nEchtes EBITDA: 2M\n+ CEO Gehalt rausrechnen\n+ "einmalige" Kosten (seit 5 Jahren)\n+ Wetter war schlecht\n\n= 15M EBITDA 📈',
+    emoji: '✨',
     dropRate: RARITY_DROP_RATE.standard,
   },
   {
     id: 'ib-07',
     rarity: 'standard',
     track: 'ib',
-    text: 'Excel crashed.\nAutosave: off.\n3 hours of work: gone.\nI\'m fine. Everything is fine.',
-    textDe: 'Excel abgestürzt.\nAutoSpeichern: aus.\n3 Stunden Arbeit: weg.\nMir geht\'s gut. Alles gut.',
-    emoji: '💾',
+    text: 'Expectation: Wolf of Wall Street 🐺\nReality: Wolf of Microsoft Excel 🐺📊',
+    textDe: 'Erwartung: Wolf of Wall Street 🐺\nRealität: Wolf of Microsoft Excel 🐺📊',
+    emoji: '🐺',
     dropRate: RARITY_DROP_RATE.standard,
   },
   {
     id: 'ib-08',
     rarity: 'standard',
     track: 'ib',
-    text: 'Adjusted EBITDA =\nReal EBITDA\n+ hopes\n+ dreams\n+ "one-time" costs (recurring annually)',
-    textDe: 'Adjusted EBITDA =\nEchtes EBITDA\n+ Hoffnung\n+ Träume\n+ "einmalige" Kosten (jährlich wiederkehrend)',
-    emoji: '✨',
+    text: '"Bro ich hab Goldman"\n"Nice! Was machst du da?"\n"Ich formatiere Tabellen in Garamond 11 und weine."',
+    textDe: '"Bro ich hab Goldman"\n"Nice! Was machst du da?"\n"Ich formatiere Tabellen in Garamond 11 und weine."',
+    emoji: '🔠',
     dropRate: RARITY_DROP_RATE.standard,
   },
   {
     id: 'ib-09',
     rarity: 'standard',
     track: 'ib',
-    text: 'Drake meme:\n❌ Work-Life-Balance\n✅ Work-Work-Balance',
-    textDe: 'Drake Meme:\n❌ Work-Life-Balance\n✅ Work-Work-Balance',
-    emoji: '🎵',
+    text: 'Staffer: "Hast du Kapazität?"\n\nÜbersetzung: "Du hast Kapazität."',
+    textDe: 'Staffer: "Hast du Kapazität?"\n\nÜbersetzung: "Du hast Kapazität."',
+    emoji: '📞',
     dropRate: RARITY_DROP_RATE.standard,
   },
   {
     id: 'ib-10',
     rarity: 'rare',
     track: 'ib',
-    text: 'The deal closes.\nThe closing dinner begins.\nMD orders the Wagyu.\nAnalyst eats breadsticks.\n🥂',
-    textDe: 'Der Deal schließt.\nDas Closing Dinner beginnt.\nMD bestellt Wagyu.\nAnalyst isst Brotstangen.\n🥂',
+    text: 'Closing Dinner:\nMD: Wagyu, Château Margaux\nVP: Steak, guter Wein\nAssociate: was der VP bestellt\nAnalyst: Brot und Wasser\n\nRechnung: 4.700€\n"Geht auf die Firma" 🥂',
+    textDe: 'Closing Dinner:\nMD: Wagyu, Château Margaux\nVP: Steak, guter Wein\nAssociate: was der VP bestellt\nAnalyst: Brot und Wasser\n\nRechnung: 4.700€\n"Geht auf die Firma" 🥂',
     emoji: '🥂',
     dropRate: RARITY_DROP_RATE.rare,
   },
@@ -141,62 +139,62 @@ export const MEMES: Meme[] = [
     id: 'cons-01',
     rarity: 'standard',
     track: 'consulting',
-    text: 'Interviewer: "How many golf balls fit in a school bus?"\nMe: "It depends."\n*gets hired*',
-    textDe: 'Interviewer: "Wie viele Golfbälle passen in einen Bus?"\nIch: "Es kommt darauf an."\n*wird eingestellt*',
-    emoji: '🔍',
+    text: '"Wie viele Friseure gibt es in München?"\n"Es kommt darauf an."\n\nFertig. Eingestellt. 130k. Nächste Frage.',
+    textDe: '"Wie viele Friseure gibt es in München?"\n"Es kommt darauf an."\n\nFertig. Eingestellt. 130k. Nächste Frage.',
+    emoji: '💇',
     dropRate: RARITY_DROP_RATE.standard,
   },
   {
     id: 'cons-02',
     rarity: 'rare',
     track: 'consulting',
-    text: 'POV: You just said "synergies" for the 47th time today and the client is nodding along',
-    textDe: 'POV: Du hast gerade zum 47. Mal "Synergien" gesagt und der Kunde nickt zustimmend',
-    emoji: '✅',
+    text: 'Ich bei McKinsey:\nKunde: "Wir wissen was das Problem ist."\nIch: *2M€ Rechnung schreiben*\n"Ja, das sehe ich auch so."',
+    textDe: 'Ich bei McKinsey:\nKunde: "Wir wissen was das Problem ist."\nIch: *2M€ Rechnung schreiben*\n"Ja, das sehe ich auch so."',
+    emoji: '💰',
     dropRate: RARITY_DROP_RATE.rare,
   },
   {
     id: 'cons-03',
     rarity: 'legendary',
     track: 'consulting',
-    text: 'Client: "We know the problem."\nMcKinsey: *charges €2M to confirm*\nClient: "Yes that\'s what we said."\nMcKinsey: "That\'ll be another €500K."',
-    textDe: 'Kunde: "Wir kennen das Problem."\nMcKinsey: *berechnet €2M zur Bestätigung*\nKunde: "Ja, das haben wir gesagt."\nMcKinsey: "Das macht nochmal €500K."',
-    emoji: '💸',
+    text: 'Montag: Flughafen\nDienstag: Kundensite\nMittwoch: Kundensite\nDonnerstag: Flughafen\nFreitag: "Working from home"\n\nMarriott Bonvoy Status: Titanium\nBeziehungsstatus: kompliziert\nKontakt zur Realität: verloren',
+    textDe: 'Montag: Flughafen\nDienstag: Kundensite\nMittwoch: Kundensite\nDonnerstag: Flughafen\nFreitag: "Working from home"\n\nMarriott Bonvoy Status: Titanium\nBeziehungsstatus: kompliziert\nKontakt zur Realität: verloren',
+    emoji: '✈️',
     dropRate: RARITY_DROP_RATE.legendary,
   },
   {
     id: 'cons-04',
     rarity: 'standard',
     track: 'consulting',
-    text: 'My brain at 3am:\n*structured framework intensifies*\n"What if life was a 2x2 matrix?"',
-    textDe: 'Mein Gehirn um 3 Uhr nachts:\n*strukturiertes Framework intensiviert sich*\n"Was wäre wenn das Leben eine 2x2-Matrix wäre?"',
-    emoji: '🧠',
+    text: '"Lass uns das offline besprechen"\n\nÜbersetzung: Wir werden nie wieder darüber reden. Niemals.',
+    textDe: '"Lass uns das offline besprechen"\n\nÜbersetzung: Wir werden nie wieder darüber reden. Niemals.',
+    emoji: '🔇',
     dropRate: RARITY_DROP_RATE.standard,
   },
   {
     id: 'cons-05',
     rarity: 'rare',
     track: 'consulting',
-    text: 'First day at MBB:\n"Here\'s your laptop."\n"Here\'s your Marriott Bonvoy card."\n"Here\'s your will to live. You won\'t need it."',
-    textDe: 'Erster Tag bei MBB:\n"Hier ist dein Laptop."\n"Hier ist deine Marriott Bonvoy Karte."\n"Hier ist dein Lebenswille. Brauchst du nicht."',
-    emoji: '🏨',
+    text: 'Case Interview Prep:\nTag 1: "Ich strukturiere jetzt alles"\nTag 30: "Ich strukturiere meinen Kühlschrank"\nTag 60: "Ich hab meinem Date ein Framework erklärt"\nTag 90: "Ich habe keine Freunde mehr"',
+    textDe: 'Case Interview Prep:\nTag 1: "Ich strukturiere jetzt alles"\nTag 30: "Ich strukturiere meinen Kühlschrank"\nTag 60: "Ich hab meinem Date ein Framework erklärt"\nTag 90: "Ich habe keine Freunde mehr"',
+    emoji: '🧠',
     dropRate: RARITY_DROP_RATE.rare,
   },
   {
     id: 'cons-06',
     rarity: 'standard',
     track: 'consulting',
-    text: '"Let\'s take this offline."\nTranslation: We will literally never speak of this again.',
-    textDe: '"Lass uns das offline besprechen."\nÜbersetzung: Wir werden buchstäblich nie wieder darüber reden.',
-    emoji: '🔄',
+    text: 'Jedes Problem auf dieser Welt:\n→ 2x2 Matrix\n→ Achsen beschriften\n→ "rechts oben ist gut"\n→ Rechnung: 500k€',
+    textDe: 'Jedes Problem auf dieser Welt:\n→ 2x2 Matrix\n→ Achsen beschriften\n→ "rechts oben ist gut"\n→ Rechnung: 500k€',
+    emoji: '📊',
     dropRate: RARITY_DROP_RATE.standard,
   },
   {
     id: 'cons-07',
     rarity: 'standard',
     track: 'consulting',
-    text: 'PowerPoint at 2am. ✅\nAnimations at 3am. ✅\nExistential crisis at 4am. ✅\nClient cancels meeting. ✅',
-    textDe: 'PowerPoint um 2 Uhr. ✅\nAnimationen um 3 Uhr. ✅\nSinnkrise um 4 Uhr. ✅\nKunde sagt Meeting ab. ✅',
+    text: 'Slide um 2 Uhr fertig ✅\nAnimationen um 3 Uhr ✅\nSinnkrise um 4 Uhr ✅\nKunde sagt Meeting ab um 8 Uhr ✅\n\nAlles für die Karriere.',
+    textDe: 'Slide um 2 Uhr fertig ✅\nAnimationen um 3 Uhr ✅\nSinnkrise um 4 Uhr ✅\nKunde sagt Meeting ab um 8 Uhr ✅\n\nAlles für die Karriere.',
     emoji: '🎞️',
     dropRate: RARITY_DROP_RATE.standard,
   },
@@ -204,8 +202,8 @@ export const MEMES: Meme[] = [
     id: 'cons-08',
     rarity: 'standard',
     track: 'consulting',
-    text: 'Drake meme:\n❌ Having a hypothesis and testing it\n✅ Making it up first, then proving it',
-    textDe: 'Drake Meme:\n❌ Hypothese aufstellen und testen\n✅ Erst ausdenken, dann beweisen',
+    text: 'Hypothesengetrieben arbeiten:\n\nSchritt 1: Ergebnis ausdenken\nSchritt 2: Daten finden die dazu passen\nSchritt 3: "Data-Driven" draufschreiben',
+    textDe: 'Hypothesengetrieben arbeiten:\n\nSchritt 1: Ergebnis ausdenken\nSchritt 2: Daten finden die dazu passen\nSchritt 3: "Data-Driven" draufschreiben',
     emoji: '💡',
     dropRate: RARITY_DROP_RATE.standard,
   },
@@ -213,18 +211,18 @@ export const MEMES: Meme[] = [
     id: 'cons-09',
     rarity: 'standard',
     track: 'consulting',
-    text: 'Every problem:\n→ put it in a 2x2\n→ label the axes\n→ ???\n→ profit',
-    textDe: 'Jedes Problem:\n→ in eine 2x2 Matrix packen\n→ Achsen beschriften\n→ ???\n→ Profit',
-    emoji: '📊',
+    text: 'Ich unter der Dusche:\n*löst den Case perfekt*\n*strukturiert, MECE, Empfehlung*\n\nIch im echten Interview:\n"Ähh... können Sie die Frage wiederholen?"',
+    textDe: 'Ich unter der Dusche:\n*löst den Case perfekt*\n*strukturiert, MECE, Empfehlung*\n\nIch im echten Interview:\n"Ähh... können Sie die Frage wiederholen?"',
+    emoji: '🚿',
     dropRate: RARITY_DROP_RATE.standard,
   },
   {
     id: 'cons-10',
     rarity: 'rare',
     track: 'consulting',
-    text: 'Me: *solves the case perfectly in the shower*\nAlso me in the actual interview: "Uhh... could you repeat the question?"',
-    textDe: 'Ich: *löst den Case perfekt unter der Dusche*\nIch im echten Interview: "Ähh... können Sie die Frage wiederholen?"',
-    emoji: '🚿',
+    text: 'LinkedIn Profil: "Strategy Consultant bei MBB"\n\nRealität: Ich mache Excel-Tabellen im Marriott und esse Room Service für 47€ weil ich zu müde bin rauszugehen',
+    textDe: 'LinkedIn Profil: "Strategy Consultant bei MBB"\n\nRealität: Ich mache Excel-Tabellen im Marriott und esse Room Service für 47€ weil ich zu müde bin rauszugehen',
+    emoji: '🏨',
     dropRate: RARITY_DROP_RATE.rare,
   },
 
@@ -235,8 +233,8 @@ export const MEMES: Meme[] = [
     id: 'pe-01',
     rarity: 'rare',
     track: 'pe',
-    text: 'GP to LP: "Strong vintage year ahead."\nNarrator: It was not a strong vintage year.',
-    textDe: 'GP zum LP: "Starkes Vintage-Jahr voraus."\nErzähler: Es war kein starkes Vintage-Jahr.',
+    text: 'PE Partner zum LP:\n"Starkes Vintage-Jahr!"\n"Exzellente Pipeline!"\n"Top-Quartile Performance!"\n\n*IRR: 3%*',
+    textDe: 'PE Partner zum LP:\n"Starkes Vintage-Jahr!"\n"Exzellente Pipeline!"\n"Top-Quartile Performance!"\n\n*IRR: 3%*',
     emoji: '🍷',
     dropRate: RARITY_DROP_RATE.rare,
   },
@@ -244,26 +242,26 @@ export const MEMES: Meme[] = [
     id: 'pe-02',
     rarity: 'legendary',
     track: 'pe',
-    text: '"The IRR looks amazing!"\n*ignores J-curve*\n*ignores denominator effect*\n*ignores everything*\n"Ship it." 📉➡️📈',
-    textDe: '"Die IRR sieht fantastisch aus!"\n*ignoriert J-Kurve*\n*ignoriert Denominator-Effekt*\n*ignoriert alles*\n"Rausschicken." 📉➡️📈',
-    emoji: '📈',
+    text: 'PE Playbook:\nTag 1: "Wir glauben an das Management"\nTag 30: CEO gefeuert\nTag 60: CFO gefeuert\nTag 90: neues Management\nTag 120: "Wir glauben an das neue Management"\nTag 365: Dividenden-Recap\n\n*chef\'s kiss* 🤌',
+    textDe: 'PE Playbook:\nTag 1: "Wir glauben an das Management"\nTag 30: CEO gefeuert\nTag 60: CFO gefeuert\nTag 90: neues Management\nTag 120: "Wir glauben an das neue Management"\nTag 365: Dividenden-Recap\n\n*chef\'s kiss* 🤌',
+    emoji: '🤌',
     dropRate: RARITY_DROP_RATE.legendary,
   },
   {
     id: 'pe-03',
     rarity: 'rare',
     track: 'pe',
-    text: 'Day 1: "We believe in the management team."\nDay 100: *replaces entire C-suite*\n"We believe in the NEW management team."',
-    textDe: 'Tag 1: "Wir glauben an das Management."\nTag 100: *tauscht komplette C-Suite aus*\n"Wir glauben an das NEUE Management."',
-    emoji: '🪓',
+    text: '"Wie hoch ist eure IRR?"\n"27%"\n"Und ohne die J-Curve?"\n"..."\n"Und auf Cash-Basis?"\n"...nächste Frage bitte"',
+    textDe: '"Wie hoch ist eure IRR?"\n"27%"\n"Und ohne die J-Curve?"\n"..."\n"Und auf Cash-Basis?"\n"...nächste Frage bitte"',
+    emoji: '📈',
     dropRate: RARITY_DROP_RATE.rare,
   },
   {
     id: 'pe-04',
     rarity: 'standard',
     track: 'pe',
-    text: 'Dry powder: €200B\nDeals at fair price: 0\nMe: "So you\'re saying there\'s a chance?"',
-    textDe: 'Dry Powder: €200 Mrd.\nDeals zu fairen Preisen: 0\nIch: "Also sagen Sie, es gibt eine Chance?"',
+    text: 'Dry Powder weltweit: $2.5 Billionen\nDeals zu fairen Preisen: 0\n\n"Wir bleiben diszipliniert"\n*kauft bei 14x EBITDA*',
+    textDe: 'Dry Powder weltweit: $2,5 Billionen\nDeals zu fairen Preisen: 0\n\n"Wir bleiben diszipliniert"\n*kauft bei 14x EBITDA*',
     emoji: '💰',
     dropRate: RARITY_DROP_RATE.standard,
   },
@@ -271,8 +269,8 @@ export const MEMES: Meme[] = [
     id: 'pe-05',
     rarity: 'standard',
     track: 'pe',
-    text: 'The carry waterfall:\nbeautiful on the slide,\nbeautiful on paper,\nbeautiful in my dreams,\nnever in my bank account 💧',
-    textDe: 'Der Carry-Wasserfall:\nwunderschön auf der Folie,\nwunderschön auf dem Papier,\nwunderschön in meinen Träumen,\nnie auf meinem Konto 💧',
+    text: 'Carry Waterfall:\nSchön auf der Folie ✅\nSchön auf dem Papier ✅\nSchön in meinen Träumen ✅\nAuf meinem Konto ❌\n\n*cries in J-Curve*',
+    textDe: 'Carry Waterfall:\nSchön auf der Folie ✅\nSchön auf dem Papier ✅\nSchön in meinen Träumen ✅\nAuf meinem Konto ❌\n\n*weint in J-Curve*',
     emoji: '💧',
     dropRate: RARITY_DROP_RATE.standard,
   },
@@ -284,8 +282,8 @@ export const MEMES: Meme[] = [
     id: 'vc-01',
     rarity: 'standard',
     track: 'vc',
-    text: '🦄 Unicorn spotted!\nRevenue: $0\nProduct: "coming soon"\nIdea: "it\'s like Uber but for dogs"\nValuation: $1B',
-    textDe: '🦄 Einhorn gesichtet!\nUmsatz: €0\nProdukt: "kommt bald"\nIdee: "wie Uber aber für Hunde"\nBewertung: €1 Mrd.',
+    text: 'Startup Pitch:\nUmsatz: 0€\nProdukt: gibt es nicht\nTeam: 2 BWL-Studenten\nIdee: "Uber für Hunde"\n\nBewertung: 50M€\nVC: "Ich bin dabei." 🤝',
+    textDe: 'Startup Pitch:\nUmsatz: 0€\nProdukt: gibt es nicht\nTeam: 2 BWL-Studenten\nIdee: "Uber für Hunde"\n\nBewertung: 50M€\nVC: "Ich bin dabei." 🤝',
     emoji: '🦄',
     dropRate: RARITY_DROP_RATE.standard,
   },
@@ -293,8 +291,8 @@ export const MEMES: Meme[] = [
     id: 'vc-02',
     rarity: 'legendary',
     track: 'vc',
-    text: 'Series A: "We found product-market fit!"\nSeries B: *same slide deck*\nSeries C: *same slide deck*\nSeries D: "Trust the process."',
-    textDe: 'Series A: "Wir haben Product-Market Fit!"\nSeries B: *gleiches Pitch Deck*\nSeries C: *gleiches Pitch Deck*\nSeries D: "Vertraut dem Prozess."',
+    text: 'Series A Pitch Deck: 🔥\nSeries B Pitch Deck: exakt das gleiche\nSeries C Pitch Deck: exakt das gleiche\nIPO Prospectus: exakt das gleiche aber in Times New Roman\n\nVC: "Die Story ist konsistent" ✅',
+    textDe: 'Series A Pitch Deck: 🔥\nSeries B Pitch Deck: exakt das gleiche\nSeries C Pitch Deck: exakt das gleiche\nIPO Prospectus: exakt das gleiche aber in Times New Roman\n\nVC: "Die Story ist konsistent" ✅',
     emoji: '🎤',
     dropRate: RARITY_DROP_RATE.legendary,
   },
@@ -302,8 +300,8 @@ export const MEMES: Meme[] = [
     id: 'vc-03',
     rarity: 'standard',
     track: 'vc',
-    text: 'TAM: $1T\nSAM: $100B\nSOM: "we\'ll figure it out"\nActual revenue: $47',
-    textDe: 'TAM: $1 Billion\nSAM: $100 Mrd.\nSOM: "kriegen wir hin"\nTatsächlicher Umsatz: €47',
+    text: 'TAM: $1 Billion\nSAM: $100 Mrd.\nSOM: "kriegen wir schon hin"\nTatsächlicher Umsatz: 47€\n\n"Wir sind pre-revenue, nicht pre-ambition"',
+    textDe: 'TAM: $1 Billion\nSAM: $100 Mrd.\nSOM: "kriegen wir schon hin"\nTatsächlicher Umsatz: 47€\n\n"Wir sind pre-revenue, nicht pre-ambition"',
     emoji: '🌍',
     dropRate: RARITY_DROP_RATE.standard,
   },
@@ -311,18 +309,18 @@ export const MEMES: Meme[] = [
     id: 'vc-04',
     rarity: 'rare',
     track: 'vc',
-    text: '"We\'re not pre-revenue.\nWe\'re pre-monetization.\nIt\'s completely different."\n*VC nods seriously*',
-    textDe: '"Wir sind nicht pre-revenue.\nWir sind pre-monetarisiert.\nDas ist was komplett anderes."\n*VC nickt ernst*',
-    emoji: '🚀',
+    text: 'VC Associate Starter Pack:\n☑️ Patagonia-Weste\n☑️ AirPods Max\n☑️ "Disruption" in jedem Satz\n☑️ Hafermilch-Flat-White\n☑️ LinkedIn Posts mit 🚀\n☑️ "Ich investiere in People"',
+    textDe: 'VC Associate Starter Pack:\n☑️ Patagonia-Weste\n☑️ AirPods Max\n☑️ "Disruption" in jedem Satz\n☑️ Hafermilch-Flat-White\n☑️ LinkedIn Posts mit 🚀\n☑️ "Ich investiere in People"',
+    emoji: '🦺',
     dropRate: RARITY_DROP_RATE.rare,
   },
   {
     id: 'vc-05',
     rarity: 'standard',
     track: 'vc',
-    text: 'Starter pack: VC Associate\n☑️ Patagonia vest\n☑️ "disrupting" in every sentence\n☑️ oat milk latte\n☑️ "let me loop in my partner"',
-    textDe: 'Starter Pack: VC Associate\n☑️ Patagonia-Weste\n☑️ "disrupting" in jedem Satz\n☑️ Hafermilch-Latte\n☑️ "ich loop mal meinen Partner ein"',
-    emoji: '🦺',
+    text: 'Gründer: "Wir sind nicht pre-revenue."\nVC: "Ah ok, wie viel Umsatz?"\nGründer: "Wir sind pre-monetization."\nVC: "...also pre-revenue?"\nGründer: "Das ist was komplett anderes."',
+    textDe: 'Gründer: "Wir sind nicht pre-revenue."\nVC: "Ah ok, wie viel Umsatz?"\nGründer: "Wir sind pre-monetization."\nVC: "...also pre-revenue?"\nGründer: "Das ist was komplett anderes."',
+    emoji: '🚀',
     dropRate: RARITY_DROP_RATE.standard,
   },
 ];
@@ -347,9 +345,6 @@ export function getMemesByRarity(rarity: MemeRarity): Meme[] {
  * Roll a meme for the given track. Picks a rarity bucket based on
  * the 60/30/10 distribution, then picks a random meme of that
  * rarity from the track that hasn't been unlocked yet.
- *
- * Falls back across rarities if the chosen bucket is exhausted.
- * Returns null when every meme of the track has been unlocked.
  */
 export function rollMeme(
   track: string,
@@ -359,14 +354,12 @@ export function rollMeme(
   const lockedMemes = trackMemes.filter((m) => !unlockedIds.includes(m.id));
   if (lockedMemes.length === 0) return null;
 
-  // Pick a rarity bucket via weighted random
   const r = Math.random();
   let preferred: MemeRarity;
   if (r < RARITY_DROP_RATE.standard) preferred = 'standard';
   else if (r < RARITY_DROP_RATE.standard + RARITY_DROP_RATE.rare) preferred = 'rare';
   else preferred = 'legendary';
 
-  // Try in preferred order, then fall back to other rarities
   const order: MemeRarity[] = (['standard', 'rare', 'legendary'] as MemeRarity[]).sort(
     (a, b) => (a === preferred ? -1 : b === preferred ? 1 : 0),
   );
@@ -378,6 +371,5 @@ export function rollMeme(
     }
   }
 
-  // Final fallback — any locked meme
   return lockedMemes[Math.floor(Math.random() * lockedMemes.length)];
 }
