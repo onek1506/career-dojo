@@ -27,6 +27,52 @@ export default function HomePage() {
   return (
     <AppShell>
       <div className="space-y-5">
+        {/* Review CTA — GANZ OBEN, prominent amber card */}
+        {reviewCount > 0 && (
+          <Link href="/review" className="block">
+            <div
+              className="duo-card p-4 border-2 transition-all group cursor-pointer"
+              style={{
+                background: 'rgba(250,238,218,0.08)',
+                borderColor: 'var(--accent-streak)',
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="relative shrink-0">
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center"
+                      style={{ background: 'var(--accent-streak)' }}
+                    >
+                      <Flame size={22} className="text-white" />
+                    </div>
+                    <span className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] px-1 rounded-full bg-[var(--accent-wrong)] text-white text-[11px] font-black flex items-center justify-center border-2 border-[var(--bg-card)]">
+                      {reviewCount}
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold uppercase tracking-wide" style={{ color: 'var(--accent-streak)' }}>
+                      {t('Spaced Repetition', 'Spaced Repetition')}
+                    </div>
+                    <div className="font-bold text-sm mt-0.5 truncate">
+                      {progress.language === 'de'
+                        ? `${reviewCount} Karten warten auf dich`
+                        : `${reviewCount} cards waiting`}
+                    </div>
+                    <div className="text-[10px] text-[var(--text-muted)] mt-0.5">
+                      {t('Tap to review with Anki-style cards', 'Tippe um Anki-Karten zu wiederholen')}
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight
+                  size={20}
+                  className="text-[var(--text-muted)] group-hover:text-[var(--accent-streak)] transition shrink-0"
+                />
+              </div>
+            </div>
+          </Link>
+        )}
+
         {/* Track Switcher */}
         <button
           onClick={() => { setShowTrackPicker(!showTrackPicker); playClickSound(); }}
@@ -136,40 +182,6 @@ export default function HomePage() {
             />
           </div>
         </div>
-
-        {/* Review CTA — only when there are due SR cards */}
-        {reviewCount > 0 && (
-          <Link href="/review" className="block">
-            <div className="duo-card p-4 border-2 border-[var(--accent-wrong)] transition-all group cursor-pointer">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="relative shrink-0">
-                    <div className="w-10 h-10 rounded-xl bg-[var(--accent-wrong)] flex items-center justify-center">
-                      <Flame size={18} className="text-white" />
-                    </div>
-                    <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-[var(--accent-streak)] text-white text-[10px] font-black flex items-center justify-center border-2 border-[var(--bg-card)]">
-                      {reviewCount}
-                    </span>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-xs text-[var(--accent-wrong)] font-bold uppercase tracking-wide">
-                      {t('Spaced Repetition', 'Spaced Repetition')}
-                    </div>
-                    <div className="font-bold text-sm mt-0.5 truncate">
-                      {progress.language === 'de'
-                        ? `${reviewCount} Karten warten auf dich`
-                        : `${reviewCount} cards waiting`}
-                    </div>
-                  </div>
-                </div>
-                <ChevronRight
-                  size={18}
-                  className="text-[var(--text-muted)] group-hover:text-[var(--accent-wrong)] transition shrink-0"
-                />
-              </div>
-            </div>
-          </Link>
-        )}
 
         {/* Solve / Online Test Prep CTA — only for Consulting track */}
         {progress.selectedTrack === 'consulting' && (

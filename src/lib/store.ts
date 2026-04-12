@@ -1,14 +1,17 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getLevelForXp } from '@/data/content';
 import {
   ReviewCard,
-  calculateNextReview,
+  sm2,
   createReviewCard,
   getDueCards,
   upsertCard,
+  type Quality,
+  QUALITY_GOOD,
 } from './spaced-repetition';
+import { getAllLessons } from '@/data/content';
 import { rollMeme as rollMemeUtil, type Meme } from '@/data/memes';
 
 // ============================================================
@@ -196,23 +199,43 @@ export function useStore() {
 
   /**
    * Record a graded answer for spaced-repetition scheduling.
-   * Upserts the ReviewCard for this questionId and tracks
-   * wrong answers for the day.
+   * Accepts either a boolean (correct/wrong from lesson quiz) or
+   * a Quality rating 0-5 (from Anki-style review).
+   * Upserts the ReviewCard for this questionId.
    */
   const recordAnswer = useCallback(
-    (questionId: string, lessonId: string, correct: boolean) => {
+    (questionId: string, lessonId: string, grade: boolean | Quality) => {
       setProgress(prev => {
         const today = getToday();
         const existing = prev.reviewCards.find(c => c.questionId === questionId);
-        const updatedCard = existing
-          ? calculateNextReview(existing, correct)
-          : createReviewCard(questionId, lessonId, correct);
+
+        let updatedCard: ReviewCard;
+        let isCorrect: boolean;
+
+        if (typeof grade === 'boolean') {
+          // Legacy boolean grading from lesson quiz
+          isCorrect = grade;
+          if (existing) {
+            updatedCard = sm2(existing, grade ? QUALITY_GOOD : (0 as Quality));
+          } else {
+            updatedCard = createReviewCard(questionId, lessonId, grade);
+          }
+        } else {
+          // SM-2 quality rating from Anki-style review
+          isCorrect = grade >= 3;
+          if (existing) {
+            updatedCard = sm2(existing, grade);
+          } else {
+            updatedCard = createReviewCard(questionId, lessonId, isCorrect);
+          }
+        }
+
         const nextCards = upsertCard(prev.reviewCards, updatedCard);
 
         // Track wrong answers today — reset list at day boundary
         const wrongList =
           prev.lastReviewDate === today ? prev.wrongAnswersToday : [];
-        const nextWrong = correct
+        const nextWrong = isCorrect
           ? wrongList.filter(id => id !== questionId)
           : wrongList.includes(questionId)
             ? wrongList
@@ -224,7 +247,7 @@ export function useStore() {
           wrongAnswersToday: nextWrong,
           lastReviewDate: today,
           totalQuestionsAnswered: prev.totalQuestionsAnswered + 1,
-          totalCorrectAnswers: prev.totalCorrectAnswers + (correct ? 1 : 0),
+          totalCorrectAnswers: prev.totalCorrectAnswers + (isCorrect ? 1 : 0),
         };
         saveProgress(next);
         return next;
@@ -233,11 +256,17 @@ export function useStore() {
     [],
   );
 
-  /** Count of review cards that are due right now. */
-  const reviewCount = getDueCards(progress.reviewCards).length;
+  /** Lesson IDs for the currently selected track (for filtering). */
+  const trackLessonIds = useMemo(() => {
+    const lessons = getAllLessons(progress.selectedTrack || 'ib');
+    return new Set(lessons.map(l => l.id));
+  }, [progress.selectedTrack]);
+
+  /** Count of review cards that are due right now (track-specific). */
+  const reviewCount = getDueCards(progress.reviewCards, trackLessonIds).length;
   const getReviewCount = useCallback(
-    () => getDueCards(progress.reviewCards).length,
-    [progress.reviewCards],
+    () => getDueCards(progress.reviewCards, trackLessonIds).length,
+    [progress.reviewCards, trackLessonIds],
   );
 
   const recordQuizScore = useCallback((lessonId: string, score: number, total: number) => {
@@ -322,6 +351,7 @@ export function useStore() {
     rollMeme,
     canReceiveMeme,
     unlockedMemes: progress.unlockedMemes,
+    trackLessonIds,
     t: (en: string, de: string) => progress.language === 'de' ? de : en,
   };
 }
