@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#58cc02",
+  themeColor: "#0a0a0a",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -49,7 +49,9 @@ export default function RootLayout({
       lang="de"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[var(--duo-bg)] text-white">
+      <body className="min-h-full flex flex-col bg-[var(--bg)] text-[var(--text-primary)]">
+        {/* Prevent FOUC: apply theme from localStorage before React hydrates */}
+        <script dangerouslySetInnerHTML={{ __html: `try{var d=JSON.parse(localStorage.getItem('career-dojo-progress')||'{}');if(d.theme==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}` }} />
         <ServiceWorkerRegister />
         <InstallBanner />
         {children}

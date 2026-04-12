@@ -11,6 +11,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const { progress, loaded, level } = useStore();
   const router = useRouter();
 
+  // Apply theme to <html> so CSS variables switch
+  useEffect(() => {
+    if (!loaded) return;
+    if (progress.theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+  }, [loaded, progress.theme]);
+
   useEffect(() => {
     if (loaded && !progress.onboardingComplete) {
       router.push('/onboarding');

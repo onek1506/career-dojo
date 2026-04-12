@@ -220,6 +220,42 @@ export default function ProfilePage() {
             {t('Settings', 'Einstellungen')}
           </h2>
 
+          {/* Theme Toggle */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-base">{progress.theme === 'light' ? '☀️' : '🌙'}</span>
+              <span className="text-sm">{t('Theme', 'Design')}</span>
+            </div>
+            <div className="flex gap-1">
+              <button
+                onClick={() => {
+                  update({ theme: 'dark' });
+                  document.documentElement.removeAttribute('data-theme');
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                  !progress.theme || progress.theme === 'dark'
+                    ? 'bg-[var(--accent-primary)] text-[var(--accent-primary-text)]'
+                    : 'bg-[var(--duo-border)] text-[var(--duo-text-muted)]'
+                }`}
+              >
+                🌙 Dark
+              </button>
+              <button
+                onClick={() => {
+                  update({ theme: 'light' });
+                  document.documentElement.setAttribute('data-theme', 'light');
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                  progress.theme === 'light'
+                    ? 'bg-[var(--accent-primary)] text-[var(--accent-primary-text)]'
+                    : 'bg-[var(--duo-border)] text-[var(--duo-text-muted)]'
+                }`}
+              >
+                ☀️ Light
+              </button>
+            </div>
+          </div>
+
           {/* Sound Toggle */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

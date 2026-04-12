@@ -37,6 +37,8 @@ export interface UserProgress {
   reviewCards: ReviewCard[];
   wrongAnswersToday: string[]; // questionIds the user got wrong today
   lastReviewDate: string; // YYYY-MM-DD of last review session
+  // ===== Theme =====
+  theme: 'dark' | 'light';
   // ===== Meme Collection =====
   unlockedMemes: string[];   // collected meme IDs
 }
@@ -63,6 +65,7 @@ const DEFAULT_PROGRESS: UserProgress = {
   reviewCards: [],
   wrongAnswersToday: [],
   lastReviewDate: '',
+  theme: 'dark',
   unlockedMemes: [],
 };
 
