@@ -10,7 +10,21 @@ function getAudioContext(): AudioContext {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
   }
+  // iOS requires resume after user gesture
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
   return audioCtx;
+}
+
+/** Call on first user touch to unlock iOS audio. */
+export function unlockAudioContext() {
+  if (typeof window === 'undefined') return;
+  try {
+    getAudioContext();
+  } catch {
+    // Audio not available
+  }
 }
 
 function isSoundEnabled(): boolean {

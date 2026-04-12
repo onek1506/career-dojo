@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import AppShell from '@/components/AppShell';
 import { useStore } from '@/lib/store';
 import { getAllLessons, getTotalQuestions, LEVEL_THRESHOLDS, getTrackData } from '@/data/content';
@@ -7,7 +8,7 @@ import { TRACKS } from '@/data/tracks';
 import { getCharacterForTrack } from '@/data/characters';
 import { playClickSound } from '@/lib/sounds';
 import Link from 'next/link';
-import { Flame, Zap, Target, Trophy, BarChart3, BookOpen, RefreshCw, Globe, Volume2, VolumeX, ArrowRightLeft, Sparkles, ChevronRight, Brain, Image as ImageIcon } from 'lucide-react';
+import { Flame, Zap, Target, Trophy, BarChart3, BookOpen, RefreshCw, Globe, Volume2, VolumeX, ArrowRightLeft, Sparkles, ChevronRight, Brain, Image as ImageIcon, Bell } from 'lucide-react';
 import { MEMES, RARITY_COLOR, RARITY_LABEL, type Meme } from '@/data/memes';
 
 export default function ProfilePage() {
@@ -20,6 +21,31 @@ export default function ProfilePage() {
     : 0;
   const totalMemes = MEMES.length;
   const collectedCount = unlockedMemes.length;
+
+  // Notification toggle state
+  const [notifEnabled, setNotifEnabled] = useState(false);
+  useEffect(() => {
+    try {
+      setNotifEnabled(localStorage.getItem('notifications-enabled') === 'true');
+    } catch { /* ignore */ }
+  }, []);
+
+  const toggleNotifications = async () => {
+    if (notifEnabled) {
+      try { localStorage.setItem('notifications-enabled', 'false'); } catch { /* */ }
+      setNotifEnabled(false);
+    } else {
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        try {
+          const result = await Notification.requestPermission();
+          if (result === 'granted') {
+            localStorage.setItem('notifications-enabled', 'true');
+            setNotifEnabled(true);
+          }
+        } catch { /* */ }
+      }
+    }
+  };
 
   return (
     <AppShell>
@@ -254,6 +280,24 @@ export default function ProfilePage() {
                 ☀️ Light
               </button>
             </div>
+          </div>
+
+          {/* Notification Toggle */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell size={16} className={notifEnabled ? 'text-[var(--accent-streak)]' : 'text-[var(--duo-text-muted)]'} />
+              <span className="text-sm">{t('Reminders', 'Erinnerungen')}</span>
+            </div>
+            <button
+              onClick={toggleNotifications}
+              className={`w-12 h-7 rounded-full transition-all relative ${
+                notifEnabled ? 'bg-[var(--accent-streak)]' : 'bg-[var(--duo-border)]'
+              }`}
+            >
+              <div className={`w-5 h-5 rounded-full bg-white absolute top-1 transition-all ${
+                notifEnabled ? 'left-6' : 'left-1'
+              }`} />
+            </button>
           </div>
 
           {/* Sound Toggle */}

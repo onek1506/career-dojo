@@ -369,42 +369,57 @@ export default function OnboardingPage() {
               </div>
             </div>
 
-            {/* Notification permission */}
-            <button
-              onClick={requestNotifications}
-              disabled={notifStatus === 'granted' || notifStatus === 'unsupported'}
-              className={`w-full p-4 rounded-xl border-2 text-left transition flex items-center gap-3 ${
-                notifStatus === 'granted'
-                  ? 'border-[var(--duo-green)] bg-[rgba(88,204,2,0.1)]'
-                  : notifStatus === 'denied'
-                    ? 'border-[var(--duo-orange)] bg-[rgba(255,150,0,0.08)]'
-                    : 'border-[var(--duo-border)] bg-[var(--duo-card)] hover:border-[var(--duo-blue)]'
-              }`}
-            >
-              {notifStatus === 'granted' ? (
-                <Bell size={20} className="text-[var(--duo-green)] shrink-0" />
-              ) : notifStatus === 'denied' || notifStatus === 'unsupported' ? (
-                <BellOff size={20} className="text-[var(--duo-orange)] shrink-0" />
-              ) : (
-                <Bell size={20} className="text-[var(--duo-blue)] shrink-0" />
-              )}
-              <div className="flex-1 min-w-0">
-                <div className="font-bold text-sm">
-                  {notifStatus === 'granted'
-                    ? lang === 'de' ? 'Erinnerungen aktiv ✓' : 'Reminders enabled ✓'
-                    : notifStatus === 'denied'
-                      ? lang === 'de' ? 'Erinnerungen blockiert' : 'Reminders blocked'
-                      : notifStatus === 'unsupported'
-                        ? lang === 'de' ? 'Nicht unterstützt' : 'Not supported'
-                        : lang === 'de' ? 'Streak-Erinnerungen aktivieren' : 'Enable streak reminders'}
+            {/* Streak Protection — Notification Permission */}
+            {notifStatus === 'granted' ? (
+              <div className="duo-card p-4 text-center border-2 border-[var(--duo-green)]">
+                <div className="flex items-center justify-center gap-2 text-[var(--duo-green)] font-bold text-sm">
+                  <Bell size={16} />
+                  {lang === 'de' ? 'Erinnerungen aktiviert ✓' : 'Reminders enabled ✓'}
                 </div>
-                <div className="text-[11px] text-[var(--duo-text-muted)] mt-0.5">
+                <p className="text-xs text-[var(--duo-text-muted)] mt-1 italic">
+                  {getCharacterForTrack(track).emoji}{' '}
                   {lang === 'de'
-                    ? 'Ich erinnere dich, wenn dein Streak in Gefahr ist.'
-                    : "I'll ping you when your streak is on the line."}
-                </div>
+                    ? '"Perfekt! Ich pass auf deinen Streak auf."'
+                    : '"Perfect! I\'ll watch over your streak."'}
+                </p>
               </div>
-            </button>
+            ) : notifStatus !== 'unsupported' ? (
+              <div className="duo-card p-5 text-left space-y-3 border-2 border-[var(--duo-orange)]">
+                <div className="flex items-start gap-3">
+                  <span className="text-3xl">🔥</span>
+                  <div>
+                    <div className="font-black text-base">
+                      {lang === 'de' ? 'Behalte deinen Streak' : 'Protect your streak'}
+                    </div>
+                    <p className="text-xs text-[var(--duo-text-muted)] mt-1 leading-relaxed">
+                      {lang === 'de'
+                        ? 'Aktiviere Erinnerungen — wir benachrichtigen dich täglich wenn du noch nicht gelernt hast. Dein Streak dankt es dir.'
+                        : 'Enable reminders — we\'ll notify you daily when you haven\'t studied yet. Your streak will thank you.'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={requestNotifications}
+                  className="w-full py-3.5 rounded-xl bg-[var(--duo-orange)] text-white font-bold text-sm btn-press transition"
+                >
+                  {lang === 'de' ? 'Ja, erinnere mich täglich' : 'Yes, remind me daily'}
+                </button>
+                {notifStatus === 'denied' ? (
+                  <p className="text-[10px] text-[var(--duo-text-muted)] text-center">
+                    {lang === 'de'
+                      ? 'Benachrichtigungen wurden blockiert. Aktiviere sie in den Browser-Einstellungen.'
+                      : 'Notifications were blocked. Enable them in browser settings.'}
+                  </p>
+                ) : (
+                  <button
+                    onClick={finish}
+                    className="w-full text-center text-xs text-[var(--duo-text-muted)] py-1 hover:underline"
+                  >
+                    {lang === 'de' ? 'Lieber nicht' : 'Maybe later'}
+                  </button>
+                )}
+              </div>
+            ) : null}
 
             <button
               onClick={finish}

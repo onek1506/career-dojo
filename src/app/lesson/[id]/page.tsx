@@ -5,6 +5,7 @@ import {
   useState,
   useMemo,
   useEffect,
+  useRef,
   type ReactNode,
 } from 'react';
 import { useStore } from '@/lib/store';
@@ -27,6 +28,9 @@ import {
   playClickSound,
   playRevealSound,
   playXpSound,
+  unlockAudioContext,
+  getSoundEnabled,
+  setSoundEnabled,
 } from '@/lib/sounds';
 import {
   ArrowLeft,
@@ -42,6 +46,8 @@ import {
   Lightbulb,
   CheckCheck,
   HelpCircle,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import Link from 'next/link';
 import GlossaryTooltip from '@/components/GlossaryTooltip';
@@ -285,6 +291,27 @@ export default function LessonPage() {
   const character = getCharacterForTrack(progress.selectedTrack || 'ib');
   const isDE = progress.language === 'de';
 
+  // Sound toggle + iOS audio unlock
+  const [soundOn, setSoundOnState] = useState(true);
+  const audioUnlocked = useRef(false);
+
+  useEffect(() => {
+    setSoundOnState(getSoundEnabled());
+  }, []);
+
+  const handleAudioUnlock = () => {
+    if (!audioUnlocked.current) {
+      audioUnlocked.current = true;
+      unlockAudioContext();
+    }
+  };
+
+  const toggleSound = () => {
+    const next = !soundOn;
+    setSoundOnState(next);
+    setSoundEnabled(next);
+  };
+
   // Roll a meme exactly once when the user reaches the results phase
   useEffect(() => {
     if (phase !== 'results' || memeRolled) return;
@@ -453,7 +480,7 @@ export default function LessonPage() {
   // Render
   // ---------------------------------------------------------------
   return (
-    <div className="h-screen bg-[var(--duo-bg)] flex flex-col overflow-hidden">
+    <div className="h-dvh bg-[var(--bg)] flex flex-col overflow-hidden" onTouchStart={handleAudioUnlock}>
       {/* ---------- Top bar ---------- */}
       <div className="shrink-0 bg-[var(--duo-card)] border-b-2 border-[var(--duo-border)] px-4 py-3">
         <div className="max-w-2xl mx-auto flex items-center gap-3">
@@ -484,6 +511,13 @@ export default function LessonPage() {
             {phase === 'results' ? totalSlides : currentStepHuman}
             <span className="opacity-60">/{totalSlides}</span>
           </span>
+          <button
+            onClick={toggleSound}
+            className="text-[var(--text-muted)] shrink-0 p-1"
+            aria-label={soundOn ? 'Mute' : 'Unmute'}
+          >
+            {soundOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
+          </button>
         </div>
       </div>
 
@@ -756,7 +790,7 @@ export default function LessonPage() {
 
       {/* ---------- Bottom action bar ---------- */}
       {phase !== 'results' && (
-        <div className="shrink-0 bg-[var(--duo-card)] border-t-2 border-[var(--duo-border)] px-4 py-3">
+        <div className="shrink-0 sticky bottom-0 z-50 bg-[var(--bg-card)] border-t-2 border-[var(--border)] px-4 py-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
           <div className="max-w-2xl mx-auto">
             {phase === 'lesson' && (
               <button
