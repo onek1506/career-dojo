@@ -42,7 +42,7 @@ export default function CasesPage() {
 
             return (
               <Link key={cs.id} href={`/cases/${cs.id}`}>
-                <div className="duo-card p-5 hover:border-[var(--duo-blue)] transition-all cursor-pointer group">
+                <div className="duo-card p-5 hover:border-[var(--accent-info)] transition-all cursor-pointer group">
                   <div className="flex items-start gap-4">
                     <div className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl shrink-0" style={{ background: `${color}15` }}>
                       {cs.clientLogo}
@@ -53,9 +53,9 @@ export default function CasesPage() {
                           {progress.language === 'de' ? cs.typeDe : cs.type.replace('_', ' ')}
                         </span>
                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                          cs.difficulty === 'beginner' ? 'bg-[rgba(88,204,2,0.15)] text-[var(--duo-green)]' :
-                          cs.difficulty === 'intermediate' ? 'bg-[rgba(28,176,246,0.15)] text-[var(--duo-blue)]' :
-                          'bg-[rgba(206,130,255,0.15)] text-[var(--duo-purple)]'
+                          cs.difficulty === 'beginner' ? 'bg-[rgba(88,204,2,0.15)] text-[var(--accent-xp)]' :
+                          cs.difficulty === 'intermediate' ? 'bg-[rgba(28,176,246,0.15)] text-[var(--accent-info)]' :
+                          'bg-[rgba(206,130,255,0.15)] text-[var(--accent-purple)]'
                         }`}>
                           {cs.difficulty}
                         </span>
@@ -68,7 +68,7 @@ export default function CasesPage() {
                         <span>{cs.steps.length} {t('steps', 'Schritte')}</span>
                       </div>
                     </div>
-                    {isDone && <CheckCircle size={20} className="text-[var(--duo-green)] shrink-0 mt-1" />}
+                    {isDone && <CheckCircle size={20} className="text-[var(--accent-xp)] shrink-0 mt-1" />}
                   </div>
                 </div>
               </Link>

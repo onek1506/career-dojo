@@ -126,7 +126,7 @@ export default function GlossaryTooltip({
           e.stopPropagation();
           setOpen((o) => !o);
         }}
-        className="inline underline decoration-dotted decoration-[var(--duo-blue)] underline-offset-2 cursor-help text-[var(--duo-blue)] font-semibold bg-transparent border-0 p-0 m-0"
+        className="inline underline decoration-dotted decoration-[var(--accent-info)] underline-offset-2 cursor-help text-[var(--accent-info)] font-semibold bg-transparent border-0 p-0 m-0"
       >
         {children}
       </button>
@@ -135,7 +135,7 @@ export default function GlossaryTooltip({
         <span
           ref={tooltipRef}
           role="tooltip"
-          className={`absolute left-1/2 z-[80] w-[280px] max-w-[90vw] rounded-xl border-2 border-[var(--duo-blue)] bg-[var(--duo-card)] shadow-2xl p-4 text-left ${
+          className={`absolute left-1/2 z-[80] w-[280px] max-w-[90vw] rounded-xl border-2 border-[var(--accent-info)] bg-[var(--duo-card)] shadow-2xl p-4 text-left ${
             placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
           }`}
           style={{
@@ -145,7 +145,7 @@ export default function GlossaryTooltip({
           onClick={(e) => e.stopPropagation()}
         >
           <span className="flex items-center gap-2 mb-2">
-            <BookOpen size={14} className="text-[var(--duo-blue)] shrink-0" />
+            <BookOpen size={14} className="text-[var(--accent-info)] shrink-0" />
             <span className="font-black text-sm text-white">
               {isDE ? entry.termDe : entry.term}
             </span>
@@ -156,7 +156,7 @@ export default function GlossaryTooltip({
           </span>
 
           {entry.formula && (
-            <span className="block text-[11px] font-mono text-[var(--duo-blue)] bg-[rgba(28,176,246,0.08)] border border-[var(--duo-blue)] rounded px-2 py-1 mb-2">
+            <span className="block text-[11px] font-mono text-[var(--accent-info)] bg-[rgba(28,176,246,0.08)] border border-[var(--accent-info)] rounded px-2 py-1 mb-2">
               {entry.formula}
             </span>
           )}
@@ -167,7 +167,7 @@ export default function GlossaryTooltip({
 
           {/* Little arrow indicator — shifts with the tooltip */}
           <span
-            className={`absolute left-1/2 w-3 h-3 rotate-45 bg-[var(--duo-card)] border-[var(--duo-blue)] ${
+            className={`absolute left-1/2 w-3 h-3 rotate-45 bg-[var(--duo-card)] border-[var(--accent-info)] ${
               placement === 'top'
                 ? 'bottom-[-7px] border-b-2 border-r-2'
                 : 'top-[-7px] border-t-2 border-l-2'

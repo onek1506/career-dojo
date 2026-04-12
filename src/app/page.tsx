@@ -186,14 +186,14 @@ export default function HomePage() {
         {/* Solve / Online Test Prep CTA — only for Consulting track */}
         {progress.selectedTrack === 'consulting' && (
           <Link href="/solve" className="block">
-            <div className="duo-card p-4 border-2 border-[var(--duo-purple)] transition-all group cursor-pointer">
+            <div className="duo-card p-4 border-2 border-[var(--accent-purple)] transition-all group cursor-pointer">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[var(--duo-purple)] flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--accent-purple)] flex items-center justify-center shrink-0">
                     <Sparkles size={18} className="text-white" />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-xs text-[var(--duo-purple)] font-bold uppercase tracking-wide">
+                    <div className="text-xs text-[var(--accent-purple)] font-bold uppercase tracking-wide">
                       {t('Round 1 Prep', 'Runde 1 Prep')}
                     </div>
                     <div className="font-bold text-sm mt-0.5 truncate">
@@ -201,7 +201,7 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <ChevronRight size={18} className="text-[var(--text-muted)] group-hover:text-[var(--duo-purple)] transition shrink-0" />
+                <ChevronRight size={18} className="text-[var(--text-muted)] group-hover:text-[var(--accent-purple)] transition shrink-0" />
               </div>
             </div>
           </Link>

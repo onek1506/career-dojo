@@ -131,7 +131,7 @@ export default function ReviewPage() {
 
           <div className="duo-card p-8 text-center space-y-4">
             <div className="text-6xl">🌱</div>
-            <h2 className="text-xl font-black text-[var(--duo-green)]">
+            <h2 className="text-xl font-black text-[var(--accent-xp)]">
               {t('All done!', 'Alles erledigt!')}
             </h2>
             <p className="text-sm text-[var(--duo-text-muted)]">
@@ -157,7 +157,7 @@ export default function ReviewPage() {
             </div>
 
             <Link href="/skill-tree">
-              <button className="w-full py-3 rounded-xl bg-[var(--duo-green)] text-white font-bold btn-press transition">
+              <button className="w-full py-3 rounded-xl bg-[var(--accent-xp)] text-white font-bold btn-press transition">
                 {t('Back to Learning', 'Zurueck zum Lernen')}
               </button>
             </Link>
@@ -341,7 +341,7 @@ export default function ReviewPage() {
                   setShowAnswer(true);
                   playClickSound();
                 }}
-                className="w-full py-4 rounded-xl bg-[var(--duo-blue)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-xl bg-[var(--accent-info)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
               >
                 <Eye size={20} />
                 {t('Show Answer', 'Antwort zeigen')}
@@ -350,8 +350,8 @@ export default function ReviewPage() {
               /* --- Back: Answer + Explanation + 4 Buttons --- */
               <>
                 {/* Correct answer */}
-                <div className="rounded-xl p-4 bg-[rgba(88,204,2,0.1)] border-2 border-[var(--duo-green)]">
-                  <div className="text-xs text-[var(--duo-green)] font-bold uppercase tracking-wide mb-2">
+                <div className="rounded-xl p-4 bg-[rgba(88,204,2,0.1)] border-2 border-[var(--accent-xp)]">
+                  <div className="text-xs text-[var(--accent-xp)] font-bold uppercase tracking-wide mb-2">
                     {t('Correct Answer', 'Richtige Antwort')}
                   </div>
                   <div className="text-sm font-bold">
@@ -402,10 +402,10 @@ export default function ReviewPage() {
                   {/* Hard */}
                   <button
                     onClick={() => handleRate(QUALITY_HARD)}
-                    className="flex flex-col items-center gap-1 py-3 px-1 rounded-xl border-2 border-[var(--duo-orange)] bg-[rgba(255,150,0,0.08)] hover:bg-[rgba(255,150,0,0.2)] btn-press transition"
+                    className="flex flex-col items-center gap-1 py-3 px-1 rounded-xl border-2 border-[var(--accent-streak)] bg-[rgba(255,150,0,0.08)] hover:bg-[rgba(255,150,0,0.2)] btn-press transition"
                   >
-                    <Flame size={18} className="text-[var(--duo-orange)]" />
-                    <span className="text-xs font-black text-[var(--duo-orange)]">
+                    <Flame size={18} className="text-[var(--accent-streak)]" />
+                    <span className="text-xs font-black text-[var(--accent-streak)]">
                       {t('Hard', 'Schwer')}
                     </span>
                     <span className="text-[10px] text-[var(--duo-text-muted)]">
@@ -416,10 +416,10 @@ export default function ReviewPage() {
                   {/* Good */}
                   <button
                     onClick={() => handleRate(QUALITY_GOOD)}
-                    className="flex flex-col items-center gap-1 py-3 px-1 rounded-xl border-2 border-[var(--duo-green)] bg-[rgba(88,204,2,0.08)] hover:bg-[rgba(88,204,2,0.2)] btn-press transition"
+                    className="flex flex-col items-center gap-1 py-3 px-1 rounded-xl border-2 border-[var(--accent-xp)] bg-[rgba(88,204,2,0.08)] hover:bg-[rgba(88,204,2,0.2)] btn-press transition"
                   >
-                    <Sparkles size={18} className="text-[var(--duo-green)]" />
-                    <span className="text-xs font-black text-[var(--duo-green)]">
+                    <Sparkles size={18} className="text-[var(--accent-xp)]" />
+                    <span className="text-xs font-black text-[var(--accent-xp)]">
                       {t('Good', 'Gut')}
                     </span>
                     <span className="text-[10px] text-[var(--duo-text-muted)]">
@@ -430,10 +430,10 @@ export default function ReviewPage() {
                   {/* Easy */}
                   <button
                     onClick={() => handleRate(QUALITY_EASY)}
-                    className="flex flex-col items-center gap-1 py-3 px-1 rounded-xl border-2 border-[var(--duo-blue)] bg-[rgba(28,176,246,0.08)] hover:bg-[rgba(28,176,246,0.2)] btn-press transition"
+                    className="flex flex-col items-center gap-1 py-3 px-1 rounded-xl border-2 border-[var(--accent-info)] bg-[rgba(28,176,246,0.08)] hover:bg-[rgba(28,176,246,0.2)] btn-press transition"
                   >
-                    <Zap size={18} className="text-[var(--duo-blue)]" />
-                    <span className="text-xs font-black text-[var(--duo-blue)]">
+                    <Zap size={18} className="text-[var(--accent-info)]" />
+                    <span className="text-xs font-black text-[var(--accent-info)]">
                       {t('Easy', 'Leicht')}
                     </span>
                     <span className="text-[10px] text-[var(--duo-text-muted)]">
@@ -509,7 +509,7 @@ export default function ReviewPage() {
             </button>
           </Link>
           <Link href="/skill-tree" className="flex-1">
-            <button className="w-full py-3 rounded-xl bg-[var(--duo-green)] text-white font-bold btn-press transition flex items-center justify-center gap-2">
+            <button className="w-full py-3 rounded-xl bg-[var(--accent-xp)] text-white font-bold btn-press transition flex items-center justify-center gap-2">
               <Sparkles size={16} />
               {t('Keep Learning', 'Weiterlernen')}
             </button>

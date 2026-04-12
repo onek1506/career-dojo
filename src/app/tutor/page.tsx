@@ -331,7 +331,7 @@ export default function TutorPage() {
       <div className="flex flex-col" style={{ minHeight: 'calc(100vh - 144px)' }}>
         {/* Header */}
         <div className="text-center mb-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--duo-purple)] to-[var(--duo-blue)] flex items-center justify-center mx-auto mb-2">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--accent-purple)] to-[var(--accent-info)] flex items-center justify-center mx-auto mb-2">
             <Bot size={28} className="text-white" />
           </div>
           <h1 className="text-lg font-black">{t('AI Finance Tutor', 'AI Finance Tutor')}</h1>
@@ -352,7 +352,7 @@ export default function TutorPage() {
                   <button
                     key={i}
                     onClick={() => sendMessage(p.text)}
-                    className="duo-card p-3 text-left text-xs hover:border-[var(--duo-blue)] transition flex items-center gap-2"
+                    className="duo-card p-3 text-left text-xs hover:border-[var(--accent-info)] transition flex items-center gap-2"
                   >
                     <span>{p.icon}</span>
                     <span className="line-clamp-2">{p.text}</span>
@@ -365,19 +365,19 @@ export default function TutorPage() {
           {messages.map((msg, i) => (
             <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : ''}`}>
               {msg.role === 'assistant' && (
-                <div className="w-8 h-8 rounded-lg bg-[var(--duo-purple)] flex items-center justify-center shrink-0 mt-1">
+                <div className="w-8 h-8 rounded-lg bg-[var(--accent-purple)] flex items-center justify-center shrink-0 mt-1">
                   <Sparkles size={14} className="text-white" />
                 </div>
               )}
               <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                 msg.role === 'user'
-                  ? 'bg-[var(--duo-blue)] text-white rounded-br-sm'
+                  ? 'bg-[var(--accent-info)] text-white rounded-br-sm'
                   : 'bg-[var(--duo-card)] border border-[var(--duo-border)] rounded-bl-sm'
               }`}>
                 <div className="whitespace-pre-line">{msg.content}</div>
               </div>
               {msg.role === 'user' && (
-                <div className="w-8 h-8 rounded-lg bg-[var(--duo-green)] flex items-center justify-center shrink-0 mt-1">
+                <div className="w-8 h-8 rounded-lg bg-[var(--accent-xp)] flex items-center justify-center shrink-0 mt-1">
                   <User size={14} className="text-white" />
                 </div>
               )}
@@ -386,7 +386,7 @@ export default function TutorPage() {
 
           {isTyping && (
             <div className="flex gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[var(--duo-purple)] flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-[var(--accent-purple)] flex items-center justify-center shrink-0">
                 <Sparkles size={14} className="text-white" />
               </div>
               <div className="bg-[var(--duo-card)] border border-[var(--duo-border)] rounded-2xl rounded-bl-sm px-4 py-3">
@@ -410,12 +410,12 @@ export default function TutorPage() {
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && sendMessage(input)}
               placeholder={t('Ask a finance question...', 'Stelle eine Finance-Frage...')}
-              className="flex-1 px-4 py-3 rounded-xl bg-[var(--duo-card)] border-2 border-[var(--duo-border)] text-white placeholder-[var(--duo-text-muted)] focus:border-[var(--duo-blue)] focus:outline-none transition text-sm"
+              className="flex-1 px-4 py-3 rounded-xl bg-[var(--duo-card)] border-2 border-[var(--duo-border)] text-white placeholder-[var(--duo-text-muted)] focus:border-[var(--accent-info)] focus:outline-none transition text-sm"
             />
             <button
               onClick={() => sendMessage(input)}
               disabled={!input.trim()}
-              className="px-4 py-3 rounded-xl bg-[var(--duo-blue)] text-white disabled:opacity-40 btn-press transition"
+              className="px-4 py-3 rounded-xl bg-[var(--accent-info)] text-white disabled:opacity-40 btn-press transition"
             >
               <Send size={18} />
             </button>

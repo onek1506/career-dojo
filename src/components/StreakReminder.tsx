@@ -75,12 +75,12 @@ export default function StreakReminder() {
 
   return (
     <div className="fixed top-16 left-4 right-4 z-[90] max-w-lg mx-auto">
-      <div className="duo-card bg-[var(--duo-card)] border-2 border-[var(--duo-orange)] rounded-2xl p-4 shadow-2xl flex items-start gap-3">
+      <div className="duo-card bg-[var(--duo-card)] border-2 border-[var(--accent-streak)] rounded-2xl p-4 shadow-2xl flex items-start gap-3">
         <div className="w-10 h-10 rounded-xl bg-[rgba(255,150,0,0.15)] flex items-center justify-center shrink-0">
-          <Flame size={20} className="text-[var(--duo-orange)]" />
+          <Flame size={20} className="text-[var(--accent-streak)]" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-bold text-[var(--duo-orange)] leading-snug">
+          <p className="text-xs font-bold text-[var(--accent-streak)] leading-snug">
             {headline}
           </p>
           <div className="flex items-start gap-2 mt-2">

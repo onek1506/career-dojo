@@ -57,7 +57,7 @@ export default function CaseDetailPage() {
             <ArrowLeft size={22} />
           </button>
           <div className="flex-1 progress-bar-track h-2.5">
-            <div className="progress-bar-fill h-full bg-[var(--duo-orange)] transition-all duration-500" style={{ width: `${progressPct}%` }} />
+            <div className="progress-bar-fill h-full bg-[var(--accent-streak)] transition-all duration-500" style={{ width: `${progressPct}%` }} />
           </div>
           <span className="text-xs text-[var(--duo-text-muted)] font-bold">{Math.round(progressPct)}%</span>
         </div>
@@ -71,7 +71,7 @@ export default function CaseDetailPage() {
               <span className="text-5xl block mb-3">{cs.clientLogo}</span>
               <h1 className="text-xl font-black">{isDE ? cs.titleDe : cs.title}</h1>
               <div className="flex items-center justify-center gap-2 mt-2">
-                <span className="text-xs px-2 py-0.5 rounded-full bg-[rgba(255,150,0,0.15)] text-[var(--duo-orange)] font-bold uppercase">{isDE ? cs.typeDe : cs.type.replace('_', ' ')}</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-[rgba(255,150,0,0.15)] text-[var(--accent-streak)] font-bold uppercase">{isDE ? cs.typeDe : cs.type.replace('_', ' ')}</span>
                 <span className="text-xs text-[var(--duo-text-muted)]">{cs.estimatedMinutes} min</span>
               </div>
             </div>
@@ -91,7 +91,7 @@ export default function CaseDetailPage() {
 
             {/* Briefing */}
             <div className="duo-card p-5">
-              <div className="text-xs text-[var(--duo-orange)] font-bold uppercase mb-2">{t('Client Briefing', 'Klienten-Briefing')}</div>
+              <div className="text-xs text-[var(--accent-streak)] font-bold uppercase mb-2">{t('Client Briefing', 'Klienten-Briefing')}</div>
               <p className="text-sm leading-relaxed text-gray-200">{isDE ? cs.briefingDe : cs.briefing}</p>
             </div>
 
@@ -101,7 +101,7 @@ export default function CaseDetailPage() {
 
             <button
               onClick={() => { setPhase('steps'); playClickSound(); }}
-              className="w-full py-4 rounded-xl bg-[var(--duo-orange)] hover:opacity-90 text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-xl bg-[var(--accent-streak)] hover:opacity-90 text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
             >
               {t('Start Case', 'Case starten')} <ChevronRight size={20} />
             </button>
@@ -113,10 +113,10 @@ export default function CaseDetailPage() {
           <div className="space-y-5">
             <div className="flex items-center gap-2 text-xs text-[var(--duo-text-muted)]">
               <span className={`px-2 py-0.5 rounded-full font-bold uppercase ${
-                step.type === 'structure' ? 'bg-[rgba(28,176,246,0.15)] text-[var(--duo-blue)]' :
-                step.type === 'math' ? 'bg-[rgba(206,130,255,0.15)] text-[var(--duo-purple)]' :
+                step.type === 'structure' ? 'bg-[rgba(28,176,246,0.15)] text-[var(--accent-info)]' :
+                step.type === 'math' ? 'bg-[rgba(206,130,255,0.15)] text-[var(--accent-purple)]' :
                 step.type === 'analysis' ? 'bg-[rgba(255,200,0,0.15)] text-[var(--duo-yellow)]' :
-                'bg-[rgba(88,204,2,0.15)] text-[var(--duo-green)]'
+                'bg-[rgba(88,204,2,0.15)] text-[var(--accent-xp)]'
               }`}>
                 {step.type}
               </span>
@@ -168,13 +168,13 @@ export default function CaseDetailPage() {
             {!showAnswer ? (
               <button
                 onClick={() => { setShowAnswer(true); playRevealSound(); }}
-                className="w-full py-3 rounded-xl border-2 border-dashed border-[var(--duo-green)] text-[var(--duo-green)] font-bold text-sm btn-press transition flex items-center justify-center gap-2 hover:bg-[rgba(88,204,2,0.05)]"
+                className="w-full py-3 rounded-xl border-2 border-dashed border-[var(--accent-xp)] text-[var(--accent-xp)] font-bold text-sm btn-press transition flex items-center justify-center gap-2 hover:bg-[rgba(88,204,2,0.05)]"
               >
                 <Eye size={16} /> {t('Show Sample Answer', 'Musterantwort anzeigen')}
               </button>
             ) : (
-              <div className="bg-[rgba(88,204,2,0.08)] border-2 border-[var(--duo-green)] rounded-xl p-4">
-                <div className="text-xs text-[var(--duo-green)] font-bold uppercase mb-2 flex items-center gap-1"><CheckCircle size={12} /> {t('Sample Answer', 'Musterantwort')}</div>
+              <div className="bg-[rgba(88,204,2,0.08)] border-2 border-[var(--accent-xp)] rounded-xl p-4">
+                <div className="text-xs text-[var(--accent-xp)] font-bold uppercase mb-2 flex items-center gap-1"><CheckCircle size={12} /> {t('Sample Answer', 'Musterantwort')}</div>
                 <div className="text-sm leading-relaxed text-gray-200 whitespace-pre-line">{isDE ? step.sampleAnswerDe : step.sampleAnswer}</div>
               </div>
             )}
@@ -182,7 +182,7 @@ export default function CaseDetailPage() {
             {showAnswer && (
               <button
                 onClick={nextStep}
-                className="w-full py-4 rounded-xl bg-[var(--duo-green)] hover:bg-[var(--duo-green-dark)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-xl bg-[var(--accent-xp)] hover:bg-[var(--accent-xp-dark)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
               >
                 {stepIdx < cs.steps.length - 1 ? t('Next Step', 'Nächster Schritt') : t('Finish Case', 'Case abschließen')}
                 <ChevronRight size={20} />
@@ -207,10 +207,10 @@ export default function CaseDetailPage() {
                 <span className="text-[var(--duo-text-muted)]">{t('XP Earned', 'XP verdient')}</span>
                 <span className="font-black text-[var(--duo-yellow)]"><Zap size={16} className="inline" fill="var(--duo-yellow)" /> {cs.xpReward}</span>
               </div>
-              <div className="text-xs text-[var(--duo-green)] font-bold uppercase mb-2">{t('Key Takeaways', 'Kernerkenntnisse')}</div>
+              <div className="text-xs text-[var(--accent-xp)] font-bold uppercase mb-2">{t('Key Takeaways', 'Kernerkenntnisse')}</div>
               {cs.keyTakeaways.map((kt, i) => (
                 <div key={i} className="flex gap-2 text-sm text-gray-300 mb-1">
-                  <span className="text-[var(--duo-green)] shrink-0">✓</span>
+                  <span className="text-[var(--accent-xp)] shrink-0">✓</span>
                   <span>{isDE ? kt.de : kt.en}</span>
                 </div>
               ))}
@@ -221,7 +221,7 @@ export default function CaseDetailPage() {
                 {t('Redo', 'Wiederholen')}
               </button>
               <Link href="/cases" className="flex-1">
-                <button className="w-full py-3 rounded-xl bg-[var(--duo-green)] text-white font-bold btn-press transition">{t('More Cases', 'Weitere Cases')}</button>
+                <button className="w-full py-3 rounded-xl bg-[var(--accent-xp)] text-white font-bold btn-press transition">{t('More Cases', 'Weitere Cases')}</button>
               </Link>
             </div>
           </div>

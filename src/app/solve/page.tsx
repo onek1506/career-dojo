@@ -17,9 +17,9 @@ export default function SolvePage() {
       <div className="space-y-6 pb-4">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(255,150,0,0.12)] border border-[var(--duo-orange)]">
-            <Sparkles size={12} className="text-[var(--duo-orange)]" />
-            <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--duo-orange)]">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(255,150,0,0.12)] border border-[var(--accent-streak)]">
+            <Sparkles size={12} className="text-[var(--accent-streak)]" />
+            <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--accent-streak)]">
               {t('Round 1 Prep', 'Runde 1 Prep')}
             </span>
           </div>
@@ -71,7 +71,7 @@ export default function SolvePage() {
             return (
               <Link key={test.id} href={`/solve/${test.id}`}>
                 <div
-                  className="duo-card p-5 hover:border-[var(--duo-blue)] transition-all cursor-pointer group mt-4"
+                  className="duo-card p-5 hover:border-[var(--accent-info)] transition-all cursor-pointer group mt-4"
                   style={{ borderColor: test.color, borderWidth: 2 }}
                 >
                   <div className="flex items-start gap-4">
@@ -90,7 +90,7 @@ export default function SolvePage() {
                           {test.firm}
                         </span>
                         {isDone && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase bg-[rgba(88,204,2,0.15)] text-[var(--duo-green)]">
+                          <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase bg-[rgba(88,204,2,0.15)] text-[var(--accent-xp)]">
                             ✓ {t('Done', 'Erledigt')}
                           </span>
                         )}
@@ -121,7 +121,7 @@ export default function SolvePage() {
                     </div>
                     <ChevronRight
                       size={20}
-                      className="text-[var(--duo-text-muted)] group-hover:text-[var(--duo-blue)] transition shrink-0"
+                      className="text-[var(--duo-text-muted)] group-hover:text-[var(--accent-info)] transition shrink-0"
                     />
                   </div>
 

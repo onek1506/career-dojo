@@ -77,7 +77,7 @@ export default function OnboardingPage() {
         {/* WELCOME */}
         {step === 'welcome' && (
           <div className="text-center space-y-6">
-            <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-[var(--duo-green)] to-[var(--duo-blue)] flex items-center justify-center text-5xl font-black text-white mx-auto shadow-lg shadow-[var(--duo-green)]/20">
+            <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-[var(--accent-xp)] to-[var(--accent-info)] flex items-center justify-center text-5xl font-black text-white mx-auto shadow-lg shadow-[var(--accent-xp)]/20">
               CD
             </div>
             <div>
@@ -91,7 +91,7 @@ export default function OnboardingPage() {
             <div className="duo-card p-4 flex items-start gap-3 text-left">
               <span className="text-3xl">{carl.emoji}</span>
               <div>
-                <div className="text-xs text-[var(--duo-orange)] font-bold">{carl.name}</div>
+                <div className="text-xs text-[var(--accent-streak)] font-bold">{carl.name}</div>
                 <p className="text-sm mt-1">{getFirstQuote(carl, lang)}</p>
               </div>
             </div>
@@ -115,11 +115,11 @@ export default function OnboardingPage() {
                 placeholder="Dein Vorname"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-[var(--duo-card)] border-2 border-[var(--duo-border)] text-white placeholder-[var(--duo-text-muted)] focus:border-[var(--duo-green)] focus:outline-none transition"
+                className="w-full px-4 py-3 rounded-xl bg-[var(--duo-card)] border-2 border-[var(--duo-border)] text-white placeholder-[var(--duo-text-muted)] focus:border-[var(--accent-xp)] focus:outline-none transition"
               />
               <button
                 onClick={() => goNext('track')}
-                className="w-full py-4 rounded-xl bg-[var(--duo-green)] hover:bg-[var(--duo-green-dark)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-xl bg-[var(--accent-xp)] hover:bg-[var(--accent-xp-dark)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
               >
                 Los geht&apos;s <ChevronRight size={20} />
               </button>
@@ -147,7 +147,7 @@ export default function OnboardingPage() {
                     className={`w-full p-4 rounded-2xl border-2 text-left transition-all ${
                       isSelected
                         ? 'border-transparent shadow-lg'
-                        : 'border-[var(--duo-border)] bg-[var(--duo-card)] hover:border-[var(--duo-blue)]'
+                        : 'border-[var(--duo-border)] bg-[var(--duo-card)] hover:border-[var(--accent-info)]'
                     }`}
                     style={isSelected ? { borderColor: t.color, background: `${t.color}15` } : undefined}
                   >
@@ -162,7 +162,7 @@ export default function OnboardingPage() {
                         <div className="flex items-center gap-2">
                           <span className="font-black text-sm">{lang === 'de' ? t.titleDe : t.title}</span>
                           {t.comingSoon && (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[var(--duo-orange)] text-white font-bold uppercase">Soon</span>
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[var(--accent-streak)] text-white font-bold uppercase">Soon</span>
                           )}
                         </div>
                         <div className="text-xs text-[var(--duo-text-muted)] mt-0.5">{lang === 'de' ? t.subtitleDe : t.subtitle}</div>
@@ -200,7 +200,7 @@ export default function OnboardingPage() {
 
             <button
               onClick={() => goNext('language')}
-              className="w-full py-4 rounded-xl bg-[var(--duo-green)] hover:bg-[var(--duo-green-dark)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-xl bg-[var(--accent-xp)] hover:bg-[var(--accent-xp-dark)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
             >
               Weiter <ChevronRight size={20} />
             </button>
@@ -211,7 +211,7 @@ export default function OnboardingPage() {
         {step === 'language' && (
           <div className="space-y-6">
             <div className="text-center">
-              <Globe size={40} className="text-[var(--duo-blue)] mx-auto mb-3" />
+              <Globe size={40} className="text-[var(--accent-info)] mx-auto mb-3" />
               <h2 className="text-2xl font-black">Sprache / Language</h2>
             </div>
             <div className="space-y-3">
@@ -221,8 +221,8 @@ export default function OnboardingPage() {
                   onClick={() => { setLang(code); playClickSound(); }}
                   className={`w-full p-4 rounded-xl border-2 text-left transition flex items-center gap-4 ${
                     lang === code
-                      ? 'border-[var(--duo-green)] bg-[rgba(88,204,2,0.1)]'
-                      : 'border-[var(--duo-border)] bg-[var(--duo-card)] hover:border-[var(--duo-blue)]'
+                      ? 'border-[var(--accent-xp)] bg-[rgba(88,204,2,0.1)]'
+                      : 'border-[var(--duo-border)] bg-[var(--duo-card)] hover:border-[var(--accent-info)]'
                   }`}
                 >
                   <span className="text-3xl">{flag}</span>
@@ -237,7 +237,7 @@ export default function OnboardingPage() {
             {/* Sound toggle */}
             <div className="duo-card p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                {soundOn ? <Volume2 size={20} className="text-[var(--duo-green)]" /> : <VolumeX size={20} className="text-[var(--duo-text-muted)]" />}
+                {soundOn ? <Volume2 size={20} className="text-[var(--accent-xp)]" /> : <VolumeX size={20} className="text-[var(--duo-text-muted)]" />}
                 <div>
                   <div className="font-bold text-sm">Sound Effects</div>
                   <div className="text-xs text-[var(--duo-text-muted)]">Ka-Ching, Level-Up & mehr</div>
@@ -245,7 +245,7 @@ export default function OnboardingPage() {
               </div>
               <button
                 onClick={() => setSoundOn(!soundOn)}
-                className={`w-12 h-7 rounded-full transition-all ${soundOn ? 'bg-[var(--duo-green)]' : 'bg-[var(--duo-border)]'}`}
+                className={`w-12 h-7 rounded-full transition-all ${soundOn ? 'bg-[var(--accent-xp)]' : 'bg-[var(--duo-border)]'}`}
               >
                 <div className={`w-5 h-5 rounded-full bg-white transition-transform ${soundOn ? 'translate-x-6' : 'translate-x-1'}`} />
               </button>
@@ -253,7 +253,7 @@ export default function OnboardingPage() {
 
             <button
               onClick={() => goNext('level')}
-              className="w-full py-4 rounded-xl bg-[var(--duo-green)] hover:bg-[var(--duo-green-dark)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-xl bg-[var(--accent-xp)] hover:bg-[var(--accent-xp-dark)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
             >
               Weiter <ChevronRight size={20} />
             </button>
@@ -264,7 +264,7 @@ export default function OnboardingPage() {
         {step === 'level' && (
           <div className="space-y-6">
             <div className="text-center">
-              <Brain size={40} className="text-[var(--duo-purple)] mx-auto mb-3" />
+              <Brain size={40} className="text-[var(--accent-purple)] mx-auto mb-3" />
               <h2 className="text-2xl font-black">
                 {lang === 'de' ? 'Wie fit bist du?' : 'What\'s your level?'}
               </h2>
@@ -279,7 +279,7 @@ export default function OnboardingPage() {
                   key={value}
                   onClick={() => { setLevel(value); playClickSound(); }}
                   className={`w-full p-4 rounded-xl border-2 text-left transition ${
-                    level === value ? 'bg-[rgba(88,204,2,0.08)]' : 'border-[var(--duo-border)] bg-[var(--duo-card)] hover:border-[var(--duo-blue)]'
+                    level === value ? 'bg-[rgba(88,204,2,0.08)]' : 'border-[var(--duo-border)] bg-[var(--duo-card)] hover:border-[var(--accent-info)]'
                   }`}
                   style={{ borderColor: level === value ? color : undefined }}
                 >
@@ -296,7 +296,7 @@ export default function OnboardingPage() {
             <button
               onClick={() => level && goNext('goal')}
               disabled={!level}
-              className="w-full py-4 rounded-xl bg-[var(--duo-green)] hover:bg-[var(--duo-green-dark)] disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-xl bg-[var(--accent-xp)] hover:bg-[var(--accent-xp-dark)] disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
             >
               Weiter <ChevronRight size={20} />
             </button>
@@ -324,8 +324,8 @@ export default function OnboardingPage() {
                   onClick={() => { setGoal(item.n); playClickSound(); }}
                   className={`w-full p-4 rounded-xl border-2 text-left transition flex items-center gap-4 ${
                     goal === item.n
-                      ? 'border-[var(--duo-green)] bg-[rgba(88,204,2,0.1)]'
-                      : 'border-[var(--duo-border)] bg-[var(--duo-card)] hover:border-[var(--duo-blue)]'
+                      ? 'border-[var(--accent-xp)] bg-[rgba(88,204,2,0.1)]'
+                      : 'border-[var(--duo-border)] bg-[var(--duo-card)] hover:border-[var(--accent-info)]'
                   }`}
                 >
                   <span className="text-2xl">{item.icon}</span>
@@ -333,13 +333,13 @@ export default function OnboardingPage() {
                     <div className="font-bold">{item.label}</div>
                     <div className="text-xs text-[var(--duo-text-muted)]">{item.n} {lang === 'de' ? 'Lektionen' : 'lessons'} · {item.desc}/{lang === 'de' ? 'Tag' : 'day'}</div>
                   </div>
-                  {goal === item.n && <span className="text-[var(--duo-green)] text-lg">✓</span>}
+                  {goal === item.n && <span className="text-[var(--accent-xp)] text-lg">✓</span>}
                 </button>
               ))}
             </div>
             <button
               onClick={() => goNext('ready')}
-              className="w-full py-4 rounded-xl bg-[var(--duo-green)] hover:bg-[var(--duo-green-dark)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-xl bg-[var(--accent-xp)] hover:bg-[var(--accent-xp-dark)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
             >
               Weiter <ChevronRight size={20} />
             </button>
@@ -371,12 +371,18 @@ export default function OnboardingPage() {
 
             {/* Streak Protection — Notification Permission */}
             {notifStatus === 'granted' ? (
-              <div className="duo-card p-4 text-center border-2 border-[var(--duo-green)]">
-                <div className="flex items-center justify-center gap-2 text-[var(--duo-green)] font-bold text-sm">
+              <div
+                className="rounded-xl p-5 text-center"
+                style={{
+                  background: 'color-mix(in srgb, var(--accent-xp) 10%, transparent)',
+                  border: '1px solid var(--accent-xp)',
+                }}
+              >
+                <div className="flex items-center justify-center gap-2 text-[var(--accent-xp)] font-bold text-sm">
                   <Bell size={16} />
                   {lang === 'de' ? 'Erinnerungen aktiviert ✓' : 'Reminders enabled ✓'}
                 </div>
-                <p className="text-xs text-[var(--duo-text-muted)] mt-1 italic">
+                <p className="text-xs text-[var(--text-secondary)] mt-2 italic">
                   {getCharacterForTrack(track).emoji}{' '}
                   {lang === 'de'
                     ? '"Perfekt! Ich pass auf deinen Streak auf."'
@@ -384,28 +390,46 @@ export default function OnboardingPage() {
                 </p>
               </div>
             ) : notifStatus !== 'unsupported' ? (
-              <div className="duo-card p-5 text-left space-y-3 border-2 border-[var(--duo-orange)]">
-                <div className="flex items-start gap-3">
-                  <span className="text-3xl">🔥</span>
-                  <div>
-                    <div className="font-black text-base">
-                      {lang === 'de' ? 'Behalte deinen Streak' : 'Protect your streak'}
-                    </div>
-                    <p className="text-xs text-[var(--duo-text-muted)] mt-1 leading-relaxed">
-                      {lang === 'de'
-                        ? 'Aktiviere Erinnerungen — wir benachrichtigen dich täglich wenn du noch nicht gelernt hast. Dein Streak dankt es dir.'
-                        : 'Enable reminders — we\'ll notify you daily when you haven\'t studied yet. Your streak will thank you.'}
-                    </p>
-                  </div>
+              <div
+                className="rounded-xl text-center"
+                style={{
+                  background: 'color-mix(in srgb, var(--accent-streak) 10%, transparent)',
+                  border: '1px solid var(--accent-streak)',
+                  borderRadius: 12,
+                  padding: '20px 16px',
+                  marginBottom: 16,
+                }}
+              >
+                <div style={{ fontSize: 36, marginBottom: 8 }}>🔥</div>
+                <div style={{ fontSize: 17, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>
+                  {lang === 'de' ? 'Behalte deinen Streak' : 'Keep your streak alive'}
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: 280, margin: '0 auto 16px' }}>
+                  {lang === 'de'
+                    ? 'Wir erinnern dich täglich wenn du noch nicht gelernt hast. Dein zukünftiges Ich wird es dir danken.'
+                    : "We'll remind you daily if you haven't studied yet. Your future self will thank you."}
                 </div>
                 <button
                   onClick={requestNotifications}
-                  className="w-full py-3.5 rounded-xl bg-[var(--duo-orange)] text-white font-bold text-sm btn-press transition"
+                  style={{
+                    width: '100%',
+                    maxWidth: 300,
+                    background: 'var(--accent-streak)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 10,
+                    padding: '14px 20px',
+                    fontSize: 16,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'block',
+                    margin: '0 auto 8px',
+                  }}
                 >
-                  {lang === 'de' ? 'Ja, erinnere mich täglich' : 'Yes, remind me daily'}
+                  {lang === 'de' ? 'Ja, erinnere mich täglich 🔔' : 'Yes, remind me daily 🔔'}
                 </button>
                 {notifStatus === 'denied' ? (
-                  <p className="text-[10px] text-[var(--duo-text-muted)] text-center">
+                  <p className="text-[10px] text-[var(--text-muted)] text-center mt-2">
                     {lang === 'de'
                       ? 'Benachrichtigungen wurden blockiert. Aktiviere sie in den Browser-Einstellungen.'
                       : 'Notifications were blocked. Enable them in browser settings.'}
@@ -413,7 +437,15 @@ export default function OnboardingPage() {
                 ) : (
                   <button
                     onClick={finish}
-                    className="w-full text-center text-xs text-[var(--duo-text-muted)] py-1 hover:underline"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--text-muted)',
+                      fontSize: 12,
+                      cursor: 'pointer',
+                      display: 'block',
+                      margin: '0 auto',
+                    }}
                   >
                     {lang === 'de' ? 'Lieber nicht' : 'Maybe later'}
                   </button>
@@ -423,7 +455,7 @@ export default function OnboardingPage() {
 
             <button
               onClick={finish}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-[var(--duo-green)] to-[var(--duo-blue)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2 shadow-lg"
+              className="w-full py-4 rounded-xl bg-gradient-to-r from-[var(--accent-xp)] to-[var(--accent-info)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2 shadow-lg"
             >
               <BookOpen size={20} />
               {lang === 'de' ? 'Training starten!' : 'Start Training!'}
@@ -437,7 +469,7 @@ export default function OnboardingPage() {
             <div
               key={s}
               className={`w-2 h-2 rounded-full transition-all ${
-                s === step ? 'w-6 bg-[var(--duo-green)]' : 'bg-[var(--duo-border)]'
+                s === step ? 'w-6 bg-[var(--accent-xp)]' : 'bg-[var(--duo-border)]'
               }`}
             />
           ))}

@@ -15,18 +15,18 @@ import { playClickSound } from '@/lib/sounds';
 type FilterTab = 'all' | 'ib' | 'consulting' | 'pe' | 'vc';
 
 const TABS: { id: FilterTab; label: string; labelDe: string; color: string }[] = [
-  { id: 'all', label: 'All', labelDe: 'Alle', color: 'var(--duo-blue)' },
-  { id: 'ib', label: 'IB', labelDe: 'IB', color: 'var(--duo-blue)' },
-  { id: 'consulting', label: 'Consulting', labelDe: 'Consulting', color: 'var(--duo-green)' },
-  { id: 'pe', label: 'PE', labelDe: 'PE', color: 'var(--duo-purple)' },
-  { id: 'vc', label: 'VC', labelDe: 'VC', color: 'var(--duo-orange)' },
+  { id: 'all', label: 'All', labelDe: 'Alle', color: 'var(--accent-info)' },
+  { id: 'ib', label: 'IB', labelDe: 'IB', color: 'var(--accent-info)' },
+  { id: 'consulting', label: 'Consulting', labelDe: 'Consulting', color: 'var(--accent-xp)' },
+  { id: 'pe', label: 'PE', labelDe: 'PE', color: 'var(--accent-purple)' },
+  { id: 'vc', label: 'VC', labelDe: 'VC', color: 'var(--accent-streak)' },
 ];
 
 const TRACK_LABEL: Record<GlossaryTrack, { label: string; color: string }> = {
-  ib: { label: 'IB', color: 'var(--duo-blue)' },
-  consulting: { label: 'CONS', color: 'var(--duo-green)' },
-  pe: { label: 'PE', color: 'var(--duo-purple)' },
-  vc: { label: 'VC', color: 'var(--duo-orange)' },
+  ib: { label: 'IB', color: 'var(--accent-info)' },
+  consulting: { label: 'CONS', color: 'var(--accent-xp)' },
+  pe: { label: 'PE', color: 'var(--accent-purple)' },
+  vc: { label: 'VC', color: 'var(--accent-streak)' },
   all: { label: 'ALL', color: 'var(--duo-text-muted)' },
 };
 
@@ -82,7 +82,7 @@ export default function GlossaryPage() {
       <div className="space-y-5 pb-6">
         {/* Header */}
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl bg-[var(--duo-blue)] flex items-center justify-center shrink-0">
+          <div className="w-11 h-11 rounded-xl bg-[var(--accent-info)] flex items-center justify-center shrink-0">
             <BookOpen size={22} className="text-white" />
           </div>
           <div>
@@ -127,7 +127,7 @@ export default function GlossaryPage() {
               'Search terms, definitions…',
               'Begriffe, Definitionen suchen…',
             )}
-            className="w-full pl-10 pr-10 py-3 rounded-xl bg-[var(--duo-card)] border-2 border-[var(--duo-border)] text-white text-sm placeholder-[var(--duo-text-muted)] focus:border-[var(--duo-blue)] focus:outline-none"
+            className="w-full pl-10 pr-10 py-3 rounded-xl bg-[var(--duo-card)] border-2 border-[var(--duo-border)] text-white text-sm placeholder-[var(--duo-text-muted)] focus:border-[var(--accent-info)] focus:outline-none"
           />
           {query && (
             <button
@@ -209,7 +209,7 @@ export default function GlossaryPage() {
                 key={entry.id}
                 onClick={() => toggle(entry.id)}
                 className={`w-full duo-card p-4 text-left transition-all ${
-                  isOpen ? 'border-[var(--duo-blue)]' : ''
+                  isOpen ? 'border-[var(--accent-info)]' : ''
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -232,7 +232,7 @@ export default function GlossaryPage() {
                       {isOpen ? (
                         <ChevronUp
                           size={16}
-                          className="shrink-0 text-[var(--duo-blue)]"
+                          className="shrink-0 text-[var(--accent-info)]"
                         />
                       ) : (
                         <ChevronDown
@@ -256,18 +256,18 @@ export default function GlossaryPage() {
                         </p>
 
                         {entry.formula && (
-                          <div className="bg-[rgba(28,176,246,0.08)] border border-[var(--duo-blue)] rounded-lg px-3 py-2">
-                            <div className="text-[9px] uppercase font-bold tracking-wide text-[var(--duo-blue)] mb-1">
+                          <div className="bg-[rgba(28,176,246,0.08)] border border-[var(--accent-info)] rounded-lg px-3 py-2">
+                            <div className="text-[9px] uppercase font-bold tracking-wide text-[var(--accent-info)] mb-1">
                               {t('Formula', 'Formel')}
                             </div>
-                            <code className="text-[11px] font-mono text-[var(--duo-blue)]">
+                            <code className="text-[11px] font-mono text-[var(--accent-info)]">
                               {entry.formula}
                             </code>
                           </div>
                         )}
 
-                        <div className="bg-[rgba(206,130,255,0.08)] border border-[var(--duo-purple)] rounded-lg px-3 py-2">
-                          <div className="text-[9px] uppercase font-bold tracking-wide text-[var(--duo-purple)] mb-1">
+                        <div className="bg-[rgba(206,130,255,0.08)] border border-[var(--accent-purple)] rounded-lg px-3 py-2">
+                          <div className="text-[9px] uppercase font-bold tracking-wide text-[var(--accent-purple)] mb-1">
                             {t('Example', 'Beispiel')}
                           </div>
                           <p className="text-[11px] italic text-gray-200">

@@ -105,7 +105,7 @@ export default function SolveDetailPage() {
     return (
       <div className="min-h-screen bg-[var(--duo-bg)] flex items-center justify-center flex-col gap-3">
         <p className="text-[var(--duo-text-muted)]">{t('Test not found', 'Test nicht gefunden')}</p>
-        <Link href="/solve" className="text-[var(--duo-blue)] text-sm underline">
+        <Link href="/solve" className="text-[var(--accent-info)] text-sm underline">
           {t('Back to Online Tests', 'Zurück zu Online Tests')}
         </Link>
       </div>
@@ -289,8 +289,8 @@ export default function SolveDetailPage() {
 
             {/* Context (optional) */}
             {exercise.context && (
-              <div className="bg-[rgba(28,176,246,0.06)] border border-[var(--duo-blue)] rounded-xl p-4">
-                <div className="text-[10px] font-bold uppercase text-[var(--duo-blue)] mb-1">
+              <div className="bg-[rgba(28,176,246,0.06)] border border-[var(--accent-info)] rounded-xl p-4">
+                <div className="text-[10px] font-bold uppercase text-[var(--accent-info)] mb-1">
                   {t('Context', 'Kontext')}
                 </div>
                 <p className="text-xs text-gray-300 leading-relaxed">
@@ -337,12 +337,12 @@ export default function SolveDetailPage() {
                       disabled={showAnswer}
                       className={`w-full text-left p-4 rounded-xl border-2 transition-all text-sm leading-relaxed ${
                         isCorrect
-                          ? 'border-[var(--duo-green)] bg-[rgba(88,204,2,0.12)] text-white'
+                          ? 'border-[var(--accent-xp)] bg-[rgba(88,204,2,0.12)] text-white'
                           : isWrong
                             ? 'border-[var(--duo-red)] bg-[rgba(255,75,75,0.12)] text-white'
                             : isSelected
-                              ? 'border-[var(--duo-blue)] bg-[rgba(28,176,246,0.08)] text-white'
-                              : 'border-[var(--duo-border)] text-gray-300 hover:border-[var(--duo-blue)]'
+                              ? 'border-[var(--accent-info)] bg-[rgba(28,176,246,0.08)] text-white'
+                              : 'border-[var(--duo-border)] text-gray-300 hover:border-[var(--accent-info)]'
                       }`}
                     >
                       <span className="font-bold mr-2">{String.fromCharCode(65 + i)}.</span>
@@ -398,7 +398,7 @@ export default function SolveDetailPage() {
                   <div
                     className={`flex items-start gap-3 rounded-xl p-4 border-2 ${
                       selectedIsCorrect && !timeUp
-                        ? 'bg-[rgba(88,204,2,0.08)] border-[var(--duo-green)]'
+                        ? 'bg-[rgba(88,204,2,0.08)] border-[var(--accent-xp)]'
                         : 'bg-[rgba(255,75,75,0.08)] border-[var(--duo-red)]'
                     }`}
                   >
@@ -412,8 +412,8 @@ export default function SolveDetailPage() {
                 )}
 
                 {/* Sample Answer */}
-                <div className="bg-[rgba(88,204,2,0.08)] border-2 border-[var(--duo-green)] rounded-xl p-4">
-                  <div className="text-xs text-[var(--duo-green)] font-bold uppercase mb-2 flex items-center gap-1">
+                <div className="bg-[rgba(88,204,2,0.08)] border-2 border-[var(--accent-xp)] rounded-xl p-4">
+                  <div className="text-xs text-[var(--accent-xp)] font-bold uppercase mb-2 flex items-center gap-1">
                     <CheckCircle size={12} /> {t('Sample Answer', 'Musterlösung')}
                   </div>
                   <div className="text-sm leading-relaxed text-gray-200 whitespace-pre-line">
@@ -433,7 +433,7 @@ export default function SolveDetailPage() {
 
                 <button
                   onClick={nextExercise}
-                  className="w-full py-4 rounded-xl bg-[var(--duo-green)] hover:bg-[var(--duo-green-dark)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
+                  className="w-full py-4 rounded-xl bg-[var(--accent-xp)] hover:bg-[var(--accent-xp-dark)] text-white font-bold text-lg btn-press transition flex items-center justify-center gap-2"
                 >
                   {exIdx < test.exercises.length - 1
                     ? t('Next Question', 'Nächste Frage')
@@ -468,7 +468,7 @@ export default function SolveDetailPage() {
                 <div className="text-xs text-[var(--duo-text-muted)] uppercase mb-1">
                   {t('Correct', 'Richtig')}
                 </div>
-                <div className="text-2xl font-black text-[var(--duo-green)]">
+                <div className="text-2xl font-black text-[var(--accent-xp)]">
                   {correctCount}/{test.exercises.length}
                 </div>
               </div>
@@ -490,7 +490,7 @@ export default function SolveDetailPage() {
                 <RotateCcw size={16} /> {t('Redo', 'Wiederholen')}
               </button>
               <Link href="/solve" className="flex-1">
-                <button className="w-full py-3 rounded-xl bg-[var(--duo-green)] text-white font-bold btn-press transition">
+                <button className="w-full py-3 rounded-xl bg-[var(--accent-xp)] text-white font-bold btn-press transition">
                   {t('More Tests', 'Weitere Tests')}
                 </button>
               </Link>

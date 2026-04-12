@@ -346,7 +346,7 @@ export default function LessonPage() {
       <div className="min-h-screen bg-[var(--duo-bg)] flex items-center justify-center">
         <div className="text-center">
           <p className="text-[var(--duo-text-muted)]">Lesson not found</p>
-          <Link href="/skill-tree" className="text-[var(--duo-blue)] mt-2 block">
+          <Link href="/skill-tree" className="text-[var(--accent-info)] mt-2 block">
             Back
           </Link>
         </div>
@@ -513,7 +513,7 @@ export default function LessonPage() {
           )}
           <div className="flex-1 progress-bar-track h-2.5">
             <div
-              className="progress-bar-fill h-full bg-[var(--duo-green)] transition-all duration-500"
+              className="progress-bar-fill h-full bg-[var(--accent-xp)] transition-all duration-500"
               style={{ width: `${progressPct}%` }}
             />
           </div>
@@ -556,7 +556,7 @@ export default function LessonPage() {
               <TypeIndicator
                 icon={HelpCircle}
                 label={t('Quiz', 'Quiz')}
-                color="var(--duo-purple)"
+                color="var(--accent-purple)"
               />
 
               <div className="flex items-center justify-between text-xs text-[var(--duo-text-muted)]">
@@ -564,7 +564,7 @@ export default function LessonPage() {
                   {t('Question', 'Frage')} {uniqueAnswered.size + 1}/
                   {totalQuestions}
                   {quizQueue.length > 1 && (
-                    <span className="ml-2 text-[var(--duo-orange)]">
+                    <span className="ml-2 text-[var(--accent-streak)]">
                       · {quizQueue.length - 1} {t('retry', 'Wdh.')}
                     </span>
                   )}
@@ -576,12 +576,12 @@ export default function LessonPage() {
               </div>
 
               {isRetry && (
-                <div className="flex items-start gap-3 bg-[rgba(255,150,0,0.1)] border-2 border-[var(--duo-orange)] rounded-xl p-3">
+                <div className="flex items-start gap-3 bg-[rgba(255,150,0,0.1)] border-2 border-[var(--accent-streak)] rounded-xl p-3">
                   <RotateCcw
                     size={18}
-                    className="text-[var(--duo-orange)] mt-0.5 shrink-0"
+                    className="text-[var(--accent-streak)] mt-0.5 shrink-0"
                   />
-                  <div className="text-sm font-bold text-[var(--duo-orange)]">
+                  <div className="text-sm font-bold text-[var(--accent-streak)]">
                     {t(
                       'Try again! You got this wrong.',
                       'Nochmal! Diese Frage hast du falsch.',
@@ -623,11 +623,11 @@ export default function LessonPage() {
                         <div
                           className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 ${
                             answered && i === currentQuestion.correctAnswer
-                              ? 'bg-[var(--duo-green)] text-white'
+                              ? 'bg-[var(--accent-xp)] text-white'
                               : answered && i === selected
                                 ? 'bg-[var(--duo-red)] text-white'
                                 : i === selected
-                                  ? 'bg-[var(--duo-blue)] text-white'
+                                  ? 'bg-[var(--accent-info)] text-white'
                                   : 'bg-[var(--duo-border)] text-[var(--duo-text-muted)]'
                           }`}
                         >
@@ -652,7 +652,7 @@ export default function LessonPage() {
                 <div
                   className={`rounded-xl p-4 border-2 ${
                     selected === currentQuestion.correctAnswer
-                      ? 'bg-[rgba(88,204,2,0.1)] border-[var(--duo-green)]'
+                      ? 'bg-[rgba(88,204,2,0.1)] border-[var(--accent-xp)]'
                       : 'bg-[rgba(255,75,75,0.1)] border-[var(--duo-red)]'
                   }`}
                 >
@@ -661,7 +661,7 @@ export default function LessonPage() {
                     <span
                       className={`text-sm font-bold ${
                         selected === currentQuestion.correctAnswer
-                          ? 'text-[var(--duo-green)]'
+                          ? 'text-[var(--accent-xp)]'
                           : 'text-[var(--duo-red)]'
                       }`}
                     >
@@ -788,7 +788,7 @@ export default function LessonPage() {
                   {t('Redo', 'Wiederholen')}
                 </button>
                 <Link href="/skill-tree" className="flex-1">
-                  <button className="w-full py-3 rounded-xl bg-[var(--duo-green)] text-white font-bold btn-press transition">
+                  <button className="w-full py-3 rounded-xl bg-[var(--accent-xp)] text-white font-bold btn-press transition">
                     {t('Continue', 'Weiter')}
                   </button>
                 </Link>
@@ -805,7 +805,7 @@ export default function LessonPage() {
             {phase === 'lesson' && (
               <button
                 onClick={handleNextSlide}
-                className="w-full py-4 rounded-xl bg-[var(--duo-green)] hover:bg-[var(--duo-green-dark)] text-white font-black text-lg btn-press transition flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-xl bg-[var(--accent-xp)] hover:bg-[var(--accent-xp-dark)] text-white font-black text-lg btn-press transition flex items-center justify-center gap-2"
               >
                 {slideIdx < totalLessonSlides - 1
                   ? t('Continue', 'Weiter')
@@ -821,14 +821,14 @@ export default function LessonPage() {
                 <button
                   onClick={handleAnswer}
                   disabled={selected === null}
-                  className="w-full py-4 rounded-xl bg-[var(--duo-green)] hover:bg-[var(--duo-green-dark)] disabled:opacity-40 disabled:cursor-not-allowed text-white font-black text-lg btn-press transition"
+                  className="w-full py-4 rounded-xl bg-[var(--accent-xp)] hover:bg-[var(--accent-xp-dark)] disabled:opacity-40 disabled:cursor-not-allowed text-white font-black text-lg btn-press transition"
                 >
                   {t('Check Answer', 'Antwort prüfen')}
                 </button>
               ) : (
                 <button
                   onClick={handleNextQuestion}
-                  className="w-full py-4 rounded-xl bg-[var(--duo-blue)] text-white font-black text-lg btn-press transition flex items-center justify-center gap-2"
+                  className="w-full py-4 rounded-xl bg-[var(--accent-info)] text-white font-black text-lg btn-press transition flex items-center justify-center gap-2"
                 >
                   {quizQueue.length > 1 ||
                   (selected !== currentQuestion.correctAnswer &&
@@ -879,7 +879,7 @@ function LessonSlideView({
         <TypeIndicator
           icon={BookOpen}
           label={t('Lesson', 'Lektion')}
-          color="var(--duo-green)"
+          color="var(--accent-xp)"
         />
         <div className="text-6xl">{character.emoji}</div>
         <h1 className="text-2xl font-black leading-tight">
@@ -924,7 +924,7 @@ function LessonSlideView({
         <TypeIndicator
           icon={BookOpen}
           label={t('Explanation', 'Erklärung')}
-          color="var(--duo-green)"
+          color="var(--accent-xp)"
         />
         <h2 className="text-xl font-black leading-snug">
           {isDE ? section.headingDe : section.heading}
@@ -934,8 +934,8 @@ function LessonSlideView({
         </div>
 
         {(section.example || section.exampleDe) && (
-          <div className="bg-[rgba(206,130,255,0.1)] border-2 border-[var(--duo-purple)] rounded-xl p-4">
-            <div className="text-[10px] text-[var(--duo-purple)] font-black uppercase mb-1 tracking-wider">
+          <div className="bg-[rgba(206,130,255,0.1)] border-2 border-[var(--accent-purple)] rounded-xl p-4">
+            <div className="text-[10px] text-[var(--accent-purple)] font-black uppercase mb-1 tracking-wider">
               {t('Example', 'Beispiel')}
             </div>
             <pre className="text-sm font-mono text-gray-300 whitespace-pre-wrap">
@@ -951,14 +951,14 @@ function LessonSlideView({
             {!showDetailedExample ? (
               <button
                 onClick={onShowDetailedExample}
-                className="w-full py-3 rounded-xl border-2 border-dashed border-[var(--duo-purple)] text-[var(--duo-purple)] font-bold text-sm btn-press transition flex items-center justify-center gap-2 hover:bg-[rgba(206,130,255,0.05)]"
+                className="w-full py-3 rounded-xl border-2 border-dashed border-[var(--accent-purple)] text-[var(--accent-purple)] font-bold text-sm btn-press transition flex items-center justify-center gap-2 hover:bg-[rgba(206,130,255,0.05)]"
               >
                 <Eye size={16} />
                 {t('Show Detailed Example', 'Ausführliches Beispiel anzeigen')}
               </button>
             ) : (
-              <div className="bg-[rgba(206,130,255,0.08)] border-2 border-[var(--duo-purple)] rounded-xl p-4">
-                <div className="text-[10px] text-[var(--duo-purple)] font-black uppercase mb-2 flex items-center gap-1 tracking-wider">
+              <div className="bg-[rgba(206,130,255,0.08)] border-2 border-[var(--accent-purple)] rounded-xl p-4">
+                <div className="text-[10px] text-[var(--accent-purple)] font-black uppercase mb-2 flex items-center gap-1 tracking-wider">
                   <Eye size={12} />
                   {t('Detailed Example', 'Ausführliches Beispiel')}
                 </div>
@@ -990,21 +990,21 @@ function LessonSlideView({
         <TypeIndicator
           icon={Calculator}
           label={t('Formula', 'Formel')}
-          color="var(--duo-blue)"
+          color="var(--accent-info)"
         />
         <div className="text-[10px] text-[var(--duo-text-muted)] uppercase font-bold tracking-wider">
           {t('From', 'Aus')}:{' '}
           {isDE ? slide.contextHeadingDe : slide.contextHeading}
         </div>
 
-        <div className="bg-[rgba(28,176,246,0.12)] border-2 border-[var(--duo-blue)] rounded-2xl p-8 text-center">
-          <code className="text-xl sm:text-2xl font-mono text-[var(--duo-blue)] font-black break-words">
+        <div className="bg-[rgba(28,176,246,0.12)] border-2 border-[var(--accent-info)] rounded-2xl p-8 text-center">
+          <code className="text-xl sm:text-2xl font-mono text-[var(--accent-info)] font-black break-words">
             {slide.formula}
           </code>
         </div>
 
         <div className="duo-card p-4">
-          <div className="text-[10px] text-[var(--duo-blue)] font-black uppercase mb-2 tracking-wider">
+          <div className="text-[10px] text-[var(--accent-info)] font-black uppercase mb-2 tracking-wider">
             {t('What each symbol means', 'Was jede Variable bedeutet')}
           </div>
           <p className="text-sm leading-relaxed text-gray-200">
@@ -1032,7 +1032,7 @@ function LessonSlideView({
         <TypeIndicator
           icon={CheckCheck}
           label={t('Key Takeaways', 'Kernaussagen')}
-          color="var(--duo-green)"
+          color="var(--accent-xp)"
         />
         <h2 className="text-xl font-black leading-snug">
           {t('What to remember', 'Das musst du mitnehmen')}
@@ -1041,12 +1041,12 @@ function LessonSlideView({
           {slide.items.map((item, i) => (
             <div
               key={i}
-              className="bg-[rgba(88,204,2,0.1)] border-2 border-[var(--duo-green)] rounded-xl p-4 flex items-start gap-3"
+              className="bg-[rgba(88,204,2,0.1)] border-2 border-[var(--accent-xp)] rounded-xl p-4 flex items-start gap-3"
             >
-              <div className="w-7 h-7 rounded-full bg-[var(--duo-green)] text-white flex items-center justify-center font-black text-sm shrink-0">
+              <div className="w-7 h-7 rounded-full bg-[var(--accent-xp)] text-white flex items-center justify-center font-black text-sm shrink-0">
                 {i + 1}
               </div>
-              <p className="text-sm font-bold text-[var(--duo-green)] leading-relaxed">
+              <p className="text-sm font-bold text-[var(--accent-xp)] leading-relaxed">
                 {wrapGlossaryTerms(isDE ? item.de : item.en, lang)}
               </p>
             </div>
@@ -1063,7 +1063,7 @@ function LessonSlideView({
         <TypeIndicator
           icon={Lightbulb}
           label={t('Interview Tip', 'Interview-Tipp')}
-          color="var(--duo-orange)"
+          color="var(--accent-streak)"
         />
         <h2 className="text-xl font-black leading-snug">
           {t('Pro tips for the interview', 'Profi-Tipps fürs Interview')}
@@ -1072,11 +1072,11 @@ function LessonSlideView({
           {slide.items.map((item, i) => (
             <div
               key={i}
-              className="bg-[rgba(255,150,0,0.1)] border-2 border-[var(--duo-orange)] rounded-xl p-4 flex items-start gap-3"
+              className="bg-[rgba(255,150,0,0.1)] border-2 border-[var(--accent-streak)] rounded-xl p-4 flex items-start gap-3"
             >
               <Lightbulb
                 size={18}
-                className="text-[var(--duo-orange)] mt-0.5 shrink-0"
+                className="text-[var(--accent-streak)] mt-0.5 shrink-0"
               />
               <p className="text-sm text-gray-200 leading-relaxed">
                 {wrapGlossaryTerms(isDE ? item.de : item.en, lang)}

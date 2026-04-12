@@ -94,7 +94,7 @@ export default function BrainTeasersPage() {
         {/* Header */}
         <div className="text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <Brain size={28} className="text-[var(--duo-purple)]" />
+            <Brain size={28} className="text-[var(--accent-purple)]" />
             <h1 className="text-2xl font-black">{t('Brain Teasers', 'Brain Teasers')}</h1>
           </div>
           <p className="text-[var(--duo-text-muted)] text-sm">
@@ -107,7 +107,7 @@ export default function BrainTeasersPage() {
           <button
             onClick={() => { setSelectedCategory(null); playClickSound(); }}
             className={`px-3 py-1.5 rounded-full text-xs font-bold transition ${
-              !selectedCategory ? 'bg-[var(--duo-blue)] text-white' : 'bg-[var(--duo-border)] text-[var(--duo-text-muted)]'
+              !selectedCategory ? 'bg-[var(--accent-info)] text-white' : 'bg-[var(--duo-border)] text-[var(--duo-text-muted)]'
             }`}
           >
             {t('All', 'Alle')} ({BRAIN_TEASERS.length})
@@ -149,7 +149,7 @@ export default function BrainTeasersPage() {
         {/* Stats */}
         <div className="duo-card p-4 flex items-center justify-around text-center">
           <div>
-            <div className="text-lg font-black text-[var(--duo-green)]">{completedTeasers.size}</div>
+            <div className="text-lg font-black text-[var(--accent-xp)]">{completedTeasers.size}</div>
             <div className="text-[10px] text-[var(--duo-text-muted)] uppercase font-bold">{t('Solved', 'Gelöst')}</div>
           </div>
           <div className="w-px h-8 bg-[var(--duo-border)]" />
@@ -174,7 +174,7 @@ export default function BrainTeasersPage() {
             const isDone = completedTeasers.has(bt.id);
 
             return (
-              <div key={bt.id} className={`duo-card overflow-hidden transition-all ${isDone ? 'border-[var(--duo-green)]' : ''}`}>
+              <div key={bt.id} className={`duo-card overflow-hidden transition-all ${isDone ? 'border-[var(--accent-xp)]' : ''}`}>
                 {/* Header */}
                 <button
                   onClick={() => { setExpandedId(isExpanded ? null : bt.id); playClickSound(); }}
@@ -182,7 +182,7 @@ export default function BrainTeasersPage() {
                 >
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
                     style={{ background: `${catInfo.color}20`, border: `2px solid ${catInfo.color}` }}>
-                    {isDone ? <span className="text-[var(--duo-green)] text-sm">✓</span> : catInfo.icon}
+                    {isDone ? <span className="text-[var(--accent-xp)] text-sm">✓</span> : catInfo.icon}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-bold text-sm leading-tight">
@@ -225,14 +225,14 @@ export default function BrainTeasersPage() {
                       onClick={() => toggleAnswer(bt.id, bt.xpReward)}
                       className="w-full flex items-center gap-2 p-3 rounded-xl bg-[rgba(88,204,2,0.08)] border border-[rgba(88,204,2,0.2)] transition hover:bg-[rgba(88,204,2,0.15)]"
                     >
-                      <Sparkles size={16} className="text-[var(--duo-green)] shrink-0" />
-                      <span className="text-sm font-bold text-[var(--duo-green)]">{t('Show Answer', 'Antwort zeigen')}</span>
+                      <Sparkles size={16} className="text-[var(--accent-xp)] shrink-0" />
+                      <span className="text-sm font-bold text-[var(--accent-xp)]">{t('Show Answer', 'Antwort zeigen')}</span>
                       {answerShown ? <EyeOff size={14} className="ml-auto text-[var(--duo-text-muted)]" /> : <Eye size={14} className="ml-auto text-[var(--duo-text-muted)]" />}
                     </button>
                     {answerShown && (
                       <div className="space-y-2">
                         <div className="p-3 rounded-xl bg-[rgba(88,204,2,0.1)] border border-[rgba(88,204,2,0.2)]">
-                          <div className="font-bold text-sm text-[var(--duo-green)] mb-1">{t('Answer:', 'Antwort:')}</div>
+                          <div className="font-bold text-sm text-[var(--accent-xp)] mb-1">{t('Answer:', 'Antwort:')}</div>
                           <div className="text-sm text-gray-200">{progress.language === 'de' ? bt.answerDe : bt.answer}</div>
                         </div>
                         <div className="text-sm text-gray-400 leading-relaxed">

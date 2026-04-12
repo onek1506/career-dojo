@@ -24,7 +24,7 @@ export default function SkillTreePage() {
         {/* Skill Tree — vertical path */}
         <div className="relative">
           {/* Blurred content wrapper for PE/VC */}
-          <div className={isPEorVC ? 'blur-[4px] pointer-events-none select-none opacity-50' : ''}>
+          <div className={isPEorVC ? 'blur-[3px] pointer-events-none select-none opacity-45' : ''}>
             <div className="flex flex-col items-center gap-4">
               {activeTrack.units.map((unit, unitIdx) => {
                 const isLocked = progress.xp < unit.requiredXp;
@@ -92,7 +92,7 @@ export default function SkillTreePage() {
                                     <span>·</span>
                                     <span>{lesson.estimatedMinutes} min</span>
                                     {lesson.type === 'quiz' && <span className="text-[var(--accent-streak)]">Quiz</span>}
-                                    {lesson.type === 'calculation' && <span className="text-[var(--duo-purple)]">Calc</span>}
+                                    {lesson.type === 'calculation' && <span className="text-[var(--accent-purple)]">Calc</span>}
                                   </div>
                                 </div>
                                 {isDone && bestScore !== undefined && (
@@ -125,13 +125,23 @@ export default function SkillTreePage() {
 
           {/* Coming Soon overlay for PE/VC — outside blur wrapper */}
           {isPEorVC && (
-            <div className="absolute inset-0 flex items-center justify-center z-10">
-              <div className="bg-black/75 text-white rounded-2xl px-8 py-6 text-center shadow-xl">
-                <div className="text-xl font-black">Coming Soon</div>
-                <div className="text-sm text-gray-300 mt-1">
-                  {t('We\'re working on it 🔨', 'Wir arbeiten daran 🔨')}
-                </div>
-              </div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 gap-2">
+              <span
+                style={{
+                  background: 'var(--text-primary)',
+                  color: 'var(--accent-primary-text)',
+                  padding: '6px 16px',
+                  borderRadius: 20,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  letterSpacing: '0.02em',
+                }}
+              >
+                Coming Soon
+              </span>
+              <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                {t('Coming soon 🔨', 'Bald verfügbar 🔨')}
+              </span>
             </div>
           )}
         </div>

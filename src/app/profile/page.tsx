@@ -121,7 +121,7 @@ export default function ProfilePage() {
       <div className="space-y-6">
         {/* Profile Header */}
         <div className="duo-card p-6 text-center">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--duo-green)] to-[var(--duo-blue)] flex items-center justify-center mx-auto mb-3 text-3xl font-black text-white">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--accent-xp)] to-[var(--accent-info)] flex items-center justify-center mx-auto mb-3 text-3xl font-black text-white">
             {(progress.username || 'A').charAt(0).toUpperCase()}
           </div>
           <h1 className="text-xl font-black">{progress.username || 'Analyst'}</h1>
@@ -149,8 +149,8 @@ export default function ProfilePage() {
               return (
                 <div key={lv.level} className="flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
-                    isReached ? 'bg-[var(--duo-green)] text-white' :
-                    isCurrent ? 'bg-[var(--duo-blue)] text-white' :
+                    isReached ? 'bg-[var(--accent-xp)] text-white' :
+                    isCurrent ? 'bg-[var(--accent-info)] text-white' :
                     'bg-[var(--duo-border)] text-[var(--duo-text-muted)]'
                   }`}>
                     {lv.level}
@@ -161,7 +161,7 @@ export default function ProfilePage() {
                     </span>
                   </div>
                   <span className="text-xs text-[var(--duo-text-muted)]">{lv.xpRequired} XP</span>
-                  {isReached && <span className="text-[var(--duo-green)] text-sm">✓</span>}
+                  {isReached && <span className="text-[var(--accent-xp)] text-sm">✓</span>}
                 </div>
               );
             })}
@@ -171,16 +171,16 @@ export default function ProfilePage() {
         {/* Stats */}
         <div className="duo-card p-5">
           <h2 className="font-bold text-sm mb-3 flex items-center gap-2">
-            <BarChart3 size={16} className="text-[var(--duo-blue)]" />
+            <BarChart3 size={16} className="text-[var(--accent-info)]" />
             {t('Statistics', 'Statistiken')}
           </h2>
           <div className="grid grid-cols-2 gap-4">
-            <StatItem icon={<Flame size={16} className="text-[var(--duo-orange)]" />} value={progress.streak} label={t('Current Streak', 'Aktueller Streak')} />
+            <StatItem icon={<Flame size={16} className="text-[var(--accent-streak)]" />} value={progress.streak} label={t('Current Streak', 'Aktueller Streak')} />
             <StatItem icon={<Flame size={16} className="text-[var(--duo-red)]" />} value={progress.longestStreak} label={t('Longest Streak', 'Längster Streak')} />
             <StatItem icon={<Zap size={16} className="text-[var(--duo-yellow)]" />} value={progress.xp} label={t('Total XP', 'Gesamt XP')} />
-            <StatItem icon={<BookOpen size={16} className="text-[var(--duo-green)]" />} value={`${progress.completedLessons.length}/${totalLessons}`} label={t('Lessons', 'Lektionen')} />
-            <StatItem icon={<Target size={16} className="text-[var(--duo-blue)]" />} value={`${accuracy}%`} label={t('Accuracy', 'Genauigkeit')} />
-            <StatItem icon={<BarChart3 size={16} className="text-[var(--duo-purple)]" />} value={progress.totalQuestionsAnswered} label={t('Questions', 'Fragen')} />
+            <StatItem icon={<BookOpen size={16} className="text-[var(--accent-xp)]" />} value={`${progress.completedLessons.length}/${totalLessons}`} label={t('Lessons', 'Lektionen')} />
+            <StatItem icon={<Target size={16} className="text-[var(--accent-info)]" />} value={`${accuracy}%`} label={t('Accuracy', 'Genauigkeit')} />
+            <StatItem icon={<BarChart3 size={16} className="text-[var(--accent-purple)]" />} value={progress.totalQuestionsAnswered} label={t('Questions', 'Fragen')} />
           </div>
         </div>
 
@@ -188,7 +188,7 @@ export default function ProfilePage() {
         <div className="duo-card p-5">
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-bold text-sm flex items-center gap-2">
-              <ImageIcon size={16} className="text-[var(--duo-purple)]" />
+              <ImageIcon size={16} className="text-[var(--accent-purple)]" />
               {t('Collection', 'Sammlung')}
             </h2>
             <span className="text-[10px] font-bold text-[var(--text-muted)] tabular-nums">
@@ -276,7 +276,7 @@ export default function ProfilePage() {
         {/* Track Switcher */}
         <div className="duo-card p-5">
           <h2 className="font-bold text-sm mb-3 flex items-center gap-2">
-            <ArrowRightLeft size={16} className="text-[var(--duo-blue)]" />
+            <ArrowRightLeft size={16} className="text-[var(--accent-info)]" />
             {t('Career Track', 'Karriere-Track')}
           </h2>
           <div className="space-y-2">
@@ -287,8 +287,8 @@ export default function ProfilePage() {
                 disabled={tr.comingSoon}
                 className={`w-full p-3 rounded-xl flex items-center gap-3 text-left transition-all border-2 ${
                   tr.id === progress.selectedTrack
-                    ? 'border-[var(--duo-green)] bg-[rgba(88,204,2,0.08)]'
-                    : 'border-[var(--duo-border)] hover:border-[var(--duo-blue)]'
+                    ? 'border-[var(--accent-xp)] bg-[rgba(88,204,2,0.08)]'
+                    : 'border-[var(--duo-border)] hover:border-[var(--accent-info)]'
                 } ${tr.comingSoon ? 'opacity-40' : ''}`}
               >
                 <span className="text-xl">{tr.icon}</span>
@@ -299,7 +299,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 {tr.comingSoon && <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--duo-border)] text-[var(--duo-text-muted)] font-bold">SOON</span>}
-                {tr.id === progress.selectedTrack && <span className="text-[var(--duo-green)]">✓</span>}
+                {tr.id === progress.selectedTrack && <span className="text-[var(--accent-xp)]">✓</span>}
               </button>
             ))}
           </div>
@@ -308,15 +308,15 @@ export default function ProfilePage() {
         {/* Prep Tools */}
         <div className="duo-card p-5">
           <h2 className="font-bold text-sm mb-3 flex items-center gap-2">
-            <Sparkles size={16} className="text-[var(--duo-purple)]" />
+            <Sparkles size={16} className="text-[var(--accent-purple)]" />
             {t('Prep Tools', 'Prep-Tools')}
           </h2>
           <div className="space-y-2">
             {progress.selectedTrack === 'consulting' && (
               <Link href="/solve" onClick={() => playClickSound()}>
-                <div className="w-full p-3 rounded-xl flex items-center gap-3 border-2 border-[var(--border)] hover:border-[var(--duo-purple)] transition-all cursor-pointer group">
+                <div className="w-full p-3 rounded-xl flex items-center gap-3 border-2 border-[var(--border)] hover:border-[var(--accent-purple)] transition-all cursor-pointer group">
                   <div className="w-10 h-10 rounded-lg bg-[rgba(206,130,255,0.15)] flex items-center justify-center shrink-0">
-                    <Sparkles size={18} className="text-[var(--duo-purple)]" />
+                    <Sparkles size={18} className="text-[var(--accent-purple)]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-bold">{t('Online Test Prep', 'Online Test Prep')}</div>
@@ -324,14 +324,14 @@ export default function ProfilePage() {
                       {t('McKinsey Solve · BCG Casey · Bain SOVA', 'McKinsey Solve · BCG Casey · Bain SOVA')}
                     </div>
                   </div>
-                  <ChevronRight size={16} className="text-[var(--text-muted)] group-hover:text-[var(--duo-purple)] transition shrink-0" />
+                  <ChevronRight size={16} className="text-[var(--text-muted)] group-hover:text-[var(--accent-purple)] transition shrink-0" />
                 </div>
               </Link>
             )}
             <Link href="/brainteasers" onClick={() => playClickSound()}>
-              <div className="w-full p-3 rounded-xl flex items-center gap-3 border-2 border-[var(--border)] hover:border-[var(--duo-orange)] transition-all cursor-pointer group mt-2">
+              <div className="w-full p-3 rounded-xl flex items-center gap-3 border-2 border-[var(--border)] hover:border-[var(--accent-streak)] transition-all cursor-pointer group mt-2">
                 <div className="w-10 h-10 rounded-lg bg-[rgba(255,150,0,0.15)] flex items-center justify-center shrink-0">
-                  <Brain size={18} className="text-[var(--duo-orange)]" />
+                  <Brain size={18} className="text-[var(--accent-streak)]" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-bold">{t('Brainteasers', 'Denksport')}</div>
@@ -339,7 +339,7 @@ export default function ProfilePage() {
                     {t('Classic interview puzzles', 'Klassische Interview-Rätsel')}
                   </div>
                 </div>
-                <ChevronRight size={16} className="text-[var(--text-muted)] group-hover:text-[var(--duo-orange)] transition shrink-0" />
+                <ChevronRight size={16} className="text-[var(--text-muted)] group-hover:text-[var(--accent-streak)] transition shrink-0" />
               </div>
             </Link>
           </div>
@@ -408,7 +408,7 @@ export default function ProfilePage() {
           {/* Sound Toggle */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              {progress.soundEnabled ? <Volume2 size={16} className="text-[var(--duo-green)]" /> : <VolumeX size={16} className="text-[var(--duo-text-muted)]" />}
+              {progress.soundEnabled ? <Volume2 size={16} className="text-[var(--accent-xp)]" /> : <VolumeX size={16} className="text-[var(--duo-text-muted)]" />}
               <span className="text-sm">{t('Sound Effects', 'Soundeffekte')}</span>
             </div>
             <button
@@ -421,7 +421,7 @@ export default function ProfilePage() {
                 if (next) playClickSound();
               }}
               className={`w-12 h-7 rounded-full transition-all relative ${
-                progress.soundEnabled ? 'bg-[var(--duo-green)]' : 'bg-[var(--duo-border)]'
+                progress.soundEnabled ? 'bg-[var(--accent-xp)]' : 'bg-[var(--duo-border)]'
               }`}
             >
               <div className={`w-5 h-5 rounded-full bg-white absolute top-1 transition-all ${
@@ -441,7 +441,7 @@ export default function ProfilePage() {
                 onClick={() => update({ language: 'de' })}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
                   progress.language === 'de'
-                    ? 'bg-[var(--duo-green)] text-white'
+                    ? 'bg-[var(--accent-xp)] text-white'
                     : 'bg-[var(--duo-border)] text-[var(--duo-text-muted)]'
                 }`}
               >
@@ -451,7 +451,7 @@ export default function ProfilePage() {
                 onClick={() => update({ language: 'en' })}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
                   progress.language === 'en'
-                    ? 'bg-[var(--duo-green)] text-white'
+                    ? 'bg-[var(--accent-xp)] text-white'
                     : 'bg-[var(--duo-border)] text-[var(--duo-text-muted)]'
                 }`}
               >

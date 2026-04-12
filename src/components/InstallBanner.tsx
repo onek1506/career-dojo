@@ -89,9 +89,9 @@ export default function InstallBanner() {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-[110] max-w-md mx-auto md:hidden">
-      <div className="duo-card bg-[var(--duo-card)] border-2 border-[var(--duo-green)] rounded-2xl p-4 shadow-2xl flex items-start gap-3">
+      <div className="duo-card bg-[var(--duo-card)] border-2 border-[var(--accent-xp)] rounded-2xl p-4 shadow-2xl flex items-start gap-3">
         <div className="w-10 h-10 rounded-xl bg-[rgba(88,204,2,0.15)] flex items-center justify-center shrink-0">
-          <Smartphone size={20} className="text-[var(--duo-green)]" />
+          <Smartphone size={20} className="text-[var(--accent-xp)]" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-xs font-bold text-white leading-snug">{title}</p>
