@@ -7,7 +7,7 @@ import { TRACKS } from '@/data/tracks';
 import { getCharacterForTrack, getRandomQuote } from '@/data/characters';
 import { playClickSound } from '@/lib/sounds';
 import Link from 'next/link';
-import { Zap, Target, BookOpen, ChevronRight, Trophy, TrendingUp, ArrowRightLeft, Sparkles, Flame } from 'lucide-react';
+import { BookOpen, ChevronRight, Trophy, ArrowRightLeft, Sparkles, Flame } from 'lucide-react';
 import { useState } from 'react';
 
 export default function HomePage() {
@@ -20,31 +20,26 @@ export default function HomePage() {
   const activeTrack = getTrackData(progress.selectedTrack || 'ib');
   const totalLessons = getAllLessons(progress.selectedTrack).length;
   const completedCount = progress.completedLessons.length;
-  const accuracy = progress.totalQuestionsAnswered > 0
-    ? Math.round((progress.totalCorrectAnswers / progress.totalQuestionsAnswered) * 100)
-    : 0;
 
   const allLessons = getAllLessons(progress.selectedTrack);
   const nextLesson = allLessons.find(l => !progress.completedLessons.includes(l.id));
 
-  const dailyProgress = Math.min(progress.lessonsCompletedToday / progress.dailyGoal, 1);
-
   return (
     <AppShell>
-      <div className="space-y-6">
+      <div className="space-y-5">
         {/* Track Switcher */}
         <button
           onClick={() => { setShowTrackPicker(!showTrackPicker); playClickSound(); }}
-          className="w-full duo-card p-3 flex items-center justify-between hover:border-[var(--duo-blue)] transition-all"
+          className="w-full duo-card p-3 flex items-center justify-between"
         >
           <div className="flex items-center gap-3">
             <span className="text-2xl">{currentTrack.icon}</span>
             <div className="text-left">
-              <div className="text-xs text-[var(--duo-text-muted)] uppercase font-bold">{t('Current Track', 'Aktueller Track')}</div>
+              <div className="text-[10px] text-[var(--text-muted)] uppercase font-bold tracking-wide">{t('Current Track', 'Aktueller Track')}</div>
               <div className="font-bold text-sm" style={{ color: currentTrack.color }}>{currentTrack.title}</div>
             </div>
           </div>
-          <ArrowRightLeft size={16} className="text-[var(--duo-text-muted)]" />
+          <ArrowRightLeft size={16} className="text-[var(--text-muted)]" />
         </button>
 
         {showTrackPicker && (
@@ -59,179 +54,118 @@ export default function HomePage() {
                 }}
                 disabled={tr.comingSoon}
                 className={`w-full duo-card p-3 flex items-center gap-3 text-left transition-all ${
-                  tr.id === progress.selectedTrack ? 'border-[var(--duo-green)]' : ''
-                } ${tr.comingSoon ? 'opacity-40' : 'hover:border-[var(--duo-blue)]'}`}
+                  tr.id === progress.selectedTrack ? 'border-[var(--accent-xp)]' : ''
+                } ${tr.comingSoon ? 'opacity-40' : ''}`}
               >
                 <span className="text-2xl">{tr.icon}</span>
                 <div className="flex-1">
                   <div className="font-bold text-sm">{tr.title}</div>
-                  <div className="text-xs text-[var(--duo-text-muted)]">
+                  <div className="text-xs text-[var(--text-secondary)]">
                     {progress.language === 'de' ? tr.subtitleDe : tr.subtitle}
                   </div>
                 </div>
-                {tr.comingSoon && <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--duo-border)] text-[var(--duo-text-muted)] font-bold">SOON</span>}
-                {tr.id === progress.selectedTrack && <span className="text-[var(--duo-green)]">✓</span>}
+                {tr.comingSoon && <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--border)] text-[var(--text-muted)] font-bold">SOON</span>}
+                {tr.id === progress.selectedTrack && <span className="text-[var(--accent-xp)]">✓</span>}
               </button>
             ))}
           </div>
         )}
 
-        {/* Character Quote */}
-        <div className="flex items-start gap-3 duo-card p-4">
-          <span className="text-2xl">{character.emoji}</span>
-          <div className="text-sm">
-            <span className="font-bold" style={{ color: character.color }}>{character.name}:</span>
-            <span className="text-gray-300 ml-1 italic">{getRandomQuote(character, progress.language)}</span>
-          </div>
+        {/* Character + Quote — compact 1-line */}
+        <div className="flex items-center gap-3 duo-card p-3">
+          <span className="text-xl shrink-0">{character.emoji}</span>
+          <p className="text-sm text-[var(--text-secondary)] italic truncate">
+            <span className="font-bold not-italic" style={{ color: character.color }}>{character.name}:</span>{' '}
+            {getRandomQuote(character, progress.language)}
+          </p>
         </div>
 
-        {/* Welcome Card */}
-        <div className="duo-card p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-xl font-black">
-                Hey {progress.username || 'Analyst'}!
-              </h1>
-              <p className="text-[var(--duo-text-muted)] text-sm mt-1">
-                {t('Keep up the momentum!', 'Bleib am Ball!')}
-              </p>
-            </div>
-            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[rgba(255,200,0,0.15)]">
-              <Trophy size={16} className="text-[var(--duo-gold)]" />
-              <span className="text-sm font-bold text-[var(--duo-gold)]">
-                {t(level.title, level.titleDe)}
-              </span>
-            </div>
-          </div>
-          <div className="mb-2 flex justify-between text-xs text-[var(--duo-text-muted)]">
-            <span>Level {level.level}</span>
-            <span>{level.nextLevel ? `${progress.xp} / ${level.nextLevel.xpRequired} XP` : 'MAX'}</span>
-          </div>
-          <div className="progress-bar-track h-3">
-            <div
-              className="progress-bar-fill h-full bg-gradient-to-r from-[var(--duo-green)] to-[var(--duo-blue)]"
-              style={{ width: `${level.progressToNext * 100}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Stats Row */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="duo-card p-4 text-center">
-            <div className="flex items-center justify-center gap-1 mb-1">
-              <span className="streak-fire">🔥</span>
-            </div>
-            <div className="text-xl font-black text-[var(--duo-orange)]">{progress.streak}</div>
-            <div className="text-[10px] text-[var(--duo-text-muted)] uppercase font-bold">
-              {t('Day Streak', 'Tage Streak')}
-            </div>
-          </div>
-          <div className="duo-card p-4 text-center">
-            <div className="flex items-center justify-center gap-1 mb-1">
-              <Zap size={18} className="text-[var(--duo-yellow)]" fill="var(--duo-yellow)" />
-            </div>
-            <div className="text-xl font-black text-[var(--duo-yellow)]">{progress.xp}</div>
-            <div className="text-[10px] text-[var(--duo-text-muted)] uppercase font-bold">
-              {t('Total XP', 'Gesamt XP')}
-            </div>
-          </div>
-          <div className="duo-card p-4 text-center">
-            <div className="flex items-center justify-center gap-1 mb-1">
-              <TrendingUp size={18} className="text-[var(--duo-green)]" />
-            </div>
-            <div className="text-xl font-black text-[var(--duo-green)]">{accuracy}%</div>
-            <div className="text-[10px] text-[var(--duo-text-muted)] uppercase font-bold">
-              {t('Accuracy', 'Genauigkeit')}
-            </div>
-          </div>
-        </div>
-
-        {/* Daily Goal */}
-        <div className="duo-card p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Target size={18} className="text-[var(--duo-blue)]" />
-              <span className="font-bold text-sm">{t('Daily Goal', 'Tagesziel')}</span>
-            </div>
-            <span className="text-sm text-[var(--duo-text-muted)]">
-              {progress.lessonsCompletedToday}/{progress.dailyGoal}
-            </span>
-          </div>
-          <div className="progress-bar-track h-3">
-            <div
-              className="progress-bar-fill h-full bg-[var(--duo-blue)]"
-              style={{ width: `${dailyProgress * 100}%` }}
-            />
-          </div>
-          {dailyProgress >= 1 && (
-            <p className="text-[var(--duo-green)] text-sm font-bold mt-2 text-center">
-              {t('Goal reached!', 'Ziel erreicht!')} 🎉
-            </p>
-          )}
-        </div>
-
-        {/* Review CTA — only when there are due SR cards */}
-        {reviewCount > 0 && (
-          <Link href="/review" className="block">
-            <div className="duo-card p-5 border-2 border-[var(--duo-red)] hover:border-[var(--duo-red)] transition-all group cursor-pointer bg-gradient-to-br from-[rgba(255,75,75,0.1)] to-transparent">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="relative shrink-0">
-                    <div className="w-12 h-12 rounded-xl bg-[var(--duo-red)] flex items-center justify-center">
-                      <Flame size={22} className="text-white" />
-                    </div>
-                    <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1 rounded-full bg-[var(--duo-yellow)] text-[var(--duo-bg)] text-[11px] font-black flex items-center justify-center border-2 border-[var(--duo-card)]">
-                      {reviewCount}
-                    </span>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-xs text-[var(--duo-red)] font-bold uppercase tracking-wide">
-                      {t('Spaced Repetition', 'Spaced Repetition')}
-                    </div>
-                    <div className="font-bold mt-0.5 truncate">
-                      {progress.language === 'de'
-                        ? `${reviewCount} Karten warten auf dich`
-                        : `${reviewCount} cards are waiting for you`}
-                    </div>
-                    <div className="text-xs text-[var(--duo-text-muted)] mt-0.5 italic truncate">
-                      {character.emoji}{' '}
-                      {progress.language === 'de'
-                        ? '"Die Fragen rächen sich. Geh sie nochmal durch."'
-                        : '"Those questions bite back. Time to face them again."'}
-                    </div>
-                  </div>
-                </div>
-                <ChevronRight
-                  size={20}
-                  className="text-[var(--duo-text-muted)] group-hover:text-[var(--duo-red)] transition shrink-0"
-                />
-              </div>
-            </div>
-          </Link>
-        )}
-
-        {/* Continue Learning CTA */}
+        {/* Continue Learning CTA — prominent */}
         {nextLesson && (
           <Link href={`/lesson/${nextLesson.id}`} className="block">
-            <div className="duo-card p-5 border-[var(--duo-green)] hover:border-[var(--duo-green)] transition-all group cursor-pointer">
+            <div className="duo-card p-5 border-[var(--accent-primary)] hover:border-[var(--accent-primary)] transition-all group cursor-pointer">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-[var(--duo-green)] flex items-center justify-center">
-                    <BookOpen size={22} className="text-white" />
+                  <div className="w-12 h-12 rounded-xl bg-[var(--accent-primary)] flex items-center justify-center">
+                    <BookOpen size={22} className="text-[var(--accent-primary-text)]" />
                   </div>
                   <div>
-                    <div className="text-xs text-[var(--duo-green)] font-bold uppercase tracking-wide">
+                    <div className="text-xs text-[var(--text-muted)] font-bold uppercase tracking-wide">
                       {t('Continue Learning', 'Weiterlernen')}
                     </div>
                     <div className="font-bold mt-0.5">
                       {t(nextLesson.title, nextLesson.titleDe)}
                     </div>
-                    <div className="text-xs text-[var(--duo-text-muted)] mt-0.5">
+                    <div className="text-xs text-[var(--text-muted)] mt-0.5">
                       +{nextLesson.xpReward} XP · {nextLesson.estimatedMinutes} min
                     </div>
                   </div>
                 </div>
-                <ChevronRight size={20} className="text-[var(--duo-text-muted)] group-hover:text-[var(--duo-green)] transition" />
+                <ChevronRight size={20} className="text-[var(--text-muted)] group-hover:text-[var(--accent-primary)] transition" />
+              </div>
+            </div>
+          </Link>
+        )}
+
+        {/* Welcome Card — Level Progress */}
+        <div className="duo-card p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h1 className="text-lg font-black">
+                Hey {progress.username || 'Analyst'}!
+              </h1>
+              <p className="text-[var(--text-muted)] text-xs mt-0.5">
+                {t('Keep up the momentum!', 'Bleib am Ball!')}
+              </p>
+            </div>
+            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[rgba(255,215,0,0.1)] border border-[rgba(255,215,0,0.2)]">
+              <Trophy size={14} className="text-[var(--duo-gold)]" />
+              <span className="text-xs font-bold text-[var(--duo-gold)]">
+                {t(level.title, level.titleDe)}
+              </span>
+            </div>
+          </div>
+          <div className="mb-1.5 flex justify-between text-[10px] text-[var(--text-muted)]">
+            <span>Level {level.level}</span>
+            <span>{level.nextLevel ? `${progress.xp} / ${level.nextLevel.xpRequired} XP` : 'MAX'}</span>
+          </div>
+          <div className="progress-bar-track h-2.5">
+            <div
+              className="progress-bar-fill h-full bg-[var(--accent-xp)]"
+              style={{ width: `${level.progressToNext * 100}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Review CTA — only when there are due SR cards */}
+        {reviewCount > 0 && (
+          <Link href="/review" className="block">
+            <div className="duo-card p-4 border-2 border-[var(--accent-wrong)] transition-all group cursor-pointer">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="relative shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-[var(--accent-wrong)] flex items-center justify-center">
+                      <Flame size={18} className="text-white" />
+                    </div>
+                    <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-[var(--accent-streak)] text-white text-[10px] font-black flex items-center justify-center border-2 border-[var(--bg-card)]">
+                      {reviewCount}
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs text-[var(--accent-wrong)] font-bold uppercase tracking-wide">
+                      {t('Spaced Repetition', 'Spaced Repetition')}
+                    </div>
+                    <div className="font-bold text-sm mt-0.5 truncate">
+                      {progress.language === 'de'
+                        ? `${reviewCount} Karten warten auf dich`
+                        : `${reviewCount} cards waiting`}
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight
+                  size={18}
+                  className="text-[var(--text-muted)] group-hover:text-[var(--accent-wrong)] transition shrink-0"
+                />
               </div>
             </div>
           </Link>
@@ -239,33 +173,30 @@ export default function HomePage() {
 
         {/* Solve / Online Test Prep CTA */}
         <Link href="/solve" className="block">
-          <div className="duo-card p-5 border-2 border-[var(--duo-purple)] hover:border-[var(--duo-purple)] transition-all group cursor-pointer bg-gradient-to-br from-[rgba(206,130,255,0.08)] to-transparent">
+          <div className="duo-card p-4 border-2 border-[var(--duo-purple)] transition-all group cursor-pointer">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-[var(--duo-purple)] flex items-center justify-center shrink-0">
-                  <Sparkles size={22} className="text-white" />
+                <div className="w-10 h-10 rounded-xl bg-[var(--duo-purple)] flex items-center justify-center shrink-0">
+                  <Sparkles size={18} className="text-white" />
                 </div>
                 <div className="min-w-0">
                   <div className="text-xs text-[var(--duo-purple)] font-bold uppercase tracking-wide">
                     {t('Round 1 Prep', 'Runde 1 Prep')}
                   </div>
-                  <div className="font-bold mt-0.5 truncate">
+                  <div className="font-bold text-sm mt-0.5 truncate">
                     {t('Online Tests: McKinsey · BCG · Bain', 'Online Tests: McKinsey · BCG · Bain')}
-                  </div>
-                  <div className="text-xs text-[var(--duo-text-muted)] mt-0.5">
-                    {t('Solve · Casey · SOVA practice', 'Solve · Casey · SOVA Übungen')}
                   </div>
                 </div>
               </div>
-              <ChevronRight size={20} className="text-[var(--duo-text-muted)] group-hover:text-[var(--duo-purple)] transition shrink-0" />
+              <ChevronRight size={18} className="text-[var(--text-muted)] group-hover:text-[var(--duo-purple)] transition shrink-0" />
             </div>
           </div>
         </Link>
 
-        {/* Unit Overview */}
+        {/* Unit Overview — compact, status-based */}
         <div>
-          <h2 className="font-black text-lg mb-3">{t('Your Learning Path', 'Dein Lernpfad')}</h2>
-          <div className="space-y-3">
+          <h2 className="font-black text-base mb-3">{t('Your Learning Path', 'Dein Lernpfad')}</h2>
+          <div className="space-y-2">
             {activeTrack.units.map(unit => {
               const unitLessons = unit.lessons;
               const unitCompleted = unitLessons.filter(l => progress.completedLessons.includes(l.id)).length;
@@ -278,10 +209,10 @@ export default function HomePage() {
                   href={isLocked ? '#' : '/skill-tree'}
                   className={`block ${isLocked ? 'pointer-events-none' : ''}`}
                 >
-                  <div className={`duo-card p-4 flex items-center gap-4 ${isLocked ? 'opacity-40' : ''}`}>
+                  <div className={`duo-card p-3 flex items-center gap-3 ${isLocked ? 'opacity-40' : ''}`}>
                     <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
-                      style={{ background: `${unit.color}20`, border: `2px solid ${unit.color}` }}
+                      className="w-10 h-10 rounded-lg flex items-center justify-center text-xl shrink-0"
+                      style={{ background: `${unit.color}15`, border: `2px solid ${unit.color}40` }}
                     >
                       {unit.icon}
                     </div>
@@ -289,19 +220,19 @@ export default function HomePage() {
                       <div className="font-bold text-sm truncate">
                         {t(unit.title, unit.titleDe)}
                       </div>
-                      <div className="text-xs text-[var(--duo-text-muted)] mt-0.5">
+                      <div className="text-[10px] text-[var(--text-muted)] mt-0.5">
                         {unitCompleted}/{unitLessons.length} {t('completed', 'abgeschlossen')}
                         {isLocked && ` · ${unit.requiredXp} XP ${t('required', 'benötigt')}`}
                       </div>
-                      <div className="progress-bar-track h-1.5 mt-2">
+                      <div className="progress-bar-track h-1 mt-1.5">
                         <div
                           className="progress-bar-fill h-full"
                           style={{ width: `${pct * 100}%`, background: unit.color }}
                         />
                       </div>
                     </div>
-                    {pct === 1 && <span className="text-[var(--duo-green)] text-lg">✓</span>}
-                    {isLocked && <span className="text-lg">🔒</span>}
+                    {pct === 1 && <span className="text-[var(--accent-xp)] text-base">✓</span>}
+                    {isLocked && <span className="text-sm">🔒</span>}
                   </div>
                 </Link>
               );
@@ -310,9 +241,9 @@ export default function HomePage() {
         </div>
 
         {/* Overall Progress */}
-        <div className="duo-card p-5 text-center">
-          <div className="text-3xl font-black">{completedCount}/{totalLessons}</div>
-          <div className="text-sm text-[var(--duo-text-muted)]">
+        <div className="duo-card p-4 text-center">
+          <div className="text-2xl font-black">{completedCount}/{totalLessons}</div>
+          <div className="text-xs text-[var(--text-muted)]">
             {t('Lessons Completed', 'Lektionen abgeschlossen')}
           </div>
         </div>

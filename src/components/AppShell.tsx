@@ -8,7 +8,7 @@ import BottomNav from './BottomNav';
 import StreakReminder from './StreakReminder';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const { progress, loaded, level, salary, onBench } = useStore();
+  const { progress, loaded, level } = useStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -19,12 +19,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   if (!loaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--duo-bg)]">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-[var(--duo-green)] flex items-center justify-center text-3xl font-black text-white animate-pulse">
+          <div className="w-16 h-16 rounded-2xl bg-[var(--accent-primary)] flex items-center justify-center text-3xl font-black text-[var(--accent-primary-text)] animate-pulse">
             CD
           </div>
-          <p className="text-[var(--duo-text-muted)] text-sm">Loading...</p>
+          <p className="text-[var(--text-secondary)] text-sm">Loading...</p>
         </div>
       </div>
     );
@@ -40,9 +40,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         xp={progress.xp}
         streak={progress.streak}
         levelTitle={progress.language === 'de' ? level.titleDe : level.title}
-        salary={salary}
-        onBench={onBench}
-        benchDays={progress.benchDays}
       />
       <StreakReminder />
       <main className="pt-16 pb-20 min-h-screen">

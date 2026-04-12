@@ -15,40 +15,6 @@ import { rollMeme as rollMemeUtil, type Meme } from '@/data/memes';
 // CareerDojo Global Store — localStorage persistence
 // ============================================================
 
-// Salary by XP level — base salary at the start of each level
-// Streak loss = bench time, applies temporary penalties (never below base)
-export const SALARY_TABLE: Record<number, number> = {
-  1: 42000,   // Praktikant
-  2: 48000,   // Werkstudent
-  3: 60000,   // Junior Analyst
-  4: 75000,   // Analyst
-  5: 90000,   // Senior Analyst
-  6: 120000,  // Associate
-  7: 150000,  // Senior Associate
-  8: 200000,  // VP
-  9: 280000,  // Director
-  10: 400000, // Managing Director
-};
-
-export function getBaseSalaryForLevel(level: number): number {
-  return SALARY_TABLE[level] ?? SALARY_TABLE[1];
-}
-
-export function getMaxSalaryForLevel(level: number): number {
-  // Cap recovery at the next level's base (or +20% above own base for L10)
-  const next = SALARY_TABLE[level + 1];
-  if (next) return next - 1;
-  return Math.round(SALARY_TABLE[level] * 1.2);
-}
-
-function daysBetween(fromDateStr: string, toDateStr: string): number {
-  if (!fromDateStr || !toDateStr) return 0;
-  const from = new Date(fromDateStr + 'T00:00:00');
-  const to = new Date(toDateStr + 'T00:00:00');
-  const ms = to.getTime() - from.getTime();
-  return Math.max(0, Math.round(ms / 86400000));
-}
-
 export interface UserProgress {
   completedLessons: string[];
   completedQuizzes: Record<string, { score: number; bestScore: number; attempts: number }>;
@@ -71,11 +37,6 @@ export interface UserProgress {
   reviewCards: ReviewCard[];
   wrongAnswersToday: string[]; // questionIds the user got wrong today
   lastReviewDate: string; // YYYY-MM-DD of last review session
-  // ===== Salary System =====
-  currentSalary: number;     // current salary in EUR
-  salaryHistory: number[];   // last 10 salary snapshots (for chart)
-  benchDays: number;         // consecutive days without learning activity
-  streakFreezes: number;     // available freezes (start with 1)
   // ===== Meme Collection =====
   unlockedMemes: string[];   // collected meme IDs
 }
@@ -102,10 +63,6 @@ const DEFAULT_PROGRESS: UserProgress = {
   reviewCards: [],
   wrongAnswersToday: [],
   lastReviewDate: '',
-  currentSalary: 42000,
-  salaryHistory: [42000],
-  benchDays: 0,
-  streakFreezes: 1,
   unlockedMemes: [],
 };
 
@@ -152,58 +109,13 @@ export function useStore() {
     const today = getToday();
 
     if (p.lastActiveDate === today) {
-      // Same day — no bench update
+      // Same day — no changes
     } else if (isYesterday(p.lastActiveDate)) {
       p.lessonsCompletedToday = 0;
-      p.benchDays = 0;
     } else if (p.lastActiveDate) {
-      // Multi-day gap — calculate bench days
-      const gap = daysBetween(p.lastActiveDate, today);
-      p.benchDays = Math.max(0, gap - 1);
+      // Multi-day gap — streak lost
       p.streak = 0;
       p.lessonsCompletedToday = 0;
-    } else {
-      p.benchDays = 0;
-    }
-
-    // Apply salary penalty cascade based on benchDays
-    const currentLevel = getLevelForXp(p.xp).level;
-    const baseSalary = getBaseSalaryForLevel(currentLevel);
-
-    if (p.benchDays === 1) {
-      // Warning only — consume freeze if available, no penalty
-      if (p.streakFreezes > 0) {
-        p.streakFreezes -= 1;
-        p.benchDays = 0; // freeze absorbs the bench day
-      }
-    } else if (p.benchDays === 2) {
-      // -8% penalty
-      p.currentSalary = Math.max(
-        baseSalary,
-        Math.round(p.currentSalary * 0.92),
-      );
-    } else if (p.benchDays === 3) {
-      // -15% penalty
-      p.currentSalary = Math.max(
-        baseSalary,
-        Math.round(p.currentSalary * 0.85),
-      );
-    } else if (p.benchDays >= 4) {
-      // -20% performance review
-      p.currentSalary = Math.max(
-        baseSalary,
-        Math.round(p.currentSalary * 0.8),
-      );
-    }
-
-    // Make sure currentSalary is at least the base of the current level
-    if (p.currentSalary < baseSalary) {
-      p.currentSalary = baseSalary;
-    }
-
-    // Initialise salaryHistory if missing or empty (legacy users)
-    if (!Array.isArray(p.salaryHistory) || p.salaryHistory.length === 0) {
-      p.salaryHistory = [p.currentSalary];
     }
 
     saveProgress(p);
@@ -234,38 +146,6 @@ export function useStore() {
         newLongestStreak = Math.max(newLongestStreak, newStreak);
       }
 
-      // ===== Salary recovery =====
-      const newLevel = getLevelForXp(newXp).level;
-      const baseSalary = getBaseSalaryForLevel(newLevel);
-      const maxSalary = getMaxSalaryForLevel(newLevel);
-
-      // First, snap salary to at least the base for the (possibly new) level
-      let salary = Math.max(prev.currentSalary, baseSalary);
-
-      // Recover +5% per learning day, but only the first lesson of the day triggers it
-      const isFirstLessonToday = prev.lastActiveDate !== today;
-      if (isFirstLessonToday) {
-        salary = Math.min(maxSalary, Math.round(salary * 1.05));
-      }
-
-      // If user just leveled up, jump straight to the new base (if higher)
-      if (newLevel > getLevelForXp(prev.xp).level) {
-        salary = Math.max(salary, baseSalary);
-      }
-
-      // Keep last 10 salary snapshots
-      const lastSnapshot = prev.salaryHistory[prev.salaryHistory.length - 1];
-      const nextHistory =
-        salary !== lastSnapshot
-          ? [...prev.salaryHistory, salary].slice(-10)
-          : prev.salaryHistory;
-
-      // Earn a streakFreeze every 7-day streak milestone (max 3)
-      let freezes = prev.streakFreezes;
-      if (newStreak > prev.streak && newStreak % 7 === 0 && freezes < 3) {
-        freezes += 1;
-      }
-
       const next: UserProgress = {
         ...prev,
         completedLessons: alreadyCompleted
@@ -278,10 +158,6 @@ export function useStore() {
         lessonsCompletedToday: prev.lastActiveDate === today
           ? prev.lessonsCompletedToday + 1
           : 1,
-        currentSalary: salary,
-        salaryHistory: nextHistory,
-        benchDays: 0,
-        streakFreezes: freezes,
       };
       saveProgress(next);
       return next;
@@ -406,7 +282,6 @@ export function useStore() {
   }, [progress.unlockedMemes]);
 
   const level = getLevelForXp(progress.xp);
-  const onBench = progress.benchDays >= 1;
 
   return {
     progress,
@@ -421,11 +296,6 @@ export function useStore() {
     reviewCount,
     getReviewCount,
     resetProgress,
-    salary: progress.currentSalary,
-    salaryHistory: progress.salaryHistory,
-    benchDays: progress.benchDays,
-    streakFreezes: progress.streakFreezes,
-    onBench,
     rollMeme,
     unlockedMemes: progress.unlockedMemes,
     t: (en: string, de: string) => progress.language === 'de' ? de : en,
