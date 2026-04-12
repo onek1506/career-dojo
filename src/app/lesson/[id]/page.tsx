@@ -56,6 +56,63 @@ import { GLOSSARY, type GlossaryTerm } from '@/data/glossary';
 const MAX_TIMES_SHOWN = 3; // show each question at most 3 times in a row
 
 // ============================================================
+// Install Banner — shown once in lesson results
+// ============================================================
+
+function InstallBannerInline({ isDE }: { isDE: boolean }) {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    try {
+      const alreadyShown = localStorage.getItem('install-prompt-shown') === 'true';
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      setShow(!alreadyShown && !isStandalone);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  if (!show) return null;
+
+  return (
+    <div
+      style={{
+        marginTop: 4,
+        padding: '12px 16px',
+        background: 'var(--bg-secondary)',
+        border: '0.5px solid var(--border)',
+        borderRadius: 10,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        fontSize: 13,
+      }}
+    >
+      <span style={{ color: 'var(--text-secondary)' }}>
+        📱 {isDE ? 'Als App speichern?' : 'Save as app?'}
+      </span>
+      <a
+        href="/install"
+        onClick={() => {
+          try {
+            localStorage.setItem('install-prompt-shown', 'true');
+          } catch {
+            // ignore
+          }
+        }}
+        style={{
+          fontWeight: 600,
+          color: 'var(--text-primary)',
+          textDecoration: 'none',
+        }}
+      >
+        {isDE ? "So geht's →" : 'How to →'}
+      </a>
+    </div>
+  );
+}
+
+// ============================================================
 // Slide model — one idea per screen
 // ============================================================
 
@@ -765,6 +822,9 @@ export default function LessonPage() {
                   </span>
                 </div>
               </div>
+
+              {/* Install Banner — show once after first lesson */}
+              <InstallBannerInline isDE={isDE} />
 
               <div className="flex gap-3">
                 <button
