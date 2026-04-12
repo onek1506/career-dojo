@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import InstallBanner from "@/components/InstallBanner";
+import ThemeInit from "@/components/ThemeInit";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,13 +49,13 @@ export default function RootLayout({
     <html
       lang="de"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-[var(--bg)] text-[var(--text-primary)]">
-        {/* Prevent FOUC: apply theme from localStorage before React hydrates */}
-        <Script
-          id="theme-init"
-          strategy="beforeInteractive"
-        >{`try{var d=JSON.parse(localStorage.getItem('career-dojo-progress')||'{}');if(d.theme==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}`}</Script>
+      <body
+        className="min-h-full flex flex-col bg-[var(--bg)] text-[var(--text-primary)]"
+        suppressHydrationWarning
+      >
+        <ThemeInit />
         <ServiceWorkerRegister />
         <InstallBanner />
         {children}
