@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import InstallBanner from "@/components/InstallBanner";
@@ -51,7 +52,10 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-[var(--bg)] text-[var(--text-primary)]">
         {/* Prevent FOUC: apply theme from localStorage before React hydrates */}
-        <script dangerouslySetInnerHTML={{ __html: `try{var d=JSON.parse(localStorage.getItem('career-dojo-progress')||'{}');if(d.theme==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}` }} />
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+        >{`try{var d=JSON.parse(localStorage.getItem('career-dojo-progress')||'{}');if(d.theme==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}`}</Script>
         <ServiceWorkerRegister />
         <InstallBanner />
         {children}

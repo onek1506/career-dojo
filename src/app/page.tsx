@@ -4,7 +4,7 @@ import AppShell from '@/components/AppShell';
 import { useStore } from '@/lib/store';
 import { getTrackData, getAllLessons } from '@/data/content';
 import { TRACKS } from '@/data/tracks';
-import { getCharacterForTrack, getRandomQuote } from '@/data/characters';
+import { getCharacterForTrack, getFirstQuote } from '@/data/characters';
 import { playClickSound } from '@/lib/sounds';
 import Link from 'next/link';
 import { BookOpen, ChevronRight, Trophy, ArrowRightLeft, Sparkles, Flame } from 'lucide-react';
@@ -76,7 +76,7 @@ export default function HomePage() {
           <span className="text-xl shrink-0">{character.emoji}</span>
           <p className="text-sm text-[var(--text-secondary)] italic truncate">
             <span className="font-bold not-italic" style={{ color: character.color }}>{character.name}:</span>{' '}
-            {getRandomQuote(character, progress.language)}
+            {getFirstQuote(character, progress.language)}
           </p>
         </div>
 

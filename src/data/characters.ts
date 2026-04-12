@@ -317,6 +317,18 @@ export function getGlobalCharacter(): Character {
   return CHARACTERS[0]; // Carl
 }
 
+/**
+ * Deterministic quote (first one). Safe for SSR / initial render.
+ */
+export function getFirstQuote(char: Character, lang: 'en' | 'de'): string {
+  const quote = char.quotes[0];
+  return lang === 'de' ? quote.de : quote.en;
+}
+
+/**
+ * Random quote — only call in useEffect / event handlers (client-only)
+ * to avoid hydration mismatches.
+ */
 export function getRandomQuote(char: Character, lang: 'en' | 'de'): string {
   const quote = char.quotes[Math.floor(Math.random() * char.quotes.length)];
   return lang === 'de' ? quote.de : quote.en;

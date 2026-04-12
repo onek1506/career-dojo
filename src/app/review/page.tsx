@@ -20,7 +20,7 @@ import {
   getCharacterForTrack,
   getRandomEncouragement,
   getRandomWrongReaction,
-  getRandomQuote,
+  getFirstQuote,
 } from '@/data/characters';
 import {
   playCorrectSound,
@@ -142,7 +142,7 @@ export default function ReviewPage() {
                   {character.name}:
                 </span>
                 <span className="text-gray-300 ml-1 italic">
-                  {getRandomQuote(character, progress.language)}
+                  {getFirstQuote(character, progress.language)}
                 </span>
               </div>
             </div>

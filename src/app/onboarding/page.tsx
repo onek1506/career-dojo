@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { TRACKS } from '@/data/tracks';
-import { getCharacterForTrack, getGlobalCharacter, getRandomQuote } from '@/data/characters';
+import { getCharacterForTrack, getGlobalCharacter, getFirstQuote } from '@/data/characters';
 import { playClickSound, playLevelUpSound } from '@/lib/sounds';
 import { ChevronRight, Zap, BookOpen, Brain, Globe, Volume2, VolumeX, Bell, BellOff } from 'lucide-react';
 
@@ -92,7 +92,7 @@ export default function OnboardingPage() {
               <span className="text-3xl">{carl.emoji}</span>
               <div>
                 <div className="text-xs text-[var(--duo-orange)] font-bold">{carl.name}</div>
-                <p className="text-sm mt-1">{getRandomQuote(carl, lang)}</p>
+                <p className="text-sm mt-1">{getFirstQuote(carl, lang)}</p>
               </div>
             </div>
 
@@ -192,7 +192,7 @@ export default function OnboardingPage() {
                       : getCharacterForTrack(track).personality}
                   </p>
                   <p className="text-xs mt-1 italic">
-                    {getRandomQuote(getCharacterForTrack(track), lang)}
+                    {getFirstQuote(getCharacterForTrack(track), lang)}
                   </p>
                 </div>
               </div>
@@ -365,7 +365,7 @@ export default function OnboardingPage() {
             <div className="duo-card p-4 flex items-start gap-3 text-left">
               <span className="text-2xl">{getCharacterForTrack(track).emoji}</span>
               <div className="text-sm italic">
-                {getRandomQuote(getCharacterForTrack(track), lang)}
+                {getFirstQuote(getCharacterForTrack(track), lang)}
               </div>
             </div>
 

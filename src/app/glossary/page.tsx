@@ -9,7 +9,7 @@ import {
   type GlossaryTerm,
   type GlossaryTrack,
 } from '@/data/glossary';
-import { getCharacterForTrack, getRandomQuote } from '@/data/characters';
+import { getCharacterForTrack, getFirstQuote } from '@/data/characters';
 import { playClickSound } from '@/lib/sounds';
 
 type FilterTab = 'all' | 'ib' | 'consulting' | 'pe' | 'vc';
@@ -108,7 +108,7 @@ export default function GlossaryPage() {
               {character.name}:
             </span>
             <span className="text-gray-300 ml-1 italic">
-              {getRandomQuote(character, progress.language)}
+              {getFirstQuote(character, progress.language)}
             </span>
           </div>
         </div>

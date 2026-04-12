@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { X, Flame } from 'lucide-react';
 import { useStore } from '@/lib/store';
-import { getCharacterForTrack, getRandomQuote } from '@/data/characters';
+import { getCharacterForTrack, getFirstQuote } from '@/data/characters';
 
 const DISMISS_KEY = 'streak-reminder-dismissed-date';
 
@@ -86,7 +86,7 @@ export default function StreakReminder() {
           <div className="flex items-start gap-2 mt-2">
             <span className="text-base shrink-0">{character.emoji}</span>
             <p className="text-[11px] italic text-[var(--duo-text-muted)] leading-snug">
-              {getRandomQuote(character, progress.language)}
+              {getFirstQuote(character, progress.language)}
             </p>
           </div>
         </div>
