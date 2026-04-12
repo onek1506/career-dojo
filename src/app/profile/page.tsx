@@ -9,7 +9,7 @@ import { getCharacterForTrack } from '@/data/characters';
 import { playClickSound } from '@/lib/sounds';
 import Link from 'next/link';
 import { Flame, Zap, Target, Trophy, BarChart3, BookOpen, RefreshCw, Globe, Volume2, VolumeX, ArrowRightLeft, Sparkles, ChevronRight, Brain, Image as ImageIcon, Bell } from 'lucide-react';
-import { MEMES, RARITY_COLOR, RARITY_LABEL, type Meme } from '@/data/memes';
+import { MEMES, RARITY_COLOR, RARITY_LABEL, type Meme, type MemeRarity } from '@/data/memes';
 
 export default function ProfilePage() {
   const { progress, level, t, update, resetProgress, unlockedMemes } = useStore();
@@ -21,6 +21,18 @@ export default function ProfilePage() {
     : 0;
   const totalMemes = MEMES.length;
   const collectedCount = unlockedMemes.length;
+
+  // Meme filter tabs
+  const [memeFilter, setMemeFilter] = useState<'all' | MemeRarity>('all');
+  const filteredMemes = memeFilter === 'all'
+    ? MEMES
+    : MEMES.filter(m => m.rarity === memeFilter);
+  const FILTER_TABS: { key: 'all' | MemeRarity; label: string }[] = [
+    { key: 'all', label: t('All', 'Alle') },
+    { key: 'standard', label: 'Standard' },
+    { key: 'rare', label: 'Rare' },
+    { key: 'legendary', label: 'Legendary' },
+  ];
 
   // Notification toggle state
   const [notifEnabled, setNotifEnabled] = useState(false);
@@ -122,44 +134,77 @@ export default function ProfilePage() {
               <ImageIcon size={16} className="text-[var(--duo-purple)]" />
               {t('Collection', 'Sammlung')}
             </h2>
-            <span className="text-[10px] font-bold text-[var(--duo-text-muted)] tabular-nums">
+            <span className="text-[10px] font-bold text-[var(--text-muted)] tabular-nums">
               {collectedCount} / {totalMemes} {t('Memes', 'Memes')}
             </span>
           </div>
+
+          {/* Filter Tabs */}
+          <div className="flex gap-1 mb-4 overflow-x-auto pb-1">
+            {FILTER_TABS.map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setMemeFilter(tab.key)}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wide whitespace-nowrap transition-all ${
+                  memeFilter === tab.key
+                    ? 'bg-[var(--accent-primary)] text-[var(--accent-primary-text)]'
+                    : 'bg-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                }`}
+                style={
+                  memeFilter === tab.key && tab.key !== 'all'
+                    ? { backgroundColor: RARITY_COLOR[tab.key as MemeRarity], color: tab.key === 'standard' ? '#1a1a1a' : '#fff' }
+                    : {}
+                }
+              >
+                {tab.key === 'legendary' && '★ '}
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
           <div className="grid grid-cols-3 gap-2">
-            {MEMES.map((m: Meme) => {
+            {filteredMemes.map((m: Meme) => {
               const unlocked = unlockedMemes.includes(m.id);
               const color = RARITY_COLOR[m.rarity];
-              const rarityLabel = progress.language === 'de'
+              const rLabel = progress.language === 'de'
                 ? RARITY_LABEL[m.rarity].de
                 : RARITY_LABEL[m.rarity].en;
+              const isLegendary = m.rarity === 'legendary';
               return (
                 <div
                   key={m.id}
-                  className={`relative aspect-square rounded-xl border-2 flex flex-col items-center justify-center gap-1 p-2 text-center overflow-hidden transition-all ${
+                  className={`relative aspect-square rounded-xl flex flex-col items-center justify-center gap-1 p-2 text-center overflow-hidden transition-all ${
                     unlocked
-                      ? 'bg-gradient-to-br from-[var(--duo-card)] to-[var(--duo-bg)]'
-                      : 'bg-[var(--duo-border)] opacity-60'
-                  }`}
-                  style={{ borderColor: unlocked ? color : 'var(--duo-border)' }}
+                      ? 'bg-gradient-to-br from-[var(--bg-card)] to-[var(--bg)]'
+                      : 'bg-[var(--border)] opacity-60'
+                  } ${isLegendary && unlocked ? 'ring-2 ring-[#B8860B] ring-offset-1 ring-offset-[var(--bg-card)]' : ''}`}
+                  style={{
+                    borderWidth: 2,
+                    borderStyle: 'solid',
+                    borderColor: unlocked ? color : 'var(--border)',
+                  }}
                   title={unlocked ? (progress.language === 'de' ? m.textDe : m.text) : '???'}
                 >
                   {unlocked ? (
                     <>
                       <div className="text-2xl leading-none">{m.emoji}</div>
                       <span
-                        className="text-[8px] font-black uppercase tracking-wider text-black px-1.5 py-0.5 rounded-full"
-                        style={{ backgroundColor: color }}
+                        className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full flex items-center gap-0.5"
+                        style={{
+                          backgroundColor: color,
+                          color: m.rarity === 'standard' ? '#1a1a1a' : '#fff',
+                        }}
                       >
-                        {rarityLabel}
+                        {isLegendary && '★ '}
+                        {rLabel}
                       </span>
                     </>
                   ) : (
                     <>
-                      <div className="text-2xl text-[var(--duo-text-muted)] grayscale opacity-40">
+                      <div className="text-2xl text-[var(--text-muted)] grayscale opacity-40">
                         ❔
                       </div>
-                      <span className="text-[8px] font-black text-[var(--duo-text-muted)] uppercase tracking-wider">
+                      <span className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-wider">
                         ???
                       </span>
                     </>
@@ -209,32 +254,34 @@ export default function ProfilePage() {
             {t('Prep Tools', 'Prep-Tools')}
           </h2>
           <div className="space-y-2">
-            <Link href="/solve" onClick={() => playClickSound()}>
-              <div className="w-full p-3 rounded-xl flex items-center gap-3 border-2 border-[var(--duo-border)] hover:border-[var(--duo-purple)] transition-all cursor-pointer group">
-                <div className="w-10 h-10 rounded-lg bg-[rgba(206,130,255,0.15)] flex items-center justify-center shrink-0">
-                  <Sparkles size={18} className="text-[var(--duo-purple)]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold">{t('Online Test Prep', 'Online Test Prep')}</div>
-                  <div className="text-[10px] text-[var(--duo-text-muted)]">
-                    {t('McKinsey Solve · BCG Casey · Bain SOVA', 'McKinsey Solve · BCG Casey · Bain SOVA')}
+            {progress.selectedTrack === 'consulting' && (
+              <Link href="/solve" onClick={() => playClickSound()}>
+                <div className="w-full p-3 rounded-xl flex items-center gap-3 border-2 border-[var(--border)] hover:border-[var(--duo-purple)] transition-all cursor-pointer group">
+                  <div className="w-10 h-10 rounded-lg bg-[rgba(206,130,255,0.15)] flex items-center justify-center shrink-0">
+                    <Sparkles size={18} className="text-[var(--duo-purple)]" />
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-bold">{t('Online Test Prep', 'Online Test Prep')}</div>
+                    <div className="text-[10px] text-[var(--text-muted)]">
+                      {t('McKinsey Solve · BCG Casey · Bain SOVA', 'McKinsey Solve · BCG Casey · Bain SOVA')}
+                    </div>
+                  </div>
+                  <ChevronRight size={16} className="text-[var(--text-muted)] group-hover:text-[var(--duo-purple)] transition shrink-0" />
                 </div>
-                <ChevronRight size={16} className="text-[var(--duo-text-muted)] group-hover:text-[var(--duo-purple)] transition shrink-0" />
-              </div>
-            </Link>
+              </Link>
+            )}
             <Link href="/brainteasers" onClick={() => playClickSound()}>
-              <div className="w-full p-3 rounded-xl flex items-center gap-3 border-2 border-[var(--duo-border)] hover:border-[var(--duo-orange)] transition-all cursor-pointer group mt-2">
+              <div className="w-full p-3 rounded-xl flex items-center gap-3 border-2 border-[var(--border)] hover:border-[var(--duo-orange)] transition-all cursor-pointer group mt-2">
                 <div className="w-10 h-10 rounded-lg bg-[rgba(255,150,0,0.15)] flex items-center justify-center shrink-0">
                   <Brain size={18} className="text-[var(--duo-orange)]" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-bold">{t('Brainteasers', 'Denksport')}</div>
-                  <div className="text-[10px] text-[var(--duo-text-muted)]">
+                  <div className="text-[10px] text-[var(--text-muted)]">
                     {t('Classic interview puzzles', 'Klassische Interview-Rätsel')}
                   </div>
                 </div>
-                <ChevronRight size={16} className="text-[var(--duo-text-muted)] group-hover:text-[var(--duo-orange)] transition shrink-0" />
+                <ChevronRight size={16} className="text-[var(--text-muted)] group-hover:text-[var(--duo-orange)] transition shrink-0" />
               </div>
             </Link>
           </div>

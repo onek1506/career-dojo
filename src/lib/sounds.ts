@@ -5,6 +5,7 @@
 // ============================================================
 
 let audioCtx: AudioContext | null = null;
+let globalUnlockSetup = false;
 
 function getAudioContext(): AudioContext {
   if (!audioCtx) {
@@ -25,6 +26,53 @@ export function unlockAudioContext() {
   } catch {
     // Audio not available
   }
+}
+
+/**
+ * Set up global document-level event listeners that unlock the
+ * AudioContext on the very first user gesture. Safari (iOS) requires
+ * the AudioContext to be created AND resumed inside a user gesture
+ * handler. This function attaches listeners to touchstart, touchend,
+ * click, and keydown on the document — covering every possible first
+ * interaction. Once unlocked, the listeners remove themselves.
+ *
+ * Call this once from AppShell or a top-level layout useEffect.
+ */
+export function setupGlobalAudioUnlock() {
+  if (typeof window === 'undefined') return;
+  if (globalUnlockSetup) return;
+  globalUnlockSetup = true;
+
+  const unlock = () => {
+    try {
+      // Create context if it doesn't exist
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      }
+      // Resume if suspended (Safari requires this inside gesture)
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      // Play a silent buffer to fully unlock on iOS Safari
+      const buffer = audioCtx.createBuffer(1, 1, 22050);
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioCtx.destination);
+      source.start(0);
+    } catch {
+      // Audio not available
+    }
+    // Remove all listeners after first successful unlock
+    document.removeEventListener('touchstart', unlock, true);
+    document.removeEventListener('touchend', unlock, true);
+    document.removeEventListener('click', unlock, true);
+    document.removeEventListener('keydown', unlock, true);
+  };
+
+  document.addEventListener('touchstart', unlock, true);
+  document.addEventListener('touchend', unlock, true);
+  document.addEventListener('click', unlock, true);
+  document.addEventListener('keydown', unlock, true);
 }
 
 function isSoundEnabled(): boolean {

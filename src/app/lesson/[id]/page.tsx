@@ -254,6 +254,7 @@ export default function LessonPage() {
     recordAnswer,
     recordQuizScore,
     rollMeme,
+    canReceiveMeme,
     unlockedMemes,
   } = useStore();
   const lessonId = params.id as string;
@@ -313,9 +314,18 @@ export default function LessonPage() {
   };
 
   // Roll a meme exactly once when the user reaches the results phase
+  // Gated behind: daily goal reached AND max 1 meme per day
   useEffect(() => {
     if (phase !== 'results' || memeRolled) return;
     setMemeRolled(true);
+
+    // Check daily gating: must reach daily goal, max 1 meme/day
+    if (!canReceiveMeme()) {
+      setRolledMeme(null);
+      setAllMemesCollected(false);
+      return;
+    }
+
     const trackId = progress.selectedTrack || 'ib';
     const trackMemes = getMemesForTrack(trackId);
     const allUnlocked =
@@ -329,7 +339,7 @@ export default function LessonPage() {
       setRolledMeme(meme);
       setAllMemesCollected(meme === null);
     }
-  }, [phase, memeRolled, progress.selectedTrack, rollMeme, unlockedMemes]);
+  }, [phase, memeRolled, progress.selectedTrack, rollMeme, canReceiveMeme, unlockedMemes]);
 
   if (!lesson) {
     return (

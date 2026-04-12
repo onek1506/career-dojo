@@ -6,12 +6,18 @@ import { useStore } from '@/lib/store';
 import TopBar from './TopBar';
 import BottomNav from './BottomNav';
 import StreakReminder from './StreakReminder';
+import { setupGlobalAudioUnlock } from '@/lib/sounds';
 import { X, Bell } from 'lucide-react';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const { progress, loaded, level, t } = useStore();
   const router = useRouter();
   const [showNotifBanner, setShowNotifBanner] = useState(false);
+
+  // Set up global audio unlock for Safari
+  useEffect(() => {
+    setupGlobalAudioUnlock();
+  }, []);
 
   // Apply theme to <html> so CSS variables switch
   useEffect(() => {
@@ -128,7 +134,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </main>
-      <BottomNav lang={progress.language} />
+      <BottomNav lang={progress.language} selectedTrack={progress.selectedTrack} />
     </>
   );
 }
