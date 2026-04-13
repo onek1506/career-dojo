@@ -274,35 +274,74 @@ export default function ProfilePage() {
         </div>
 
         {/* Track Switcher */}
-        <div className="duo-card p-5">
-          <h2 className="font-bold text-sm mb-3 flex items-center gap-2">
-            <ArrowRightLeft size={16} className="text-[var(--accent-info)]" />
-            {t('Career Track', 'Karriere-Track')}
-          </h2>
-          <div className="space-y-2">
-            {TRACKS.map(tr => (
+        <div
+          style={{
+            border: '0.5px solid var(--border)',
+            borderRadius: 12,
+            padding: 16,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: 'var(--text-muted)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              marginBottom: 8,
+            }}
+          >
+            {t('Your Track', 'Dein Track')}
+          </div>
+          {TRACKS.map(tr => {
+            const isComingSoon = tr.id === 'pe' || tr.id === 'vc' || tr.id === 'ib';
+            const isSelected = tr.id === progress.selectedTrack;
+            return (
               <button
                 key={tr.id}
-                onClick={() => { update({ selectedTrack: tr.id }); playClickSound(); }}
-                disabled={tr.comingSoon}
-                className={`w-full p-3 rounded-xl flex items-center gap-3 text-left transition-all border-2 ${
-                  tr.id === progress.selectedTrack
-                    ? 'border-[var(--accent-xp)] bg-[rgba(88,204,2,0.08)]'
-                    : 'border-[var(--duo-border)] hover:border-[var(--accent-info)]'
-                } ${tr.comingSoon ? 'opacity-40' : ''}`}
+                onClick={() => {
+                  update({ selectedTrack: tr.id });
+                  playClickSound();
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  width: '100%',
+                  padding: '10px 12px',
+                  background: isSelected ? 'var(--bg-secondary)' : 'transparent',
+                  border: isSelected
+                    ? '1px solid var(--text-primary)'
+                    : '0.5px solid var(--border)',
+                  borderRadius: 8,
+                  marginBottom: 6,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
               >
-                <span className="text-xl">{tr.icon}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold">{tr.title}</div>
-                  <div className="text-[10px] text-[var(--duo-text-muted)]">
-                    {progress.language === 'de' ? tr.subtitleDe : tr.subtitle}
+                <span style={{ fontSize: 18 }}>{tr.icon}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: 'var(--text-primary)',
+                    }}
+                  >
+                    {progress.language === 'de' ? (tr.titleDe || tr.title) : tr.title}
                   </div>
+                  {isComingSoon && (
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                      Coming Soon
+                    </div>
+                  )}
                 </div>
-                {tr.comingSoon && <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--duo-border)] text-[var(--duo-text-muted)] font-bold">SOON</span>}
-                {tr.id === progress.selectedTrack && <span className="text-[var(--accent-xp)]">✓</span>}
+                {isSelected && (
+                  <span style={{ marginLeft: 'auto', fontSize: 16 }}>✓</span>
+                )}
               </button>
-            ))}
-          </div>
+            );
+          })}
         </div>
 
         {/* Prep Tools */}

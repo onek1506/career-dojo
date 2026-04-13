@@ -5,14 +5,11 @@ import { useStore } from '@/lib/store';
 import { getTrackData, getAllLessons } from '@/data/content';
 import { TRACKS } from '@/data/tracks';
 import { getCharacterForTrack, getFirstQuote } from '@/data/characters';
-import { playClickSound } from '@/lib/sounds';
 import Link from 'next/link';
-import { BookOpen, ChevronRight, Trophy, ArrowRightLeft, Sparkles, Flame } from 'lucide-react';
-import { useState } from 'react';
+import { BookOpen, ChevronRight, Trophy, Sparkles, Flame } from 'lucide-react';
 
 export default function HomePage() {
-  const { progress, level, t, update, reviewCount } = useStore();
-  const [showTrackPicker, setShowTrackPicker] = useState(false);
+  const { progress, level, t, reviewCount } = useStore();
 
   const currentTrack = TRACKS.find(tr => tr.id === progress.selectedTrack) || TRACKS[0];
   const character = getCharacterForTrack(progress.selectedTrack || 'ib');
@@ -73,49 +70,13 @@ export default function HomePage() {
           </Link>
         )}
 
-        {/* Track Switcher */}
-        <button
-          onClick={() => { setShowTrackPicker(!showTrackPicker); playClickSound(); }}
-          className="w-full duo-card p-3 flex items-center justify-between"
-        >
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{currentTrack.icon}</span>
-            <div className="text-left">
-              <div className="text-[10px] text-[var(--text-muted)] uppercase font-bold tracking-wide">{t('Current Track', 'Aktueller Track')}</div>
-              <div className="font-bold text-sm" style={{ color: currentTrack.color }}>{currentTrack.title}</div>
-            </div>
-          </div>
-          <ArrowRightLeft size={16} className="text-[var(--text-muted)]" />
-        </button>
-
-        {showTrackPicker && (
-          <div className="space-y-2">
-            {TRACKS.map(tr => (
-              <button
-                key={tr.id}
-                onClick={() => {
-                  update({ selectedTrack: tr.id });
-                  setShowTrackPicker(false);
-                  playClickSound();
-                }}
-                disabled={tr.comingSoon}
-                className={`w-full duo-card p-3 flex items-center gap-3 text-left transition-all ${
-                  tr.id === progress.selectedTrack ? 'border-[var(--accent-xp)]' : ''
-                } ${tr.comingSoon ? 'opacity-40' : ''}`}
-              >
-                <span className="text-2xl">{tr.icon}</span>
-                <div className="flex-1">
-                  <div className="font-bold text-sm">{tr.title}</div>
-                  <div className="text-xs text-[var(--text-secondary)]">
-                    {progress.language === 'de' ? tr.subtitleDe : tr.subtitle}
-                  </div>
-                </div>
-                {tr.comingSoon && <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--border)] text-[var(--text-muted)] font-bold">SOON</span>}
-                {tr.id === progress.selectedTrack && <span className="text-[var(--accent-xp)]">✓</span>}
-              </button>
-            ))}
-          </div>
-        )}
+        {/* Track Label — static, switcher is in Profile */}
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-lg">{currentTrack.icon}</span>
+          <span className="text-xs font-medium text-[var(--text-muted)]">
+            {currentTrack.title}
+          </span>
+        </div>
 
         {/* Character + Quote — compact 1-line */}
         <div className="flex items-center gap-3 duo-card p-3">

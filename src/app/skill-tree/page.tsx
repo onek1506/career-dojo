@@ -9,7 +9,7 @@ import { Lock, Check, Star } from 'lucide-react';
 export default function SkillTreePage() {
   const { progress, t } = useStore();
   const activeTrack = getTrackData(progress.selectedTrack || 'ib');
-  const isPEorVC = progress.selectedTrack === 'pe' || progress.selectedTrack === 'vc';
+  const isPEorVC = progress.selectedTrack === 'pe' || progress.selectedTrack === 'vc' || progress.selectedTrack === 'ib';
 
   return (
     <AppShell>

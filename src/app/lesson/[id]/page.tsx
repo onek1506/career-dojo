@@ -349,6 +349,9 @@ export default function LessonPage() {
   const character = getCharacterForTrack(progress.selectedTrack || 'ib');
   const isDE = progress.language === 'de';
 
+  // Swipe navigation for lesson slides
+  const touchStartX = useRef<number>(0);
+
   // Sound toggle + iOS audio unlock
   const [soundOn, setSoundOnState] = useState(true);
   const audioUnlocked = useRef(false);
@@ -589,7 +592,18 @@ export default function LessonPage() {
       </div>
 
       {/* ---------- Content ---------- */}
-      <div className="flex-1 overflow-y-auto">
+      <div
+        className="flex-1 overflow-y-auto"
+        onTouchStart={e => { touchStartX.current = e.touches[0].clientX; }}
+        onTouchEnd={e => {
+          if (phase !== 'lesson') return;
+          const diff = touchStartX.current - e.changedTouches[0].clientX;
+          if (Math.abs(diff) > 50) {
+            if (diff > 0) handleNextSlide();
+            else if (canGoBack) handleBackSlide();
+          }
+        }}
+      >
         <div className="max-w-2xl mx-auto w-full px-4 py-6 flex flex-col gap-5 min-h-full">
           {/* ===== LESSON PHASE ===== */}
           {phase === 'lesson' && currentSlide && (
