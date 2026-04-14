@@ -6,7 +6,8 @@ import { getTrackData, getAllLessons } from '@/data/content';
 import { TRACKS } from '@/data/tracks';
 import { getCharacterForTrack, getFirstQuote } from '@/data/characters';
 import Link from 'next/link';
-import { BookOpen, ChevronRight, Sparkles, Flame } from 'lucide-react';
+import { BookOpen, ChevronRight, Sparkles, Flame, Brain } from 'lucide-react';
+import { BRAIN_TEASERS } from '@/data/brainteasers';
 
 export default function HomePage() {
   const { progress, level, t, reviewCount } = useStore();
@@ -20,6 +21,13 @@ export default function HomePage() {
 
   const allLessons = getAllLessons(progress.selectedTrack);
   const nextLesson = allLessons.find(l => !progress.completedLessons.includes(l.id));
+
+  // Daily Brainteaser — deterministic rotation by day-of-year
+  const isConsulting = progress.selectedTrack === 'consulting';
+  const dayOfYear = Math.floor(
+    (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
+  );
+  const dailyBrainteaser = BRAIN_TEASERS[dayOfYear % BRAIN_TEASERS.length];
 
   return (
     <AppShell>
@@ -131,6 +139,49 @@ export default function HomePage() {
             />
           </div>
         </div>
+
+        {/* Daily Brainteaser — Consulting only */}
+        {isConsulting && (
+          <div>
+            <Link href="/brainteasers" className="block">
+              <div className="duo-card p-4 border-2 border-[var(--border)] hover:border-[var(--accent-primary)] transition-all group cursor-pointer">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--accent-primary)] flex items-center justify-center shrink-0">
+                    <Brain size={18} className="text-[var(--accent-primary-text)]" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs text-[var(--text-muted)] font-bold uppercase tracking-wide">
+                      {t('Daily Brainteaser', 'Täglicher Brainteaser')}
+                    </div>
+                    <div className="font-bold text-sm mt-0.5 line-clamp-2">
+                      {progress.language === 'de' ? dailyBrainteaser.questionDe : dailyBrainteaser.question}
+                    </div>
+                    <div className="text-[10px] text-[var(--text-muted)] mt-1">
+                      +{dailyBrainteaser.xpReward} XP · {dailyBrainteaser.difficulty}
+                    </div>
+                  </div>
+                  <ChevronRight size={18} className="text-[var(--text-muted)] group-hover:text-[var(--accent-primary)] transition shrink-0" />
+                </div>
+              </div>
+            </Link>
+            <Link
+              href="/brainteasers"
+              style={{
+                display: 'block',
+                textAlign: 'center',
+                fontSize: 12,
+                color: 'var(--text-muted)',
+                textDecoration: 'none',
+                marginTop: 8,
+                padding: '4px 0',
+              }}
+            >
+              {progress.language === 'de'
+                ? `Alle ${BRAIN_TEASERS.length} Brainteaser ansehen →`
+                : `View all ${BRAIN_TEASERS.length} brainteasers →`}
+            </Link>
+          </div>
+        )}
 
         {/* Solve / Online Test Prep CTA — only for Consulting track */}
         {progress.selectedTrack === 'consulting' && (
