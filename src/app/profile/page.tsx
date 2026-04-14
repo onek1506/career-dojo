@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import AppShell from '@/components/AppShell';
+import ComingSoonModal from '@/components/ComingSoonModal';
 import { useStore } from '@/lib/store';
 import { getAllLessons, getTotalQuestions, LEVEL_THRESHOLDS, getTrackData } from '@/data/content';
 import { TRACKS } from '@/data/tracks';
@@ -34,6 +35,9 @@ export default function ProfilePage() {
     { key: 'rare', label: 'Rare' },
     { key: 'legendary', label: 'Legendary' },
   ];
+
+  // Coming Soon modal state — set to the track being joined, null when closed
+  const [waitlistTrack, setWaitlistTrack] = useState<typeof TRACKS[number] | null>(null);
 
   // Notification toggle state
   const [notifEnabled, setNotifEnabled] = useState(false);
@@ -134,6 +138,81 @@ export default function ProfilePage() {
           <p className="text-xs text-[var(--duo-text-muted)] mt-1">
             Level {level.level} · {progress.xp} XP
           </p>
+        </div>
+
+        {/* Track Switcher — position 2, right under the profile header */}
+        <div
+          style={{
+            border: '0.5px solid var(--border)',
+            borderRadius: 12,
+            padding: 16,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: 'var(--text-muted)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              marginBottom: 8,
+            }}
+          >
+            {t('Your Track', 'Dein Track')}
+          </div>
+          {TRACKS.map(tr => {
+            const isComingSoon = tr.id === 'pe' || tr.id === 'vc' || tr.id === 'ib';
+            const isSelected = tr.id === progress.selectedTrack;
+            return (
+              <button
+                key={tr.id}
+                onClick={() => {
+                  playClickSound();
+                  if (isComingSoon) {
+                    setWaitlistTrack(tr);
+                  } else {
+                    update({ selectedTrack: tr.id });
+                  }
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  width: '100%',
+                  padding: '10px 12px',
+                  background: isSelected ? 'var(--bg-secondary)' : 'transparent',
+                  border: isSelected
+                    ? '1px solid var(--text-primary)'
+                    : '0.5px solid var(--border)',
+                  borderRadius: 8,
+                  marginBottom: 6,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <span style={{ fontSize: 18 }}>{tr.icon}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: 'var(--text-primary)',
+                    }}
+                  >
+                    {progress.language === 'de' ? (tr.titleDe || tr.title) : tr.title}
+                  </div>
+                  {isComingSoon && (
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                      {t('Coming Soon · Tap to join waitlist', 'Coming Soon · Tippen für Warteliste')}
+                    </div>
+                  )}
+                </div>
+                {isSelected && (
+                  <span style={{ marginLeft: 'auto', fontSize: 16 }}>✓</span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* Level Progress */}
@@ -273,77 +352,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Track Switcher */}
-        <div
-          style={{
-            border: '0.5px solid var(--border)',
-            borderRadius: 12,
-            padding: 16,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              color: 'var(--text-muted)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginBottom: 8,
-            }}
-          >
-            {t('Your Track', 'Dein Track')}
-          </div>
-          {TRACKS.map(tr => {
-            const isComingSoon = tr.id === 'pe' || tr.id === 'vc' || tr.id === 'ib';
-            const isSelected = tr.id === progress.selectedTrack;
-            return (
-              <button
-                key={tr.id}
-                onClick={() => {
-                  update({ selectedTrack: tr.id });
-                  playClickSound();
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  width: '100%',
-                  padding: '10px 12px',
-                  background: isSelected ? 'var(--bg-secondary)' : 'transparent',
-                  border: isSelected
-                    ? '1px solid var(--text-primary)'
-                    : '0.5px solid var(--border)',
-                  borderRadius: 8,
-                  marginBottom: 6,
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                }}
-              >
-                <span style={{ fontSize: 18 }}>{tr.icon}</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 500,
-                      color: 'var(--text-primary)',
-                    }}
-                  >
-                    {progress.language === 'de' ? (tr.titleDe || tr.title) : tr.title}
-                  </div>
-                  {isComingSoon && (
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                      Coming Soon
-                    </div>
-                  )}
-                </div>
-                {isSelected && (
-                  <span style={{ marginLeft: 'auto', fontSize: 16 }}>✓</span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
         {/* Prep Tools */}
         <div className="duo-card p-5">
           <h2 className="font-bold text-sm mb-3 flex items-center gap-2">
@@ -358,7 +366,15 @@ export default function ProfilePage() {
                     <Sparkles size={18} className="text-[var(--accent-purple)]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-bold">{t('Online Test Prep', 'Online Test Prep')}</div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-sm font-bold">{t('Online Test Prep', 'Online Test Prep')}</div>
+                      <span
+                        className="text-[8px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-wider"
+                        style={{ background: 'var(--text-primary)', color: 'var(--bg)' }}
+                      >
+                        Soon
+                      </span>
+                    </div>
                     <div className="text-[10px] text-[var(--text-muted)]">
                       {t('McKinsey Solve · BCG Casey · Bain SOVA', 'McKinsey Solve · BCG Casey · Bain SOVA')}
                     </div>
@@ -383,6 +399,25 @@ export default function ProfilePage() {
             </Link>
           </div>
         </div>
+
+        {/* Coming Soon waitlist modal — shared across track switcher */}
+        <ComingSoonModal
+          isOpen={waitlistTrack !== null}
+          onClose={() => setWaitlistTrack(null)}
+          featureId={waitlistTrack ? `track-${waitlistTrack.id}` : 'track'}
+          featureName={waitlistTrack?.title ?? ''}
+          featureNameDe={waitlistTrack?.titleDe ?? waitlistTrack?.title ?? ''}
+          description={
+            waitlistTrack
+              ? `The ${waitlistTrack.title} track is coming soon. Join the waitlist to be the first to practice.`
+              : ''
+          }
+          descriptionDe={
+            waitlistTrack
+              ? `Der ${waitlistTrack.titleDe ?? waitlistTrack.title}-Track kommt bald. Trage dich ein, um sofort loslegen zu können.`
+              : ''
+          }
+        />
 
         {/* Settings */}
         <div className="duo-card p-5 space-y-4">

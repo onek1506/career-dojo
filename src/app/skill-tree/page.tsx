@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import AppShell from '@/components/AppShell';
+import ComingSoonModal from '@/components/ComingSoonModal';
 import { useStore } from '@/lib/store';
 import { getTrackData } from '@/data/content';
+import { TRACKS } from '@/data/tracks';
 import Link from 'next/link';
 import { Lock, Check, Star } from 'lucide-react';
 
@@ -10,6 +13,8 @@ export default function SkillTreePage() {
   const { progress, t } = useStore();
   const activeTrack = getTrackData(progress.selectedTrack || 'ib');
   const isPEorVC = progress.selectedTrack === 'pe' || progress.selectedTrack === 'vc' || progress.selectedTrack === 'ib';
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
+  const currentTrack = TRACKS.find(tr => tr.id === progress.selectedTrack);
 
   return (
     <AppShell>
@@ -123,9 +128,13 @@ export default function SkillTreePage() {
             </div>
           </div>
 
-          {/* Coming Soon overlay for PE/VC — outside blur wrapper */}
+          {/* Coming Soon overlay for PE/VC/IB — outside blur wrapper, click to join waitlist */}
           {isPEorVC && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 gap-2">
+            <button
+              type="button"
+              onClick={() => setWaitlistOpen(true)}
+              className="absolute inset-0 flex flex-col items-center justify-center z-10 gap-2 cursor-pointer bg-transparent border-0"
+            >
               <span
                 style={{
                   background: 'var(--text-primary)',
@@ -140,12 +149,24 @@ export default function SkillTreePage() {
                 Coming Soon
               </span>
               <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-                {t('Coming soon 🔨', 'Bald verfügbar 🔨')}
+                {t('Tap to join the waitlist', 'Tippen für die Warteliste')}
               </span>
-            </div>
+            </button>
           )}
         </div>
       </div>
+
+      {currentTrack && (
+        <ComingSoonModal
+          isOpen={waitlistOpen}
+          onClose={() => setWaitlistOpen(false)}
+          featureId={`track-${currentTrack.id}`}
+          featureName={currentTrack.title}
+          featureNameDe={currentTrack.titleDe ?? currentTrack.title}
+          description={`The ${currentTrack.title} track is coming soon. Join the waitlist to be the first to practice.`}
+          descriptionDe={`Der ${currentTrack.titleDe ?? currentTrack.title}-Track kommt bald. Trage dich ein, um sofort loslegen zu können.`}
+        />
+      )}
     </AppShell>
   );
 }

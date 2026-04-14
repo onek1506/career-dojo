@@ -11,18 +11,12 @@ const fs = require('fs');
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
 function buildSvg(size) {
-  // Duolingo-green gradient background, rounded square, white "CD" wordmark
+  // Black rounded-square background with a white "CD" wordmark — monochrome look
   const radius = Math.round(size * 0.22);
   const fontSize = Math.round(size * 0.42);
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#58CC02"/>
-      <stop offset="100%" stop-color="#1CB0F6"/>
-    </linearGradient>
-  </defs>
-  <rect x="0" y="0" width="${size}" height="${size}" rx="${radius}" ry="${radius}" fill="url(#bg)"/>
+  <rect x="0" y="0" width="${size}" height="${size}" rx="${radius}" ry="${radius}" fill="#000000"/>
   <text
     x="50%"
     y="50%"

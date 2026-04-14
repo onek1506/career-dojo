@@ -151,7 +151,7 @@ export default function HomePage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="text-xs text-[var(--text-muted)] font-bold uppercase tracking-wide">
-                      {t('Daily Brainteaser', 'Täglicher Brainteaser')}
+                      {t('Daily Brainteaser', 'Täglicher Denksport')}
                     </div>
                     <div className="font-bold text-sm mt-0.5 line-clamp-2">
                       {progress.language === 'de' ? dailyBrainteaser.questionDe : dailyBrainteaser.question}
@@ -177,13 +177,13 @@ export default function HomePage() {
               }}
             >
               {progress.language === 'de'
-                ? `Alle ${BRAIN_TEASERS.length} Brainteaser ansehen →`
+                ? `Alle ${BRAIN_TEASERS.length} Denksport-Rätsel ansehen →`
                 : `View all ${BRAIN_TEASERS.length} brainteasers →`}
             </Link>
           </div>
         )}
 
-        {/* Solve / Online Test Prep CTA — only for Consulting track */}
+        {/* Solve / Online Test Prep CTA — only for Consulting track, Coming Soon */}
         {progress.selectedTrack === 'consulting' && (
           <Link href="/solve" className="block">
             <div className="duo-card p-4 border-2 border-[var(--accent-purple)] transition-all group cursor-pointer">
@@ -193,8 +193,16 @@ export default function HomePage() {
                     <Sparkles size={18} className="text-white" />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-xs text-[var(--accent-purple)] font-bold uppercase tracking-wide">
-                      {t('Round 1 Prep', 'Runde 1 Prep')}
+                    <div className="flex items-center gap-2">
+                      <div className="text-xs text-[var(--accent-purple)] font-bold uppercase tracking-wide">
+                        {t('Round 1 Prep', 'Runde 1 Prep')}
+                      </div>
+                      <span
+                        className="text-[8px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-wider"
+                        style={{ background: 'var(--text-primary)', color: 'var(--bg)' }}
+                      >
+                        Soon
+                      </span>
                     </div>
                     <div className="font-bold text-sm mt-0.5 truncate">
                       {t('Online Tests: McKinsey · BCG · Bain', 'Online Tests: McKinsey · BCG · Bain')}

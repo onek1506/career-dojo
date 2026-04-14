@@ -2,26 +2,22 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, GitBranch, BookOpen, User, Briefcase, Brain, Sparkles } from 'lucide-react';
+import { Home, GitBranch, BookOpen, User, Briefcase, Brain } from 'lucide-react';
 
 interface BottomNavProps {
   lang?: 'en' | 'de';
   selectedTrack?: string;
 }
 
-export default function BottomNav({ lang = 'de', selectedTrack = '' }: BottomNavProps) {
+export default function BottomNav({ lang = 'de' }: BottomNavProps) {
   const pathname = usePathname();
-  const isConsulting = selectedTrack === 'consulting';
 
-  // Build nav items dynamically based on track
+  // Same nav items across all tracks
   const NAV_ITEMS = [
     { href: '/', icon: Home, label: 'Home', labelDe: 'Home' },
     { href: '/skill-tree', icon: GitBranch, label: 'Learn', labelDe: 'Lernen' },
     { href: '/cases', icon: Briefcase, label: 'Cases', labelDe: 'Cases' },
-    // Show "Solve" for consulting, "Brainteasers" for others
-    ...(isConsulting
-      ? [{ href: '/solve', icon: Sparkles, label: 'Solve', labelDe: 'Solve' }]
-      : [{ href: '/brainteasers', icon: Brain, label: 'Brainteasers', labelDe: 'Denksport' }]),
+    { href: '/brainteasers', icon: Brain, label: 'Brainteasers', labelDe: 'Denksport' },
     { href: '/glossary', icon: BookOpen, label: 'Glossary', labelDe: 'Glossar' },
     { href: '/profile', icon: User, label: 'Profile', labelDe: 'Profil' },
   ];
