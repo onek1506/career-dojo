@@ -1158,6 +1158,580 @@ export const GLOSSARY: GlossaryTerm[] = [
       'Series B 1x → Series A 1x → Common. Bei einem Down-Exit bleibt Common oft bei €0.',
     track: ['vc'],
   },
+
+  // ============================================================
+  // CONSULTING EXTENDED (2025/2026)
+  // ============================================================
+  {
+    id: 'engagement',
+    term: 'Engagement',
+    termDe: 'Engagement',
+    definition:
+      'A consulting project with a client. Typically 4-12 weeks. Defined by scope, timeline, team size, and fee.',
+    definitionDe:
+      'Ein Beratungsprojekt mit einem Kunden. Typischerweise 4-12 Wochen. Definiert durch Umfang, Zeitplan, Teamgröße und Honorar.',
+    example: 'An 8-week strategy engagement at McKinsey with a 4-person team.',
+    exampleDe: 'Ein 8-wöchiges Strategy-Engagement bei McKinsey mit einem 4er-Team.',
+    track: ['consulting'],
+  },
+  {
+    id: 'deliverable',
+    term: 'Deliverable',
+    termDe: 'Deliverable',
+    definition:
+      'A concrete output produced during a consulting engagement — typically a slide deck, model, or report. Defined at project start.',
+    definitionDe:
+      'Ein konkretes Ergebnis eines Beratungsengagements — typischerweise ein Foliendeck, Modell oder Bericht. Zu Projektbeginn definiert.',
+    example: 'Final deliverable: 40-slide board deck + Excel business case.',
+    exampleDe: 'Finales Deliverable: 40-seitiges Board-Deck + Excel Business Case.',
+    track: ['consulting'],
+  },
+  {
+    id: 'tagesatz',
+    term: 'Day Rate',
+    termDe: 'Tagesatz',
+    definition:
+      'Daily billing rate charged by consulting firms. MBB day rates range from €2,000-€10,000+ depending on seniority.',
+    definitionDe:
+      'Täglicher Abrechnungssatz der Beratungsfirmen. MBB-Tagessätze liegen je nach Seniorität zwischen €2.000-€10.000+.',
+    example: 'Associate Partner day rate: ~€8,000. 4-week project with 4 people = ~€640k fee.',
+    exampleDe: 'Associate Partner Tagesatz: ~€8.000. 4-Wochen Projekt mit 4 Personen = ~€640k Honorar.',
+    track: ['consulting'],
+  },
+  {
+    id: 'ansoff-matrix',
+    term: 'Ansoff Matrix',
+    termDe: 'Ansoff-Matrix',
+    definition:
+      'Growth framework: Market Penetration, Market Development, Product Development, Diversification.',
+    definitionDe:
+      'Wachstumsframework: Marktdurchdringung, Marktentwicklung, Produktentwicklung, Diversifikation.',
+    example: 'Netflix: streaming (penetration) → international expansion (market development) → original content (product development).',
+    exampleDe: 'Netflix: Streaming (Durchdringung) → Internationalisierung (Marktentwicklung) → Eigene Serien (Produktentwicklung).',
+    track: ['consulting'],
+  },
+  {
+    id: '3c-framework',
+    term: '3C Framework',
+    termDe: '3C-Framework',
+    definition:
+      'Company, Customer, Competitor. Simple starting structure for business situation analysis in case interviews.',
+    definitionDe:
+      'Unternehmen, Kunde, Wettbewerber. Einfache Ausgangsstruktur für die Analyse von Geschäftssituationen in Case Interviews.',
+    example: 'Start a market entry case with 3C before diving deeper.',
+    exampleDe: 'Einen Markteintritts-Case mit 3C starten, bevor man tiefer einsteigt.',
+    track: ['consulting'],
+  },
+  {
+    id: 'profitability-framework',
+    term: 'Profitability Framework',
+    termDe: 'Profitabilitäts-Framework',
+    definition:
+      'Profit = Revenue − Costs. Revenue = Price × Volume. Costs = Fixed + Variable. Fundamental structure for profitability cases.',
+    definitionDe:
+      'Gewinn = Umsatz − Kosten. Umsatz = Preis × Volumen. Kosten = Fixkosten + Variable Kosten. Grundstruktur für Profitabilitäts-Cases.',
+    formula: 'Profit = (Price × Volume) − (FC + VC)',
+    example: 'Declining profit case → break down into price, volume, FC, VC buckets.',
+    exampleDe: 'Sinkende Gewinne → in Preis, Volumen, FC, VC aufbrechen.',
+    track: ['consulting'],
+  },
+  {
+    id: 'luenendonk',
+    term: 'Lünendonk List',
+    termDe: 'Lünendonk-Liste',
+    definition:
+      'Annual German consulting market ranking. Tracks the 25 largest management consulting firms by revenue in Germany.',
+    definitionDe:
+      'Jährliches Ranking des deutschen Beratungsmarkts. Listet die 25 größten Unternehmensberatungen nach Umsatz in Deutschland.',
+    example: 'McKinsey, BCG, Roland Berger regelmäßig in den Top 5 der Lünendonk-Liste.',
+    exampleDe: 'McKinsey, BCG, Roland Berger regelmäßig in den Top 5 der Lünendonk-Liste.',
+    track: ['consulting'],
+  },
+  {
+    id: 'bdu',
+    term: 'BDU',
+    termDe: 'BDU',
+    definition:
+      'Bundesverband Deutscher Unternehmensberater. Industry association for German management consulting firms.',
+    definitionDe:
+      'Bundesverband Deutscher Unternehmensberater. Branchenverband der deutschen Unternehmensberatungen.',
+    example: 'BDU publishes annual industry studies on consulting market size and trends.',
+    exampleDe: 'BDU veröffentlicht jährliche Branchenstudien zu Marktgröße und Trends.',
+    track: ['consulting'],
+  },
+
+  // ============================================================
+  // IB / ACCOUNTING EXTENDED
+  // ============================================================
+  {
+    id: 'due-diligence',
+    term: 'Due Diligence',
+    termDe: 'Due Diligence',
+    definition:
+      'Comprehensive investigation of a target before acquisition. Types: Financial, Legal, Commercial, Technical. Typically 4-8 weeks.',
+    definitionDe:
+      'Umfassende Untersuchung eines Zielunternehmens vor der Akquisition. Arten: Financial, Legal, Commercial, Technical. Typischerweise 4-8 Wochen.',
+    example: 'PE fund hires Big 4 + law firm + strategy consultant for parallel DD workstreams.',
+    exampleDe: 'PE-Fonds engagiert Big 4 + Kanzlei + Strategieberatung für parallele DD-Workstreams.',
+    track: ['ib', 'pe'],
+  },
+  {
+    id: 'pe-ratio',
+    term: 'P/E Ratio',
+    termDe: 'KGV (Kurs-Gewinn-Verhältnis)',
+    definition:
+      'Price-to-Earnings Ratio = Share Price / EPS. Most common equity valuation multiple. Tech 25-40x, utilities 15-20x.',
+    definitionDe:
+      'Kurs-Gewinn-Verhältnis = Aktienkurs / Gewinn je Aktie. Häufigster Aktienbewertungsmultiplikator. Tech 25-40x, Versorger 15-20x.',
+    formula: 'P/E = Share Price / EPS',
+    example: 'Apple trading at 30x P/E means investors pay €30 per €1 of earnings.',
+    exampleDe: 'Apple mit 30x KGV bedeutet: Investoren zahlen €30 je €1 Gewinn.',
+    track: ['ib'],
+  },
+  {
+    id: 'roe',
+    term: 'ROE',
+    termDe: 'Eigenkapitalrendite (ROE)',
+    definition:
+      'Return on Equity = Net Income / Shareholders\' Equity. Measures efficiency of shareholder capital deployment.',
+    definitionDe:
+      'Eigenkapitalrendite = Nettogewinn / Eigenkapital. Misst Effizienz des eingesetzten Eigenkapitals.',
+    formula: 'ROE = Net Income / Equity',
+    example: 'Net Income €100M / Equity €500M = 20% ROE.',
+    exampleDe: 'Nettogewinn €100M / Eigenkapital €500M = 20% ROE.',
+    track: ['ib'],
+  },
+  {
+    id: 'cagr',
+    term: 'CAGR',
+    termDe: 'CAGR (Jährliche Wachstumsrate)',
+    definition:
+      'Compound Annual Growth Rate. Steady annualized rate between two points. Smooths over volatility.',
+    definitionDe:
+      'Zusammengesetzte jährliche Wachstumsrate. Stetige jährliche Rate zwischen zwei Punkten. Glättet Volatilität.',
+    formula: 'CAGR = (End / Start)^(1/n) − 1',
+    example: 'Revenue €100M → €150M in 3y = 14.5% CAGR.',
+    exampleDe: 'Umsatz €100M → €150M in 3J = 14,5% CAGR.',
+    track: ['ib', 'consulting'],
+  },
+  {
+    id: 'working-capital',
+    term: 'Working Capital',
+    termDe: 'Working Capital',
+    definition:
+      'Current Assets − Current Liabilities. Measures short-term liquidity and operational efficiency.',
+    definitionDe:
+      'Umlaufvermögen − Kurzfristige Verbindlichkeiten. Misst kurzfristige Liquidität und operative Effizienz.',
+    formula: 'NWC = CA − CL',
+    example: 'Retailer with €200M inventory and €150M payables → NWC €50M.',
+    exampleDe: 'Einzelhändler mit €200M Lager und €150M Verbindlichkeiten → NWC €50M.',
+    track: ['ib'],
+  },
+  {
+    id: 'ebit',
+    term: 'EBIT',
+    termDe: 'EBIT',
+    definition:
+      'Earnings Before Interest and Taxes. Operating profit. Key metric for operational performance across capital structures.',
+    definitionDe:
+      'Ergebnis vor Zinsen und Steuern. Operativer Gewinn. Schlüsselkennzahl für operative Performance unabhängig von Kapitalstruktur.',
+    formula: 'EBIT = Revenue − COGS − OpEx',
+    example: 'Revenue €100M, COGS €60M, OpEx €25M → EBIT €15M.',
+    exampleDe: 'Umsatz €100M, COGS €60M, OpEx €25M → EBIT €15M.',
+    track: ['ib'],
+  },
+  {
+    id: 'gaap',
+    term: 'GAAP',
+    termDe: 'US-GAAP',
+    definition:
+      'Generally Accepted Accounting Principles (US). Accounting standard used by US public companies. Rule-based.',
+    definitionDe:
+      'Generally Accepted Accounting Principles (US). Rechnungslegungsstandard für US-Börsennotierte. Regelbasiert.',
+    example: 'Apple reports under US-GAAP; Siemens under IFRS.',
+    exampleDe: 'Apple bilanziert nach US-GAAP; Siemens nach IFRS.',
+    track: ['ib'],
+  },
+  {
+    id: 'ifrs',
+    term: 'IFRS',
+    termDe: 'IFRS',
+    definition:
+      'International Financial Reporting Standards. Accounting standard used in EU and 140+ countries. Principle-based.',
+    definitionDe:
+      'International Financial Reporting Standards. Rechnungslegungsstandard in der EU und 140+ Ländern. Prinzipienbasiert.',
+    example: 'All DAX 40 firms report under IFRS since 2005.',
+    exampleDe: 'Alle DAX 40 bilanzieren seit 2005 nach IFRS.',
+    track: ['ib'],
+  },
+  {
+    id: 'capex',
+    term: 'CapEx',
+    termDe: 'CapEx (Investitionen)',
+    definition:
+      'Capital Expenditures. Money spent on long-term assets (PP&E). Appears in cash flow statement as investing activity.',
+    definitionDe:
+      'Investitionsausgaben für langfristige Vermögenswerte (Sachanlagen). Erscheint im Cashflow als Investitionstätigkeit.',
+    example: 'Airline buying €500M of aircraft = CapEx, depreciated over 20+ years.',
+    exampleDe: 'Airline kauft Flugzeuge für €500M = CapEx, über 20+ Jahre abgeschrieben.',
+    track: ['ib'],
+  },
+  {
+    id: 'opex',
+    term: 'OpEx',
+    termDe: 'OpEx (Betriebskosten)',
+    definition:
+      'Operating Expenses. Day-to-day running costs: salaries, rent, utilities, marketing. Fully expensed in the P&L.',
+    definitionDe:
+      'Betriebskosten. Laufende Kosten: Gehälter, Miete, Versorgung, Marketing. Vollständig in der GuV erfasst.',
+    example: 'SaaS company: OpEx = salaries + AWS + sales commissions.',
+    exampleDe: 'SaaS-Unternehmen: OpEx = Gehälter + AWS + Vertriebsprovisionen.',
+    track: ['ib'],
+  },
+  {
+    id: 'da',
+    term: 'D&A',
+    termDe: 'Abschreibungen (D&A)',
+    definition:
+      'Depreciation (tangible assets) + Amortization (intangibles). Non-cash expense. Added back to get from EBIT to EBITDA.',
+    definitionDe:
+      'Abschreibungen auf Sachanlagen + immaterielle Vermögenswerte. Nicht-zahlungswirksam. Zurückgerechnet, um von EBIT auf EBITDA zu kommen.',
+    formula: 'EBITDA = EBIT + D&A',
+    example: 'Factory depreciation €20M/year reduces taxable income but not cash.',
+    exampleDe: 'Fabrik-Abschreibung €20M/Jahr reduziert Steuerbasis, nicht Cash.',
+    track: ['ib'],
+  },
+  {
+    id: 'fcf',
+    term: 'Free Cash Flow',
+    termDe: 'Free Cash Flow (FCF)',
+    definition:
+      'Cash generated after CapEx, available to all capital providers. Core input for DCF valuation.',
+    definitionDe:
+      'Cash nach CapEx, verfügbar für alle Kapitalgeber. Kern-Input für DCF-Bewertung.',
+    formula: 'FCF = EBIT × (1−t) + D&A − ΔNWC − CapEx',
+    example: 'EBIT €100M × (1−0.25) + D&A €20M − NWC change €5M − CapEx €30M = €60M FCF.',
+    exampleDe: 'EBIT €100M × (1−0,25) + D&A €20M − NWC-Änderung €5M − CapEx €30M = €60M FCF.',
+    track: ['ib'],
+  },
+  {
+    id: 'net-income',
+    term: 'Net Income',
+    termDe: 'Nettogewinn',
+    definition:
+      'Bottom-line profit after all costs, interest, and taxes. Flows into retained earnings on balance sheet.',
+    definitionDe:
+      'Gewinn nach allen Kosten, Zinsen und Steuern. Fließt in Gewinnrücklagen der Bilanz.',
+    example: 'Revenue €500M → EBIT €80M → EBT €60M → Net Income €45M (after 25% tax).',
+    exampleDe: 'Umsatz €500M → EBIT €80M → EBT €60M → Nettogewinn €45M (nach 25% Steuer).',
+    track: ['ib'],
+  },
+  {
+    id: 'gross-margin',
+    term: 'Gross Margin',
+    termDe: 'Bruttomarge',
+    definition:
+      'Gross Profit / Revenue. Revenue minus Cost of Goods Sold. Shows production efficiency before OpEx.',
+    definitionDe:
+      'Bruttogewinn / Umsatz. Umsatz minus Herstellungskosten. Zeigt Produktionseffizienz vor OpEx.',
+    formula: 'Gross Margin = (Revenue − COGS) / Revenue',
+    example: 'SaaS gross margins 75-85%; retail 20-40%; airlines 10-20%.',
+    exampleDe: 'SaaS-Bruttomargen 75-85%; Retail 20-40%; Airlines 10-20%.',
+    track: ['ib', 'consulting'],
+  },
+  {
+    id: 'operating-margin',
+    term: 'Operating Margin',
+    termDe: 'Operative Marge',
+    definition:
+      'EBIT / Revenue. Core profitability of ongoing operations, excluding financing and tax decisions.',
+    definitionDe:
+      'EBIT / Umsatz. Kernprofitabilität des operativen Geschäfts, exkl. Finanzierungs- und Steuerentscheidungen.',
+    formula: 'Operating Margin = EBIT / Revenue',
+    example: 'Apple ~30% operating margin; Walmart ~4%; Ferrari ~25%.',
+    exampleDe: 'Apple ~30% Operating Margin; Walmart ~4%; Ferrari ~25%.',
+    track: ['ib', 'consulting'],
+  },
+
+  // ============================================================
+  // MARKETS / DEAL TYPES
+  // ============================================================
+  {
+    id: 'ipo',
+    term: 'IPO',
+    termDe: 'Börsengang (IPO)',
+    definition:
+      'Initial Public Offering. First sale of stock to public investors. Funds raised go to company (primary) or selling shareholders (secondary).',
+    definitionDe:
+      'Erstemission: Erster Verkauf von Aktien an öffentliche Investoren. Erlöse fließen an Unternehmen (primär) oder Altaktionäre (sekundär).',
+    example: 'Porsche AG IPO 2022: €9.4B raised, one of Europe\'s biggest ever.',
+    exampleDe: 'Porsche AG Börsengang 2022: €9,4 Mrd., einer der größten Europas.',
+    track: ['ib'],
+  },
+  {
+    id: 'spo',
+    term: 'SPO',
+    termDe: 'SPO (Zweitplatzierung)',
+    definition:
+      'Secondary Public Offering. Follow-on stock offering after IPO. Can be dilutive (new shares) or non-dilutive (existing holders sell).',
+    definitionDe:
+      'Folgeplatzierung nach dem IPO. Kann verwässernd (neue Aktien) oder nicht-verwässernd (Altaktionäre verkaufen) sein.',
+    example: 'BioNTech SPO 2021: $1.5B raised for vaccine scaling.',
+    exampleDe: 'BioNTech SPO 2021: $1,5 Mrd. für Impfstoff-Skalierung.',
+    track: ['ib'],
+  },
+  {
+    id: 'ma',
+    term: 'M&A',
+    termDe: 'M&A (Fusionen & Übernahmen)',
+    definition:
+      'Mergers & Acquisitions. Transactions where companies combine (merger) or one buys another (acquisition). Core IB product.',
+    definitionDe:
+      'Fusionen und Übernahmen. Transaktionen bei denen Firmen fusionieren oder übernommen werden. Kernprodukt des IB.',
+    example: 'Microsoft acquires Activision for $69B (2023) — largest tech M&A.',
+    exampleDe: 'Microsoft übernimmt Activision für $69 Mrd. (2023) — größter Tech-M&A.',
+    track: ['ib'],
+  },
+  {
+    id: 'spin-off',
+    term: 'Spin-off',
+    termDe: 'Spin-off',
+    definition:
+      'Parent distributes shares of a subsidiary to existing shareholders, creating a new independent public company. Tax-free structure.',
+    definitionDe:
+      'Muttergesellschaft verteilt Aktien einer Tochter an Altaktionäre und schafft damit eine neue unabhängige Börsengesellschaft. Steuerneutrale Struktur.',
+    example: 'Siemens Energy spin-off from Siemens AG (2020).',
+    exampleDe: 'Siemens Energy Spin-off von Siemens AG (2020).',
+    track: ['ib'],
+  },
+  {
+    id: 'carve-out',
+    term: 'Carve-out',
+    termDe: 'Carve-out',
+    definition:
+      'Parent sells a minority/majority stake in a subsidiary via IPO or to a strategic/PE buyer. Generates cash for parent.',
+    definitionDe:
+      'Muttergesellschaft verkauft Minderheits-/Mehrheitsanteil einer Tochter via IPO oder an strategischen/PE-Käufer. Bringt Cash.',
+    example: 'Bayer carved out Covestro in 2015 via IPO.',
+    exampleDe: 'Bayer hat Covestro 2015 per IPO ausgegliedert.',
+    track: ['ib'],
+  },
+  {
+    id: 'block-trade',
+    term: 'Block Trade',
+    termDe: 'Block Trade',
+    definition:
+      'Large share transaction (typically >€50M) executed off-exchange through an IB, often at a small discount to market price.',
+    definitionDe:
+      'Große Aktientransaktion (typischerweise >€50M) außerbörslich via IB ausgeführt, oft mit kleinem Abschlag.',
+    example: 'PE fund exits 5% stake via overnight block trade at 3% discount.',
+    exampleDe: 'PE-Fonds exited 5%-Stake per Übernacht-Block Trade mit 3% Abschlag.',
+    track: ['ib'],
+  },
+
+  // ============================================================
+  // PE EXTENDED
+  // ============================================================
+  {
+    id: 'j-curve',
+    term: 'J-Curve',
+    termDe: 'J-Kurve',
+    definition:
+      'Early PE fund returns are negative (fees + unrealized losses) before value creation kicks in. Shape looks like a J.',
+    definitionDe:
+      'PE-Fondsrenditen sind früh negativ (Gebühren + Unrealized Losses), bevor Wertschöpfung greift. Form wie ein J.',
+    example: 'Years 1-3: IRR negative; years 4-10: strong positive as exits happen.',
+    exampleDe: 'Jahre 1-3: IRR negativ; Jahre 4-10: stark positiv durch Exits.',
+    track: ['pe'],
+  },
+  {
+    id: 'fund-of-funds',
+    term: 'Fund of Funds',
+    termDe: 'Dachfonds',
+    definition:
+      'A PE fund that invests in other PE funds instead of direct deals. Lower returns (extra fee layer) but diversification.',
+    definitionDe:
+      'PE-Fonds, der in andere PE-Fonds statt direkt in Deals investiert. Niedrigere Renditen (doppelte Gebühren), dafür Diversifikation.',
+    example: 'HarbourVest, Pantheon — classic FoF players.',
+    exampleDe: 'HarbourVest, Pantheon — klassische FoF-Spieler.',
+    track: ['pe'],
+  },
+  {
+    id: 'dilution',
+    term: 'Dilution',
+    termDe: 'Verwässerung',
+    definition:
+      'Reduction of existing shareholders\' ownership % due to new shares issued. Happens at every funding round.',
+    definitionDe:
+      'Verringerung des Anteils der Altaktionäre durch Ausgabe neuer Aktien. Passiert bei jeder Finanzierungsrunde.',
+    example: 'Founder owns 100%, raises Seed 20% → diluted to 80%; Series A 20% → 64%.',
+    exampleDe: 'Gründer hält 100%, gibt Seed 20% ab → verwässert auf 80%; Series A 20% → 64%.',
+    track: ['vc'],
+  },
+  {
+    id: 'vesting',
+    term: 'Vesting',
+    termDe: 'Vesting',
+    definition:
+      'Schedule over which equity/options are earned by an employee or founder. Standard: 4-year vest with 1-year cliff.',
+    definitionDe:
+      'Zeitplan über den Equity/Optionen verdient werden. Standard: 4-Jahres-Vesting mit 1-Jahres-Cliff.',
+    example: '25% vests after year 1 (cliff), then monthly until year 4.',
+    exampleDe: '25% nach Jahr 1 (Cliff), danach monatlich bis Jahr 4.',
+    track: ['vc'],
+  },
+  {
+    id: 'cliff',
+    term: 'Cliff',
+    termDe: 'Cliff',
+    definition:
+      'Initial period in a vesting schedule with zero equity earned. Prevents early quitters from taking stock.',
+    definitionDe:
+      'Anfangszeit im Vesting ohne Equity-Earn. Verhindert, dass früh Kündigende Aktien mitnehmen.',
+    example: 'If employee leaves in month 10 of 12-month cliff, gets 0 shares.',
+    exampleDe: 'Wenn Mitarbeiter in Monat 10 von 12-Monats-Cliff geht, 0 Aktien.',
+    track: ['vc'],
+  },
+  {
+    id: 'safe',
+    term: 'SAFE',
+    termDe: 'SAFE',
+    definition:
+      'Simple Agreement for Future Equity. Convertible instrument (no interest, no maturity) used in early-stage rounds. Invented by Y Combinator.',
+    definitionDe:
+      'Simple Agreement for Future Equity. Wandelbares Instrument (kein Zins, keine Laufzeit) in Frühphasenrunden. Von Y Combinator erfunden.',
+    example: '$500k SAFE with $5M cap converts in Series A at min(Series A price, $5M cap).',
+    exampleDe: '$500k SAFE mit $5M Cap wandelt in Series A zum min(Series A-Preis, $5M Cap).',
+    track: ['vc'],
+  },
+  {
+    id: 'valuation-cap',
+    term: 'Valuation Cap',
+    termDe: 'Valuation Cap',
+    definition:
+      'Maximum valuation at which a SAFE or convertible note converts into equity. Protects early investors from upside dilution.',
+    definitionDe:
+      'Maximale Bewertung zu der ein SAFE/Convertible in Equity wandelt. Schützt Frühinvestoren vor Verwässerung beim Upside.',
+    example: 'Series A at $20M but SAFE cap $5M → SAFE converts at $5M → 4x bonus.',
+    exampleDe: 'Series A bei $20M, SAFE-Cap $5M → SAFE wandelt bei $5M → 4x Bonus.',
+    track: ['vc'],
+  },
+  {
+    id: 'seed-round',
+    term: 'Seed Round',
+    termDe: 'Seed-Runde',
+    definition:
+      'First institutional funding round for a startup. Typically €500k–€3M for 10-25% equity. Pre-product or early product.',
+    definitionDe:
+      'Erste institutionelle Finanzierungsrunde. Typischerweise €500k–€3M für 10-25% Anteil. Vor- oder frühe Produktphase.',
+    example: 'German fintech raises €2M seed from Earlybird at €10M post-money.',
+    exampleDe: 'Deutsches Fintech nimmt €2M Seed von Earlybird bei €10M Post-Money.',
+    track: ['vc'],
+  },
+
+  // ============================================================
+  // MACRO / MARKETS
+  // ============================================================
+  {
+    id: 'gdp',
+    term: 'GDP',
+    termDe: 'BIP',
+    definition:
+      'Gross Domestic Product. Total value of all goods & services produced by a country in a given period. Key macroeconomic indicator.',
+    definitionDe:
+      'Bruttoinlandsprodukt. Gesamtwert aller produzierten Güter & Dienstleistungen eines Landes. Kern-Makroindikator.',
+    example: 'Germany GDP 2024: ~€4.1T. Real GDP growth ~0-1% in recent years.',
+    exampleDe: 'Deutschland BIP 2024: ~€4,1 Bio. Reales Wachstum ~0-1% zuletzt.',
+    track: ['ib', 'consulting'],
+  },
+  {
+    id: 'inflation',
+    term: 'Inflation',
+    termDe: 'Inflation',
+    definition:
+      'Sustained rise in the general price level. Measured via CPI. ECB target: ~2% per year.',
+    definitionDe:
+      'Anhaltender Anstieg des allgemeinen Preisniveaus. Gemessen via VPI. EZB-Ziel: ~2% p.a.',
+    example: 'Euro area inflation hit 10.6% in Oct 2022; back to ~2-3% by 2024.',
+    exampleDe: 'Euro-Inflation im Okt 2022 bei 10,6%; 2024 zurück bei ~2-3%.',
+    track: ['ib'],
+  },
+  {
+    id: 'yield-curve',
+    term: 'Yield Curve',
+    termDe: 'Zinskurve',
+    definition:
+      'Plot of bond yields across maturities. Normal: upward-sloping. Inverted: short > long — often a recession signal.',
+    definitionDe:
+      'Kurve der Anleiherenditen über Laufzeiten. Normal: ansteigend. Invers: Kurz > Lang — oft Rezessionssignal.',
+    example: 'US 2s10s inverted in 2022-23; recession predicted but delayed.',
+    exampleDe: 'US 2s10s invers 2022-23; Rezession prognostiziert, aber verzögert.',
+    track: ['ib'],
+  },
+  {
+    id: 'alpha',
+    term: 'Alpha',
+    termDe: 'Alpha',
+    definition:
+      'Excess return vs. benchmark after adjusting for risk (beta). Positive alpha = outperformance. What active managers chase.',
+    definitionDe:
+      'Überrendite zum Benchmark nach Risiko-Anpassung (Beta). Positives Alpha = Outperformance. Ziel aktiver Manager.',
+    example: 'Fund returns 12% vs. S&P 10% with same beta → +2% alpha.',
+    exampleDe: 'Fonds liefert 12% vs. S&P 10% bei gleichem Beta → +2% Alpha.',
+    track: ['ib'],
+  },
+  {
+    id: 'interest-rate',
+    term: 'Interest Rate',
+    termDe: 'Zinssatz',
+    definition:
+      'Cost of borrowing money, set by central banks (policy rate). Drives valuations, M&A activity, and debt capacity.',
+    definitionDe:
+      'Kosten des Geldleihens, von Zentralbanken gesetzt (Leitzins). Treibt Bewertungen, M&A-Aktivität und Verschuldungskapazität.',
+    example: 'ECB rate rose from 0% (2022) to 4% (2023), crushing LBO volumes.',
+    exampleDe: 'EZB-Zins stieg von 0% (2022) auf 4% (2023), brach LBO-Volumen ein.',
+    track: ['ib'],
+  },
+  {
+    id: 'recession',
+    term: 'Recession',
+    termDe: 'Rezession',
+    definition:
+      'Two consecutive quarters of negative GDP growth. Drops deal activity, valuations, and hiring across finance.',
+    definitionDe:
+      'Zwei aufeinanderfolgende Quartale mit negativem BIP-Wachstum. Senkt Dealaktivität, Bewertungen und Hiring in Finance.',
+    example: 'Germany entered technical recession in 2023 with −0.1% / −0.4% quarters.',
+    exampleDe: 'Deutschland in technischer Rezession 2023 mit −0,1% / −0,4%-Quartalen.',
+    track: ['ib'],
+  },
+
+  // ============================================================
+  // SALARY & MBB DATA
+  // ============================================================
+  {
+    id: 'mbb-salary',
+    term: 'MBB Salary',
+    termDe: 'MBB-Gehalt',
+    definition:
+      'Entry-level consultant (Associate/BA): ~€85-100k base + 15-20% bonus in Germany 2025. Engagement Manager: €150-200k. Partner: €500k-€2M+.',
+    definitionDe:
+      'Einstieg (Associate/BA): ~€85-100k Grundgehalt + 15-20% Bonus in DE 2025. Engagement Manager: €150-200k. Partner: €500k-€2M+.',
+    example: 'McKinsey BA Munich 2025: €92k base + signing bonus ~€10k.',
+    exampleDe: 'McKinsey BA München 2025: €92k Base + Signing Bonus ~€10k.',
+    track: ['consulting'],
+  },
+  {
+    id: 'ib-salary',
+    term: 'IB Salary',
+    termDe: 'IB-Gehalt',
+    definition:
+      'Analyst 1 at BB/EB in Frankfurt 2025: ~€85-110k base + 50-100% bonus. Associate: €150k+€100-200k bonus. VP: €250k+.',
+    definitionDe:
+      'Analyst 1 bei BB/EB in Frankfurt 2025: ~€85-110k Base + 50-100% Bonus. Associate: €150k + €100-200k Bonus. VP: €250k+.',
+    example: 'GS/MS Frankfurt Analyst 1: €100k base + €70k bonus year 1.',
+    exampleDe: 'GS/MS Frankfurt Analyst 1: €100k Base + €70k Bonus Jahr 1.',
+    track: ['ib'],
+  },
 ];
 
 // ============================================================

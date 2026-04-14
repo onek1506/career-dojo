@@ -6,7 +6,7 @@ import { getTrackData, getAllLessons } from '@/data/content';
 import { TRACKS } from '@/data/tracks';
 import { getCharacterForTrack, getFirstQuote } from '@/data/characters';
 import Link from 'next/link';
-import { BookOpen, ChevronRight, Trophy, Sparkles, Flame } from 'lucide-react';
+import { BookOpen, ChevronRight, Sparkles, Flame } from 'lucide-react';
 
 export default function HomePage() {
   const { progress, level, t, reviewCount } = useStore();
@@ -78,14 +78,18 @@ export default function HomePage() {
           </span>
         </div>
 
-        {/* Character + Quote — compact 1-line */}
-        <div className="flex items-center gap-3 duo-card p-3">
-          <span className="text-xl shrink-0">{character.emoji}</span>
-          <p className="text-sm text-[var(--text-secondary)] italic truncate">
-            <span className="font-bold not-italic" style={{ color: character.color }}>{character.name}:</span>{' '}
-            {getFirstQuote(character, progress.language)}
-          </p>
-        </div>
+        {/* Character + Quote — only shown conditionally */}
+        {(progress.streak % 7 === 0 && progress.streak > 0) ||
+         (completedCount % 5 === 0 && completedCount > 0) ||
+         progress.lessonsCompletedToday === 0 ? (
+          <div className="flex items-center gap-3 duo-card p-3">
+            <span className="text-xl shrink-0">{character.emoji}</span>
+            <p className="text-sm text-[var(--text-secondary)] italic truncate">
+              <span className="font-bold not-italic" style={{ color: character.color }}>{character.name}:</span>{' '}
+              {getFirstQuote(character, progress.language)}
+            </p>
+          </div>
+        ) : null}
 
         {/* Continue Learning CTA — prominent */}
         {nextLesson && (
@@ -114,31 +118,15 @@ export default function HomePage() {
           </Link>
         )}
 
-        {/* Welcome Card — Level Progress */}
-        <div className="duo-card p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h1 className="text-lg font-black">
-                Hey {progress.username || 'Analyst'}!
-              </h1>
-              <p className="text-[var(--text-muted)] text-xs mt-0.5">
-                {t('Keep up the momentum!', 'Bleib am Ball!')}
-              </p>
-            </div>
-            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[rgba(255,215,0,0.1)] border border-[rgba(255,215,0,0.2)]">
-              <Trophy size={14} className="text-[var(--duo-gold)]" />
-              <span className="text-xs font-bold text-[var(--duo-gold)]">
-                {t(level.title, level.titleDe)}
-              </span>
-            </div>
+        {/* Thin XP Progress Bar */}
+        <div className="px-1">
+          <div className="flex justify-between text-[10px] text-[var(--text-muted)] mb-1">
+            <span>Lv. {level.level} {t(level.title, level.titleDe)}</span>
+            <span>{level.nextLevel ? `${progress.xp}/${level.nextLevel.xpRequired} XP` : 'MAX'}</span>
           </div>
-          <div className="mb-1.5 flex justify-between text-[10px] text-[var(--text-muted)]">
-            <span>Level {level.level}</span>
-            <span>{level.nextLevel ? `${progress.xp} / ${level.nextLevel.xpRequired} XP` : 'MAX'}</span>
-          </div>
-          <div className="progress-bar-track h-2.5">
+          <div className="progress-bar-track h-[3px] rounded-full">
             <div
-              className="progress-bar-fill h-full bg-[var(--accent-xp)]"
+              className="progress-bar-fill h-full rounded-full bg-[var(--accent-xp)]"
               style={{ width: `${level.progressToNext * 100}%` }}
             />
           </div>
