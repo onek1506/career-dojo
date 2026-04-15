@@ -13,7 +13,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import AppShell from '@/components/AppShell';
-import { useStore } from '@/lib/store';
+import { useReviewStats } from '@/lib/use-review-stats';
 import { getAllLessons } from '@/data/content';
 import type { QuizQuestion } from '@/data/content';
 import {
@@ -51,7 +51,7 @@ interface ReviewItem {
 
 export default function ReviewPage() {
   const router = useRouter();
-  const { progress, loaded, t, recordAnswer, update, trackLessonIds } = useStore();
+  const { progress, loaded, t, recordAnswer, update, trackLessonIds } = useReviewStats();
   const character = getCharacterForTrack(progress.selectedTrack || 'ib');
   const isDE = progress.language === 'de';
 

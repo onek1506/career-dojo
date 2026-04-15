@@ -1,7 +1,7 @@
 'use client';
 
 import AppShell from '@/components/AppShell';
-import { useStore } from '@/lib/store';
+import { useReviewStats } from '@/lib/use-review-stats';
 import { getTrackData, getAllLessons } from '@/data/content';
 import { TRACKS } from '@/data/tracks';
 import { getCharacterForTrack, getFirstQuote } from '@/data/characters';
@@ -10,7 +10,7 @@ import { BookOpen, ChevronRight, Sparkles, Flame, Brain } from 'lucide-react';
 import { BRAIN_TEASERS } from '@/data/brainteasers';
 
 export default function HomePage() {
-  const { progress, level, t, reviewCount } = useStore();
+  const { progress, level, t, reviewCount } = useReviewStats();
 
   const currentTrack = TRACKS.find(tr => tr.id === progress.selectedTrack) || TRACKS[0];
   const character = getCharacterForTrack(progress.selectedTrack || 'ib');

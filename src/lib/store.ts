@@ -1,17 +1,18 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { getLevelForXp } from '@/data/content';
+import { useState, useEffect, useCallback } from 'react';
+// IMPORTANT: import level helpers from content-core, NOT from @/data/content.
+// The latter pulls ~500 KB of track data (IB + Consulting + PE + VC) into
+// every chunk that imports useStore — and useStore is used on every page.
+import { getLevelForXp } from '@/data/content-core';
 import {
   ReviewCard,
   sm2,
   createReviewCard,
-  getDueCards,
   upsertCard,
   type Quality,
   QUALITY_GOOD,
 } from './spaced-repetition';
-import { getAllLessons } from '@/data/content';
 import { rollMeme as rollMemeUtil, type Meme } from '@/data/memes';
 
 // ============================================================
@@ -256,18 +257,9 @@ export function useStore() {
     [],
   );
 
-  /** Lesson IDs for the currently selected track (for filtering). */
-  const trackLessonIds = useMemo(() => {
-    const lessons = getAllLessons(progress.selectedTrack || 'ib');
-    return new Set(lessons.map(l => l.id));
-  }, [progress.selectedTrack]);
-
-  /** Count of review cards that are due right now (track-specific). */
-  const reviewCount = getDueCards(progress.reviewCards, trackLessonIds).length;
-  const getReviewCount = useCallback(
-    () => getDueCards(progress.reviewCards, trackLessonIds).length,
-    [progress.reviewCards, trackLessonIds],
-  );
+  // NOTE: `trackLessonIds` / `reviewCount` / `getReviewCount` used to live here
+  // but pulled the full 500 KB content bundle into every caller. They now live
+  // in the `useReviewStats` hook, which only the Home and Review pages import.
 
   const recordQuizScore = useCallback((lessonId: string, score: number, total: number) => {
     setProgress(prev => {
@@ -345,13 +337,10 @@ export function useStore() {
     recordQuizAnswer,
     recordAnswer,
     recordQuizScore,
-    reviewCount,
-    getReviewCount,
     resetProgress,
     rollMeme,
     canReceiveMeme,
     unlockedMemes: progress.unlockedMemes,
-    trackLessonIds,
     t: (en: string, de: string) => progress.language === 'de' ? de : en,
   };
 }
