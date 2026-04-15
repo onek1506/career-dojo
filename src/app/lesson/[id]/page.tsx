@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import {
   useState,
   useMemo,
@@ -10,7 +11,12 @@ import {
 } from 'react';
 import { useStore } from '@/lib/store';
 import { type Meme, getMemesForTrack } from '@/data/memes';
-import ScratchCard from '@/components/ScratchCard';
+// ScratchCard only renders after a lesson is completed + a meme is rolled.
+// Splitting it into its own chunk trims ~15 kB from the lesson page's initial JS.
+const ScratchCard = dynamic(() => import('@/components/ScratchCard'), {
+  ssr: false,
+  loading: () => null,
+});
 import {
   getLessonById,
   type Lesson,
