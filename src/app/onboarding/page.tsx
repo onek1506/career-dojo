@@ -101,7 +101,7 @@ export default function OnboardingPage() {
               <span className="text-3xl">{carl.emoji}</span>
               <div>
                 <div className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>{carl.name}</div>
-                <p className="text-sm mt-1 text-[var(--text-secondary)]">{getFirstQuote(carl, lang)}</p>
+                <p className="text-base mt-1 text-[var(--text-secondary)]">{getFirstQuote(carl, lang)}</p>
               </div>
             </div>
 
@@ -117,8 +117,8 @@ export default function OnboardingPage() {
                   className="p-3 sm:p-4 flex items-center gap-3 rounded-xl"
                   style={{ border: '0.5px solid var(--border)', background: 'var(--bg-card)' }}
                 >
-                  <span className="text-xl sm:text-2xl">{item.icon}</span>
-                  <span className="text-xs sm:text-sm text-[var(--text-primary)]">{item.text}</span>
+                  <span className="text-2xl sm:text-3xl">{item.icon}</span>
+                  <span className="text-sm sm:text-base text-[var(--text-primary)]">{item.text}</span>
                 </div>
               ))}
             </div>
@@ -153,8 +153,8 @@ export default function OnboardingPage() {
         {step === 'track' && (
           <div className="space-y-5">
             <div className="text-center">
-              <h2 className="text-2xl font-black">Was willst du meistern?</h2>
-              <p className="text-[var(--text-muted)] text-sm mt-1">
+              <h2 className="text-3xl font-black">Was willst du meistern?</h2>
+              <p className="text-[var(--text-muted)] text-base mt-1">
                 Weitere Tracks folgen bald
               </p>
             </div>
@@ -190,7 +190,7 @@ export default function OnboardingPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-black text-sm">{lang === 'de' ? t.titleDe : t.title}</span>
+                          <span className="font-black text-base">{lang === 'de' ? t.titleDe : t.title}</span>
                           {isComingSoon && (
                             <span
                               className="text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase"
@@ -203,8 +203,8 @@ export default function OnboardingPage() {
                             </span>
                           )}
                         </div>
-                        <div className="text-xs text-[var(--text-muted)] mt-0.5">{lang === 'de' ? t.subtitleDe : t.subtitle}</div>
-                        <div className="text-xs mt-1 flex items-center gap-1 text-[var(--text-secondary)]">
+                        <div className="text-sm text-[var(--text-muted)] mt-0.5">{lang === 'de' ? t.subtitleDe : t.subtitle}</div>
+                        <div className="text-sm mt-1 flex items-center gap-1 text-[var(--text-secondary)]">
                           <span>{char.emoji}</span>
                           <span className="font-bold">{char.name}</span>
                         </div>
@@ -227,12 +227,12 @@ export default function OnboardingPage() {
                   <div className="text-xs font-bold text-[var(--text-muted)]">
                     {getCharacterForTrack(track).name}
                   </div>
-                  <p className="text-xs text-[var(--text-secondary)] mt-1">
+                  <p className="text-sm text-[var(--text-secondary)] mt-1">
                     {lang === 'de'
                       ? getCharacterForTrack(track).personalityDe
                       : getCharacterForTrack(track).personality}
                   </p>
-                  <p className="text-xs mt-1 italic text-[var(--text-secondary)]">
+                  <p className="text-sm mt-1 italic text-[var(--text-secondary)]">
                     {getFirstQuote(getCharacterForTrack(track), lang)}
                   </p>
                 </div>
@@ -257,7 +257,7 @@ export default function OnboardingPage() {
           <div className="space-y-6">
             <div className="text-center">
               <Globe size={40} className="text-[var(--text-muted)] mx-auto mb-3" />
-              <h2 className="text-2xl font-black">Sprache / Language</h2>
+              <h2 className="text-3xl font-black">Sprache / Language</h2>
             </div>
             <div className="space-y-3">
               {([['de', '🇩🇪', 'Deutsch', 'Lektionen auf Deutsch mit englischen Fachbegriffen'], ['en', '🇬🇧', 'English', 'Lessons in English with German translations']] as const).map(([code, flag, label, desc]) => (
@@ -272,8 +272,8 @@ export default function OnboardingPage() {
                 >
                   <span className="text-3xl">{flag}</span>
                   <div>
-                    <div className="font-bold text-[var(--text-primary)]">{label}</div>
-                    <div className="text-xs text-[var(--text-muted)]">{desc}</div>
+                    <div className="font-bold text-lg text-[var(--text-primary)]">{label}</div>
+                    <div className="text-sm text-[var(--text-muted)]">{desc}</div>
                   </div>
                 </button>
               ))}
@@ -324,7 +324,7 @@ export default function OnboardingPage() {
           <div className="space-y-6">
             <div className="text-center">
               <Brain size={40} className="text-[var(--text-muted)] mx-auto mb-3" />
-              <h2 className="text-2xl font-black">
+              <h2 className="text-3xl font-black">
                 {lang === 'de' ? 'Wie fit bist du?' : 'What\'s your level?'}
               </h2>
             </div>
@@ -346,8 +346,8 @@ export default function OnboardingPage() {
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{icon}</span>
                     <div>
-                      <div className="font-bold text-[var(--text-primary)]">{label}</div>
-                      <div className="text-xs text-[var(--text-muted)]">{desc}</div>
+                      <div className="font-bold text-lg text-[var(--text-primary)]">{label}</div>
+                      <div className="text-sm text-[var(--text-muted)]">{desc}</div>
                     </div>
                   </div>
                 </button>
@@ -372,7 +372,7 @@ export default function OnboardingPage() {
           <div className="space-y-6">
             <div className="text-center">
               <Zap size={40} className="text-[var(--text-muted)] mx-auto mb-3" />
-              <h2 className="text-2xl font-black">
+              <h2 className="text-3xl font-black">
                 {lang === 'de' ? 'Tägliches Ziel' : 'Daily Goal'}
               </h2>
             </div>
@@ -394,8 +394,8 @@ export default function OnboardingPage() {
                 >
                   <span className="text-2xl">{item.icon}</span>
                   <div className="flex-1">
-                    <div className="font-bold text-[var(--text-primary)]">{item.label}</div>
-                    <div className="text-xs text-[var(--text-muted)]">{item.n} {lang === 'de' ? 'Lektionen' : 'lessons'} · {item.desc}/{lang === 'de' ? 'Tag' : 'day'}</div>
+                    <div className="font-bold text-lg text-[var(--text-primary)]">{item.label}</div>
+                    <div className="text-sm text-[var(--text-muted)]">{item.n} {lang === 'de' ? 'Lektionen' : 'lessons'} · {item.desc}/{lang === 'de' ? 'Tag' : 'day'}</div>
                   </div>
                   {goal === item.n && <span className="text-lg">✓</span>}
                 </button>
@@ -418,12 +418,12 @@ export default function OnboardingPage() {
         {step === 'ready' && (
           <div className="text-center space-y-6">
             <div className="text-6xl">{getCharacterForTrack(track).emoji}</div>
-            <h2 className="text-2xl font-black">
+            <h2 className="text-3xl font-black">
               {lang === 'de' ? `Bereit, ${name || 'Analyst'}!` : `Ready, ${name || 'Analyst'}!`}
             </h2>
 
             <div
-              className="p-4 text-left space-y-2 text-sm rounded-xl"
+              className="p-4 text-left space-y-2 text-base rounded-xl"
               style={{ border: '0.5px solid var(--border)', background: 'var(--bg-card)' }}
             >
               <div className="flex justify-between"><span className="text-[var(--text-muted)]">Track</span><span className="font-bold">{selectedTrackInfo?.icon} {selectedTrackInfo?.title}</span></div>
@@ -438,7 +438,7 @@ export default function OnboardingPage() {
               style={{ border: '0.5px solid var(--border)', background: 'var(--bg-card)' }}
             >
               <span className="text-2xl">{getCharacterForTrack(track).emoji}</span>
-              <div className="text-sm italic text-[var(--text-secondary)]">
+              <div className="text-base italic text-[var(--text-secondary)]">
                 {getFirstQuote(getCharacterForTrack(track), lang)}
               </div>
             </div>
@@ -467,10 +467,10 @@ export default function OnboardingPage() {
                 }}
               >
                 <div style={{ fontSize: 36, marginBottom: 8 }}>🔥</div>
-                <div style={{ fontSize: 17, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
                   {lang === 'de' ? 'Behalte deinen Streak' : 'Keep your streak alive'}
                 </div>
-                <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: 280, margin: '0 auto 16px' }}>
+                <div style={{ fontSize: 15, color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: 300, margin: '0 auto 16px' }}>
                   {lang === 'de'
                     ? 'Wir erinnern dich täglich wenn du noch nicht gelernt hast.'
                     : "We'll remind you daily if you haven't studied yet."}
