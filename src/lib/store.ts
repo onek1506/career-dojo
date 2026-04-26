@@ -22,8 +22,7 @@ import { rollMeme as rollMemeUtil, type Meme } from '@/data/memes';
 export interface UserProgress {
   completedLessons: string[];
   completedQuizzes: Record<string, { score: number; bestScore: number; attempts: number }>;
-  completedCases: string[];
-  xp: number;
+xp: number;
   streak: number;
   lastActiveDate: string;
   longestStreak: number;
@@ -51,8 +50,7 @@ export interface UserProgress {
 const DEFAULT_PROGRESS: UserProgress = {
   completedLessons: [],
   completedQuizzes: {},
-  completedCases: [],
-  xp: 0,
+xp: 0,
   streak: 0,
   lastActiveDate: '',
   longestStreak: 0,
@@ -167,19 +165,6 @@ export function useStore() {
         lessonsCompletedToday: prev.lastActiveDate === today
           ? prev.lessonsCompletedToday + 1
           : 1,
-      };
-      saveProgress(next);
-      return next;
-    });
-  }, []);
-
-  const completeCase = useCallback((caseId: string, xpEarned: number) => {
-    setProgress(prev => {
-      const alreadyDone = prev.completedCases.includes(caseId);
-      const next: UserProgress = {
-        ...prev,
-        completedCases: alreadyDone ? prev.completedCases : [...prev.completedCases, caseId],
-        xp: prev.xp + (alreadyDone ? Math.floor(xpEarned / 2) : xpEarned),
       };
       saveProgress(next);
       return next;
@@ -333,7 +318,6 @@ export function useStore() {
     level,
     update,
     completeLesson,
-    completeCase,
     recordQuizAnswer,
     recordAnswer,
     recordQuizScore,
