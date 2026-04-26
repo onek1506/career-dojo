@@ -7,3 +7,4 @@
 - [x]  Cases-Funktion raus (komplett in allen Sections)
 - [x]  Übersichtlicheres Onboarding (Größere Schrift in allen Sections)
 - [x]  Memefeature raus
+- [ ] "Denksport" in German UI umbenennen zu "Brainteaser"
