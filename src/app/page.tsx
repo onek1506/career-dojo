@@ -151,7 +151,7 @@ export default function HomePage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="text-xs text-[var(--text-muted)] font-bold uppercase tracking-wide">
-                      {t('Daily Brainteaser', 'Täglicher Denksport')}
+                      {t('Daily Brainteaser', 'Täglicher Brainteaser')}
                     </div>
                     <div className="font-bold text-sm mt-0.5 line-clamp-2">
                       {progress.language === 'de' ? dailyBrainteaser.questionDe : dailyBrainteaser.question}
@@ -177,7 +177,7 @@ export default function HomePage() {
               }}
             >
               {progress.language === 'de'
-                ? `Alle ${BRAIN_TEASERS.length} Denksport-Rätsel ansehen →`
+                ? `Alle ${BRAIN_TEASERS.length} Brainteaser ansehen →`
                 : `View all ${BRAIN_TEASERS.length} brainteasers →`}
             </Link>
           </div>

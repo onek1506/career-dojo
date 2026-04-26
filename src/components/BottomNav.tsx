@@ -16,7 +16,7 @@ export default function BottomNav({ lang = 'de' }: BottomNavProps) {
   const NAV_ITEMS = [
     { href: '/', icon: Home, label: 'Home', labelDe: 'Home' },
     { href: '/skill-tree', icon: GitBranch, label: 'Learn', labelDe: 'Lernen' },
-{ href: '/brainteasers', icon: Brain, label: 'Brainteasers', labelDe: 'Denksport' },
+{ href: '/brainteasers', icon: Brain, label: 'Brainteasers', labelDe: 'Brainteasers' },
     { href: '/glossary', icon: BookOpen, label: 'Glossary', labelDe: 'Glossar' },
     { href: '/profile', icon: User, label: 'Profile', labelDe: 'Profil' },
   ];

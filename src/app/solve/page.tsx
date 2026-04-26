@@ -86,7 +86,7 @@ export default function SolvePage() {
           💡{' '}
           {t(
             'Until launch: drill brainteasers, market sizing and mental math — they train the same muscles.',
-            'Bis zum Launch: übe Denksport, Market Sizing und Kopfrechnen — sie trainieren die gleichen Muskeln.',
+            'Bis zum Launch: übe Brainteasers, Market Sizing und Kopfrechnen — sie trainieren die gleichen Muskeln.',
           )}
         </div>
       </div>

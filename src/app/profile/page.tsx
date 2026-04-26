@@ -227,7 +227,7 @@ export default function ProfilePage() {
                   <Brain size={18} className="text-[var(--accent-streak)]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold">{t('Brainteasers', 'Denksport')}</div>
+                  <div className="text-sm font-bold">{t('Brainteasers', 'Brainteasers')}</div>
                   <div className="text-[10px] text-[var(--text-muted)]">
                     {t('Classic interview puzzles', 'Klassische Interview-Rätsel')}
                   </div>

@@ -2144,7 +2144,7 @@ export const ibTrack: Track = {
       title: 'Advanced Technical Questions',
       titleDe: 'Fortgeschrittene Technical Questions',
       description: 'WACC, Beta, Working Capital, and brain teasers',
-      descriptionDe: 'WACC, Beta, Working Capital und Denksport',
+      descriptionDe: 'WACC, Beta, Working Capital und Brainteasers',
       icon: '🧠',
       difficulty: 'advanced',
       order: 6,
@@ -2277,7 +2277,7 @@ export const ibTrack: Track = {
     {
       id: 'brainteasers',
       title: 'Brainteasers & Market Sizing',
-      titleDe: 'Denksport & Market Sizing',
+      titleDe: 'Brainteasers & Market Sizing',
       description: 'Mental math, estimation, and logic puzzles',
       descriptionDe: 'Kopfrechnen, Schätzungen und Logikrätsel',
       icon: '🧩',
