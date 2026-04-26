@@ -184,57 +184,14 @@ function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function parseInlineMarkdown(text: string): ReactNode {
-  const parts: ReactNode[] = [];
-  let cursor = 0;
-  const pattern = /\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`/g;
-  let match: RegExpExecArray | null;
-  while ((match = pattern.exec(text)) !== null) {
-    if (match.index > cursor) parts.push(text.slice(cursor, match.index));
-    if (match[1] !== undefined) {
-      parts.push(<strong key={match.index}>{match[1]}</strong>);
-    } else if (match[2] !== undefined) {
-      parts.push(<em key={match.index}>{match[2]}</em>);
-    } else if (match[3] !== undefined) {
-      parts.push(
-        <code key={match.index} className="bg-[rgba(0,0,0,0.15)] rounded px-1 font-mono text-xs">
-          {match[3]}
-        </code>,
-      );
-    }
-    cursor = match.index + match[0].length;
-  }
-  if (cursor < text.length) parts.push(text.slice(cursor));
-  if (parts.length === 1 && typeof parts[0] === 'string') return parts[0];
-  return <>{parts}</>;
-}
-
-/**
- * Walk `text` and wrap every whole-word match against the glossary in
- * a `<GlossaryTooltip/>`. Longest terms are matched first so that e.g.
- * "Terminal Value" wins over "Value". Whole-word boundary excludes
- * letters, digits, underscore AND hyphens — so "EBITDA" won't match
- * inside "EBITDA-Marge".
- */
-function wrapGlossaryTerms(
-  text: string | undefined | null,
+// Applies glossary tooltip wrapping to a single plain-text segment
+// (markdown markers have already been stripped by the caller).
+function applyGlossaryToText(
+  text: string,
   language: 'en' | 'de',
+  candidates: GlossaryTerm[],
 ): ReactNode {
-  if (!text) return text ?? null;
-
-  // Sort longest-first to prevent sub-term stealing.
-  const candidates = [...GLOSSARY].sort((a, b) => {
-    const aKey = language === 'de' ? a.termDe : a.term;
-    const bKey = language === 'de' ? b.termDe : b.term;
-    return bKey.length - aKey.length;
-  });
-
-  type Match = {
-    start: number;
-    end: number;
-    entry: GlossaryTerm;
-    matched: string;
-  };
+  type Match = { start: number; end: number; entry: GlossaryTerm; matched: string };
   const matches: Match[] = [];
   const used: boolean[] = new Array(text.length).fill(false);
 
@@ -243,14 +200,11 @@ function wrapGlossaryTerms(
     if (!phrase) continue;
     let re: RegExp;
     try {
-      // Guard: no letter/digit/underscore/hyphen on either side.
-      // Requires lookbehind — supported in all browsers Next.js 16 targets.
       re = new RegExp(
         `(?<![\\p{L}\\p{N}_-])${escapeRegex(phrase)}(?![\\p{L}\\p{N}_-])`,
         'giu',
       );
     } catch {
-      // Fallback to ASCII \b for ancient engines.
       re = new RegExp(`\\b${escapeRegex(phrase)}\\b`, 'gi');
     }
     let m: RegExpExecArray | null;
@@ -259,10 +213,7 @@ function wrapGlossaryTerms(
       const end = m.index + m[0].length;
       let overlaps = false;
       for (let i = start; i < end; i++) {
-        if (used[i]) {
-          overlaps = true;
-          break;
-        }
+        if (used[i]) { overlaps = true; break; }
       }
       if (overlaps) continue;
       matches.push({ start, end, entry, matched: m[0] });
@@ -270,13 +221,13 @@ function wrapGlossaryTerms(
     }
   }
 
-  if (matches.length === 0) return parseInlineMarkdown(text);
+  if (matches.length === 0) return text;
   matches.sort((a, b) => a.start - b.start);
 
   const nodes: ReactNode[] = [];
   let cursor = 0;
   matches.forEach((m, i) => {
-    if (m.start > cursor) nodes.push(parseInlineMarkdown(text.slice(cursor, m.start)));
+    if (m.start > cursor) nodes.push(text.slice(cursor, m.start));
     nodes.push(
       <GlossaryTooltip
         key={`gl-${m.entry.id}-${i}-${m.start}`}
@@ -289,7 +240,70 @@ function wrapGlossaryTerms(
     );
     cursor = m.end;
   });
-  if (cursor < text.length) nodes.push(parseInlineMarkdown(text.slice(cursor)));
+  if (cursor < text.length) nodes.push(text.slice(cursor));
+  return <>{nodes}</>;
+}
+
+/**
+ * Walk `text` and wrap every whole-word match against the glossary in
+ * a `<GlossaryTooltip/>`. Longest terms are matched first so that e.g.
+ * "Terminal Value" wins over "Value". Whole-word boundary excludes
+ * letters, digits, underscore AND hyphens — so "EBITDA" won't match
+ * inside "EBITDA-Marge".
+ *
+ * Inline markdown (**bold**, *italic*, `code`) is parsed BEFORE glossary
+ * matching so that markers like ** are never left as orphaned literals
+ * when the glossary term sits inside a bold span.
+ */
+function wrapGlossaryTerms(
+  text: string | undefined | null,
+  language: 'en' | 'de',
+): ReactNode {
+  if (!text) return text ?? null;
+
+  const candidates = [...GLOSSARY].sort((a, b) => {
+    const aKey = language === 'de' ? a.termDe : a.term;
+    const bKey = language === 'de' ? b.termDe : b.term;
+    return bKey.length - aKey.length;
+  });
+
+  // Split by inline markdown markers first, then apply glossary per segment.
+  type Chunk = { content: string; bold: boolean; italic: boolean; code: boolean };
+  const chunks: Chunk[] = [];
+  const mdRe = /\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`/g;
+  let cur = 0;
+  let mm: RegExpExecArray | null;
+  while ((mm = mdRe.exec(text)) !== null) {
+    if (mm.index > cur) {
+      chunks.push({ content: text.slice(cur, mm.index), bold: false, italic: false, code: false });
+    }
+    if (mm[1] !== undefined) {
+      chunks.push({ content: mm[1], bold: true, italic: false, code: false });
+    } else if (mm[2] !== undefined) {
+      chunks.push({ content: mm[2], bold: false, italic: true, code: false });
+    } else if (mm[3] !== undefined) {
+      chunks.push({ content: mm[3], bold: false, italic: false, code: true });
+    }
+    cur = mm.index + mm[0].length;
+  }
+  if (cur < text.length) {
+    chunks.push({ content: text.slice(cur), bold: false, italic: false, code: false });
+  }
+
+  const nodes: ReactNode[] = chunks.map((chunk, ci) => {
+    if (chunk.code) {
+      return (
+        <code key={ci} className="bg-[rgba(0,0,0,0.15)] rounded px-1 font-mono text-xs">
+          {chunk.content}
+        </code>
+      );
+    }
+    const inner = applyGlossaryToText(chunk.content, language, candidates);
+    if (chunk.bold) return <strong key={ci}>{inner}</strong>;
+    if (chunk.italic) return <em key={ci}>{inner}</em>;
+    return <span key={ci}>{inner}</span>;
+  });
+
   return <>{nodes}</>;
 }
 
