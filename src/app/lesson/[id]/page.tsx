@@ -1,7 +1,6 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import {
   useState,
   useMemo,
@@ -10,13 +9,6 @@ import {
   type ReactNode,
 } from 'react';
 import { useStore } from '@/lib/store';
-import { type Meme, getMemesForTrack } from '@/data/memes';
-// ScratchCard only renders after a lesson is completed + a meme is rolled.
-// Splitting it into its own chunk trims ~15 kB from the lesson page's initial JS.
-const ScratchCard = dynamic(() => import('@/components/ScratchCard'), {
-  ssr: false,
-  loading: () => null,
-});
 import {
   getLessonById,
   type Lesson,
@@ -316,9 +308,6 @@ export default function LessonPage() {
     completeLesson,
     recordAnswer,
     recordQuizScore,
-    rollMeme,
-    canReceiveMeme,
-    unlockedMemes,
   } = useStore();
   const lessonId = params.id as string;
   const lesson = getLessonById(lessonId);
@@ -338,9 +327,6 @@ export default function LessonPage() {
   const [phase, setPhase] = useState<'lesson' | 'quiz' | 'results'>('lesson');
   const [slideIdx, setSlideIdx] = useState(0);
   const [showDetailedExample, setShowDetailedExample] = useState(false);
-  const [rolledMeme, setRolledMeme] = useState<Meme | null>(null);
-  const [memeRolled, setMemeRolled] = useState(false);
-  const [allMemesCollected, setAllMemesCollected] = useState(false);
 
   // Quiz state (queue-based retry logic from session 5) ---------------------
   const [quizQueue, setQuizQueue] = useState<QuizQuestion[]>(initialQueue);
@@ -378,34 +364,6 @@ export default function LessonPage() {
     setSoundOnState(next);
     setSoundEnabled(next);
   };
-
-  // Roll a meme exactly once when the user reaches the results phase
-  // Gated behind: daily goal reached AND max 1 meme per day
-  useEffect(() => {
-    if (phase !== 'results' || memeRolled) return;
-    setMemeRolled(true);
-
-    // Check daily gating: must reach daily goal, max 1 meme/day
-    if (!canReceiveMeme()) {
-      setRolledMeme(null);
-      setAllMemesCollected(false);
-      return;
-    }
-
-    const trackId = progress.selectedTrack || 'ib';
-    const trackMemes = getMemesForTrack(trackId);
-    const allUnlocked =
-      trackMemes.length > 0 &&
-      trackMemes.every((m) => unlockedMemes.includes(m.id));
-    if (allUnlocked) {
-      setAllMemesCollected(true);
-      setRolledMeme(null);
-    } else {
-      const meme = rollMeme(trackId);
-      setRolledMeme(meme);
-      setAllMemesCollected(meme === null);
-    }
-  }, [phase, memeRolled, progress.selectedTrack, rollMeme, canReceiveMeme, unlockedMemes]);
 
   if (!lesson) {
     return (
@@ -788,26 +746,6 @@ export default function LessonPage() {
                 </p>
               </div>
 
-              {/* ===== Meme Drop ===== */}
-              {rolledMeme && (
-                <ScratchCard
-                  meme={rolledMeme}
-                  lang={progress.language}
-                  character={character}
-                />
-              )}
-              {!rolledMeme && allMemesCollected && (
-                <div className="duo-card p-4 text-sm font-bold text-[var(--duo-gold)] flex items-center justify-center gap-2">
-                  🏆
-                  <span>
-                    {t(
-                      'You collected every meme of this track!',
-                      'Du hast alle Memes dieses Tracks gesammelt!',
-                    )}
-                  </span>
-                </div>
-              )}
-
               <div className="duo-card p-6 space-y-4">
                 <div className="flex justify-between">
                   <span className="text-[var(--duo-text-muted)]">
@@ -859,9 +797,6 @@ export default function LessonPage() {
                     setScore(0);
                     setXpEarned(0);
                     setShowDetailedExample(false);
-                    setMemeRolled(false);
-                    setRolledMeme(null);
-                    setAllMemesCollected(false);
                   }}
                   className="flex-1 py-3 rounded-xl border-2 border-[var(--duo-border)] text-white font-bold btn-press transition"
                 >

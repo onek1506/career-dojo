@@ -13,7 +13,6 @@ import {
   type Quality,
   QUALITY_GOOD,
 } from './spaced-repetition';
-import { rollMeme as rollMemeUtil, type Meme } from '@/data/memes';
 
 // ============================================================
 // CareerDojo Global Store — localStorage persistence
@@ -42,9 +41,6 @@ xp: number;
   lastReviewDate: string; // YYYY-MM-DD of last review session
   // ===== Theme =====
   theme: 'dark' | 'light';
-  // ===== Meme Collection =====
-  unlockedMemes: string[];   // collected meme IDs
-  lastMemeDate: string;       // YYYY-MM-DD of last meme drop (max 1/day)
 }
 
 const DEFAULT_PROGRESS: UserProgress = {
@@ -69,8 +65,6 @@ xp: 0,
   wrongAnswersToday: [],
   lastReviewDate: '',
   theme: 'dark',
-  unlockedMemes: [],
-  lastMemeDate: '',
 };
 
 const STORAGE_KEY = 'career-dojo-progress';
@@ -272,44 +266,6 @@ export function useStore() {
     setProgress(fresh);
   }, []);
 
-  /**
-   * Check whether the user is eligible for a meme drop right now.
-   * Conditions: daily goal reached AND hasn't received a meme today.
-   */
-  const canReceiveMeme = useCallback((): boolean => {
-    const today = getToday();
-    if (progress.lastMemeDate === today) return false;
-    if (progress.lessonsCompletedToday < progress.dailyGoal) return false;
-    return true;
-  }, [progress.lastMemeDate, progress.lessonsCompletedToday, progress.dailyGoal]);
-
-  /**
-   * Roll a meme for the given track. Uses the current unlocked list,
-   * persists the unlock if a meme is rolled, and returns the rolled
-   * meme (or null when every meme of the track is collected or
-   * daily gating prevents a drop).
-   */
-  const rollMeme = useCallback((track: string): Meme | null => {
-    const today = getToday();
-    // Daily gating: max 1 meme per day, only after daily goal
-    if (progress.lastMemeDate === today) return null;
-    if (progress.lessonsCompletedToday < progress.dailyGoal) return null;
-
-    const meme = rollMemeUtil(track, progress.unlockedMemes);
-    if (!meme) return null;
-    setProgress((prev) => {
-      if (prev.unlockedMemes.includes(meme.id)) return prev;
-      const next: UserProgress = {
-        ...prev,
-        unlockedMemes: [...prev.unlockedMemes, meme.id],
-        lastMemeDate: today,
-      };
-      saveProgress(next);
-      return next;
-    });
-    return meme;
-  }, [progress.unlockedMemes, progress.lastMemeDate, progress.lessonsCompletedToday, progress.dailyGoal]);
-
   const level = getLevelForXp(progress.xp);
 
   return {
@@ -322,9 +278,6 @@ export function useStore() {
     recordAnswer,
     recordQuizScore,
     resetProgress,
-    rollMeme,
-    canReceiveMeme,
-    unlockedMemes: progress.unlockedMemes,
     t: (en: string, de: string) => progress.language === 'de' ? de : en,
   };
 }

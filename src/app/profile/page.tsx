@@ -9,33 +9,16 @@ import { TRACKS } from '@/data/tracks';
 import { getCharacterForTrack } from '@/data/characters';
 import { playClickSound } from '@/lib/sounds';
 import Link from 'next/link';
-import { Flame, Zap, Target, Trophy, BarChart3, BookOpen, RefreshCw, Globe, Volume2, VolumeX, ArrowRightLeft, Sparkles, ChevronRight, Brain, Image as ImageIcon, Bell, X, Star } from 'lucide-react';
-import { MEMES, RARITY_COLOR, RARITY_LABEL, type Meme, type MemeRarity } from '@/data/memes';
+import { Flame, Zap, Target, Trophy, BarChart3, BookOpen, RefreshCw, Globe, Volume2, VolumeX, Sparkles, ChevronRight, Brain, Bell } from 'lucide-react';
 
 export default function ProfilePage() {
-  const { progress, level, t, update, resetProgress, unlockedMemes } = useStore();
+  const { progress, level, t, update, resetProgress } = useStore();
   const currentTrack = TRACKS.find(tr => tr.id === progress.selectedTrack) || TRACKS[0];
   const character = getCharacterForTrack(progress.selectedTrack || 'ib');
   const totalLessons = getAllLessons(progress.selectedTrack).length;
   const accuracy = progress.totalQuestionsAnswered > 0
     ? Math.round((progress.totalCorrectAnswers / progress.totalQuestionsAnswered) * 100)
     : 0;
-  const totalMemes = MEMES.length;
-  const collectedCount = unlockedMemes.length;
-
-  // Meme modal + filter tabs
-  const [selectedMeme, setSelectedMeme] = useState<Meme | null>(null);
-  const [memeFilter, setMemeFilter] = useState<'all' | MemeRarity>('all');
-  const filteredMemes = memeFilter === 'all'
-    ? MEMES
-    : MEMES.filter(m => m.rarity === memeFilter);
-  const FILTER_TABS: { key: 'all' | MemeRarity; label: string }[] = [
-    { key: 'all', label: t('All', 'Alle') },
-    { key: 'standard', label: 'Standard' },
-    { key: 'rare', label: 'Rare' },
-    { key: 'legendary', label: 'Legendary' },
-  ];
-
   // Coming Soon modal state — set to the track being joined, null when closed
   const [waitlistTrack, setWaitlistTrack] = useState<typeof TRACKS[number] | null>(null);
 
@@ -66,62 +49,6 @@ export default function ProfilePage() {
 
   return (
     <AppShell>
-      {/* ===== Meme Detail Modal ===== */}
-      {selectedMeme && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
-          onClick={() => setSelectedMeme(null)}
-        >
-          <div
-            className={`relative w-full max-w-sm rounded-2xl overflow-hidden ${
-              selectedMeme.rarity === 'legendary' ? 'meme-modal-legendary' : ''
-            }`}
-            style={{
-              borderWidth: 4,
-              borderStyle: 'solid',
-              borderColor: RARITY_COLOR[selectedMeme.rarity],
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="bg-gradient-to-br from-[var(--bg-card)] to-[var(--bg)] p-6 flex flex-col items-center gap-4 text-center min-h-[280px] justify-center">
-              <div className="text-6xl">{selectedMeme.emoji}</div>
-              <p className="text-base font-bold text-[var(--text-primary)] leading-snug whitespace-pre-line">
-                {progress.language === 'de' ? selectedMeme.textDe : selectedMeme.text}
-              </p>
-              <span
-                className="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider flex items-center gap-1"
-                style={{
-                  backgroundColor: RARITY_COLOR[selectedMeme.rarity],
-                  color: selectedMeme.rarity === 'standard' ? '#1a1a1a' : '#fff',
-                }}
-              >
-                {selectedMeme.rarity === 'legendary' && <Star size={12} fill="currentColor" />}
-                {progress.language === 'de'
-                  ? RARITY_LABEL[selectedMeme.rarity].de
-                  : RARITY_LABEL[selectedMeme.rarity].en}
-                {selectedMeme.rarity === 'legendary' && <Star size={12} fill="currentColor" />}
-              </span>
-            </div>
-            <button
-              onClick={() => setSelectedMeme(null)}
-              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition"
-            >
-              <X size={16} />
-            </button>
-          </div>
-          <style jsx>{`
-            .meme-modal-legendary {
-              box-shadow: 0 0 30px rgba(184, 134, 11, 0.5), 0 0 60px rgba(184, 134, 11, 0.25);
-              animation: modal-glow 2s ease-in-out infinite;
-            }
-            @keyframes modal-glow {
-              0%, 100% { box-shadow: 0 0 30px rgba(184, 134, 11, 0.5), 0 0 60px rgba(184, 134, 11, 0.25); }
-              50% { box-shadow: 0 0 40px rgba(184, 134, 11, 0.7), 0 0 80px rgba(184, 134, 11, 0.35); }
-            }
-          `}</style>
-        </div>
-      )}
-
       <div className="space-y-6">
         {/* Profile Header */}
         <div className="duo-card p-6 text-center">
@@ -260,95 +187,6 @@ export default function ProfilePage() {
             <StatItem icon={<BookOpen size={16} className="text-[var(--accent-xp)]" />} value={`${progress.completedLessons.length}/${totalLessons}`} label={t('Lessons', 'Lektionen')} />
             <StatItem icon={<Target size={16} className="text-[var(--accent-info)]" />} value={`${accuracy}%`} label={t('Accuracy', 'Genauigkeit')} />
             <StatItem icon={<BarChart3 size={16} className="text-[var(--accent-purple)]" />} value={progress.totalQuestionsAnswered} label={t('Questions', 'Fragen')} />
-          </div>
-        </div>
-
-        {/* Meme Collection */}
-        <div className="duo-card p-5">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-bold text-sm flex items-center gap-2">
-              <ImageIcon size={16} className="text-[var(--accent-purple)]" />
-              {t('Collection', 'Sammlung')}
-            </h2>
-            <span className="text-[10px] font-bold text-[var(--text-muted)] tabular-nums">
-              {collectedCount} / {totalMemes} {t('Memes', 'Memes')}
-            </span>
-          </div>
-
-          {/* Filter Tabs */}
-          <div className="flex gap-1 mb-4 overflow-x-auto pb-1">
-            {FILTER_TABS.map(tab => (
-              <button
-                key={tab.key}
-                onClick={() => setMemeFilter(tab.key)}
-                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wide whitespace-nowrap transition-all ${
-                  memeFilter === tab.key
-                    ? 'bg-[var(--accent-primary)] text-[var(--accent-primary-text)]'
-                    : 'bg-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                }`}
-                style={
-                  memeFilter === tab.key && tab.key !== 'all'
-                    ? { backgroundColor: RARITY_COLOR[tab.key as MemeRarity], color: tab.key === 'standard' ? '#1a1a1a' : '#fff' }
-                    : {}
-                }
-              >
-                {tab.key === 'legendary' && '★ '}
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-3 gap-2">
-            {filteredMemes.map((m: Meme) => {
-              const unlocked = unlockedMemes.includes(m.id);
-              const color = RARITY_COLOR[m.rarity];
-              const rLabel = progress.language === 'de'
-                ? RARITY_LABEL[m.rarity].de
-                : RARITY_LABEL[m.rarity].en;
-              const isLegendary = m.rarity === 'legendary';
-              return (
-                <div
-                  key={m.id}
-                  onClick={() => unlocked && setSelectedMeme(m)}
-                  className={`relative aspect-square rounded-xl flex flex-col items-center justify-center gap-1 p-2 text-center overflow-hidden transition-all ${
-                    unlocked
-                      ? 'bg-gradient-to-br from-[var(--bg-card)] to-[var(--bg)] cursor-pointer active:scale-95'
-                      : 'bg-[var(--border)] opacity-60'
-                  } ${isLegendary && unlocked ? 'ring-2 ring-[#B8860B] ring-offset-1 ring-offset-[var(--bg-card)]' : ''}`}
-                  style={{
-                    borderWidth: 2,
-                    borderStyle: 'solid',
-                    borderColor: unlocked ? color : 'var(--border)',
-                  }}
-                  title={unlocked ? (progress.language === 'de' ? m.textDe : m.text) : '???'}
-                >
-                  {unlocked ? (
-                    <>
-                      <div className="text-2xl leading-none">{m.emoji}</div>
-                      <span
-                        className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full flex items-center gap-0.5"
-                        style={{
-                          backgroundColor: color,
-                          color: m.rarity === 'standard' ? '#1a1a1a' : '#fff',
-                        }}
-                      >
-                        {isLegendary && '★ '}
-                        {rLabel}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <div className="text-2xl text-[var(--text-muted)] grayscale opacity-40">
-                        ❔
-                      </div>
-                      <span className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-wider">
-                        ???
-                      </span>
-                    </>
-                  )}
-                </div>
-              );
-            })}
           </div>
         </div>
 
