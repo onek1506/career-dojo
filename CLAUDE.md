@@ -31,3 +31,14 @@ Wenn ich sage "Setz dich an die Todos" oder ähnlich, folge exakt diesem Ablauf:
 - **Clean Code:** Bevorzuge modernen, lesbaren Code. Vermeide Codeduplikate (DRY - Don't Repeat Yourself).
 - **Sprache im Code:** Schreibe ALLE Code-Kommentare, Variablen, Funktionsnamen und Commit-Messages ausschließlich auf **Englisch**. (Unsere Konversation im Chat bleibt auf Deutsch).
 - **Fehlerbehandlung:** Wenn ein Befehl fehlschlägt, analysiere den Error-Log selbstständig und versuche, das Problem zu beheben, bevor du mich fragst.
+
+## 4. Workflow: Neue Todos hinzufügen
+Wenn ich sage "Füge die folgende Todo ein: [Beschreibung]" oder ähnlich, folge diesem Ablauf:
+
+1. **Sync:** Führe `git pull` aus, um sicherzustellen, dass du auf dem neuesten Stand bist.
+2. **Doubletten-Check:** Lies die `TODO.md` und prüfe, ob bereits eine Aufgabe mit einer sehr ähnlichen Beschreibung existiert.
+   - **Falls ja:** Nenne mir die existierende Aufgabe und frage explizit nach: "Die Aufgabe '[X]' scheint bereits vorhanden zu sein. Soll ich '[Beschreibung]' trotzdem als neues Todo hinzufügen?"
+   - **Falls nein:** Fahre fort.
+3. **Einfügen:** Füge die neue Aufgabe am Ende des passenden Abschnitts in der `TODO.md` ein (Format: `- [ ] [Beschreibung]`).
+4. **Sync & Push:** Führe `git add TODO.md`, `git commit -m "chore: add new todo: [Beschreibung]"` und `git push` aus.
+5. **Bestätigung:** Gib mir eine kurze Rückmeldung, dass das Todo hinzugefügt und synchronisiert wurde.
