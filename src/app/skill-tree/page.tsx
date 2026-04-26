@@ -12,7 +12,7 @@ import { Lock, Check, Star } from 'lucide-react';
 export default function SkillTreePage() {
   const { progress, t } = useStore();
   const activeTrack = getTrackData(progress.selectedTrack || 'ib');
-  const isPEorVC = progress.selectedTrack === 'pe' || progress.selectedTrack === 'vc' || progress.selectedTrack === 'ib';
+  const isPEorVC = progress.selectedTrack === 'pe' || progress.selectedTrack === 'vc';
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const currentTrack = TRACKS.find(tr => tr.id === progress.selectedTrack);
 
@@ -128,7 +128,7 @@ export default function SkillTreePage() {
             </div>
           </div>
 
-          {/* Coming Soon overlay for PE/VC/IB — outside blur wrapper, click to join waitlist */}
+          {/* Coming Soon overlay for PE/VC — outside blur wrapper, click to join waitlist */}
           {isPEorVC && (
             <button
               type="button"

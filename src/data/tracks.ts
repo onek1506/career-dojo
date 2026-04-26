@@ -35,7 +35,8 @@ export const TRACKS: TrackInfo[] = [
     color: '#1CB0F6',
     bgGradient: 'from-blue-600 to-cyan-500',
     available: true,
-    lessonCount: 17,
+    comingSoon: false,
+    lessonCount: 40,
   },
   {
     id: 'pe',

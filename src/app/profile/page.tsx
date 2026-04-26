@@ -161,7 +161,7 @@ export default function ProfilePage() {
             {t('Your Track', 'Dein Track')}
           </div>
           {TRACKS.map(tr => {
-            const isComingSoon = tr.id === 'pe' || tr.id === 'vc' || tr.id === 'ib';
+            const isComingSoon = tr.id === 'pe' || tr.id === 'vc';
             const isSelected = tr.id === progress.selectedTrack;
             return (
               <button

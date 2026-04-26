@@ -162,7 +162,7 @@ export default function OnboardingPage() {
               {TRACKS.map(t => {
                 const char = getCharacterForTrack(t.id);
                 const isSelected = track === t.id;
-                const isComingSoon = t.id === 'ib' || t.id === 'pe' || t.id === 'vc';
+                const isComingSoon = t.id === 'pe' || t.id === 'vc';
                 return (
                   <button
                     key={t.id}
