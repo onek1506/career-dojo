@@ -4,6 +4,7 @@ import AppShell from '@/components/AppShell';
 import { useStore } from '@/lib/store';
 import { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Sparkles, BookOpen } from 'lucide-react';
+import Markdown from '@/components/Markdown';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -374,7 +375,11 @@ export default function TutorPage() {
                   ? 'bg-[var(--accent-info)] text-white rounded-br-sm'
                   : 'bg-[var(--duo-card)] border border-[var(--duo-border)] rounded-bl-sm'
               }`}>
-                <div className="whitespace-pre-line">{msg.content}</div>
+                {msg.role === 'assistant' ? (
+                  <Markdown className="text-sm leading-relaxed">{msg.content}</Markdown>
+                ) : (
+                  <div className="whitespace-pre-line">{msg.content}</div>
+                )}
               </div>
               {msg.role === 'user' && (
                 <div className="w-8 h-8 rounded-lg bg-[var(--accent-xp)] flex items-center justify-center shrink-0 mt-1">

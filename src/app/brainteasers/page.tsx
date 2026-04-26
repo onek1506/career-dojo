@@ -6,6 +6,7 @@ import { BRAIN_TEASERS } from '@/data/brainteasers';
 import { playClickSound, playRevealSound } from '@/lib/sounds';
 import { useState, useEffect } from 'react';
 import { Brain, Lightbulb, Eye, EyeOff, ChevronDown, ChevronUp, Sparkles, Calculator, BarChart3, Puzzle, Dice5 } from 'lucide-react';
+import Markdown from '@/components/Markdown';
 
 const DONE_STORAGE_KEY = 'brainteaser_done';
 
@@ -233,11 +234,11 @@ export default function BrainTeasersPage() {
                       <div className="space-y-2">
                         <div className="p-3 rounded-xl bg-[rgba(88,204,2,0.1)] border border-[rgba(88,204,2,0.2)]">
                           <div className="font-bold text-sm text-[var(--accent-xp)] mb-1">{t('Answer:', 'Antwort:')}</div>
-                          <div className="text-sm text-[var(--text-primary)]">{progress.language === 'de' ? bt.answerDe : bt.answer}</div>
+                          <Markdown className="text-sm text-[var(--text-primary)]">{progress.language === 'de' ? bt.answerDe : bt.answer}</Markdown>
                         </div>
                         <div className="text-sm text-[var(--text-secondary)] leading-relaxed">
                           <span className="font-bold text-[var(--text-primary)]">{t('Explanation:', 'Erklärung:')}</span>{' '}
-                          {progress.language === 'de' ? bt.explanationDe : bt.explanation}
+                          <Markdown className="inline">{progress.language === 'de' ? bt.explanationDe : bt.explanation}</Markdown>
                         </div>
                       </div>
                     )}

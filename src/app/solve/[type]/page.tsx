@@ -8,6 +8,7 @@ import { getOnlineTest, OnlineTestExercise } from '@/data/online-tests';
 import { getCharacterForTrack, getRandomEncouragement, getRandomWrongReaction } from '@/data/characters';
 import { playClickSound, playRevealSound, playCorrectSound, playWrongSound, playCompleteSound } from '@/lib/sounds';
 import { ArrowLeft, ChevronRight, Eye, Zap, CheckCircle, Clock, Target, AlertCircle, RotateCcw } from 'lucide-react';
+import Markdown from '@/components/Markdown';
 
 type Phase = 'briefing' | 'exercise' | 'results';
 
@@ -293,17 +294,17 @@ export default function SolveDetailPage() {
                 <div className="text-[10px] font-bold uppercase text-[var(--accent-info)] mb-1">
                   {t('Context', 'Kontext')}
                 </div>
-                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                <Markdown className="text-xs text-[var(--text-secondary)] leading-relaxed">
                   {isDE ? exercise.contextDe : exercise.context}
-                </p>
+                </Markdown>
               </div>
             )}
 
             {/* Prompt */}
             <div className="duo-card p-5">
-              <p className="text-sm leading-relaxed text-[var(--text-primary)] whitespace-pre-line">
+              <Markdown className="text-sm leading-relaxed text-[var(--text-primary)]">
                 {isDE ? exercise.promptDe : exercise.prompt}
-              </p>
+              </Markdown>
             </div>
 
             {/* Time-up warning */}
@@ -416,9 +417,9 @@ export default function SolveDetailPage() {
                   <div className="text-xs text-[var(--accent-xp)] font-bold uppercase mb-2 flex items-center gap-1">
                     <CheckCircle size={12} /> {t('Sample Answer', 'Musterlösung')}
                   </div>
-                  <div className="text-sm leading-relaxed text-[var(--text-primary)] whitespace-pre-line">
+                  <Markdown className="text-sm leading-relaxed text-[var(--text-primary)]">
                     {isDE ? exercise.sampleAnswerDe : exercise.sampleAnswer}
-                  </div>
+                  </Markdown>
                 </div>
 
                 {/* Explanation */}
@@ -426,9 +427,9 @@ export default function SolveDetailPage() {
                   <div className="text-xs text-[var(--duo-yellow)] font-bold uppercase mb-2">
                     {t('Why this matters', 'Warum das wichtig ist')}
                   </div>
-                  <p className="text-sm leading-relaxed text-[var(--text-primary)] whitespace-pre-line">
+                  <Markdown className="text-sm leading-relaxed text-[var(--text-primary)]">
                     {isDE ? exercise.explanationDe : exercise.explanation}
-                  </p>
+                  </Markdown>
                 </div>
 
                 <button

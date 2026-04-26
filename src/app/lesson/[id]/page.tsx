@@ -49,6 +49,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import GlossaryTooltip from '@/components/GlossaryTooltip';
+import Markdown from '@/components/Markdown';
 import { GLOSSARY, type GlossaryTerm } from '@/data/glossary';
 
 const MAX_TIMES_SHOWN = 3; // show each question at most 3 times in a row
@@ -183,6 +184,31 @@ function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function parseInlineMarkdown(text: string): ReactNode {
+  const parts: ReactNode[] = [];
+  let cursor = 0;
+  const pattern = /\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`/gs;
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > cursor) parts.push(text.slice(cursor, match.index));
+    if (match[1] !== undefined) {
+      parts.push(<strong key={match.index}>{match[1]}</strong>);
+    } else if (match[2] !== undefined) {
+      parts.push(<em key={match.index}>{match[2]}</em>);
+    } else if (match[3] !== undefined) {
+      parts.push(
+        <code key={match.index} className="bg-[rgba(0,0,0,0.15)] rounded px-1 font-mono text-xs">
+          {match[3]}
+        </code>,
+      );
+    }
+    cursor = match.index + match[0].length;
+  }
+  if (cursor < text.length) parts.push(text.slice(cursor));
+  if (parts.length === 1 && typeof parts[0] === 'string') return parts[0];
+  return <>{parts}</>;
+}
+
 /**
  * Walk `text` and wrap every whole-word match against the glossary in
  * a `<GlossaryTooltip/>`. Longest terms are matched first so that e.g.
@@ -244,13 +270,13 @@ function wrapGlossaryTerms(
     }
   }
 
-  if (matches.length === 0) return text;
+  if (matches.length === 0) return parseInlineMarkdown(text);
   matches.sort((a, b) => a.start - b.start);
 
   const nodes: ReactNode[] = [];
   let cursor = 0;
   matches.forEach((m, i) => {
-    if (m.start > cursor) nodes.push(text.slice(cursor, m.start));
+    if (m.start > cursor) nodes.push(parseInlineMarkdown(text.slice(cursor, m.start)));
     nodes.push(
       <GlossaryTooltip
         key={`gl-${m.entry.id}-${i}-${m.start}`}
@@ -263,7 +289,7 @@ function wrapGlossaryTerms(
     );
     cursor = m.end;
   });
-  if (cursor < text.length) nodes.push(text.slice(cursor));
+  if (cursor < text.length) nodes.push(parseInlineMarkdown(text.slice(cursor)));
   return <>{nodes}</>;
 }
 

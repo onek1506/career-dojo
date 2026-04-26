@@ -13,6 +13,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import AppShell from '@/components/AppShell';
+import Markdown from '@/components/Markdown';
 import { useReviewStats } from '@/lib/use-review-stats';
 import { getAllLessons } from '@/data/content';
 import type { QuizQuestion } from '@/data/content';
@@ -373,9 +374,9 @@ export default function ReviewPage() {
                       {character.name}:
                     </span>
                   </div>
-                  <p className="text-sm text-[var(--text-secondary)]">
+                  <Markdown className="text-sm text-[var(--text-secondary)]">
                     {isDE ? q.explanationDe : q.explanation}
-                  </p>
+                  </Markdown>
                 </div>
 
                 {/* How well did you know this? */}
