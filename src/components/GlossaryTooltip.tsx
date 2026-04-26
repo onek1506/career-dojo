@@ -146,12 +146,12 @@ export default function GlossaryTooltip({
         >
           <span className="flex items-center gap-2 mb-2">
             <BookOpen size={14} className="text-[var(--accent-info)] shrink-0" />
-            <span className="font-black text-sm text-white">
+            <span className="font-black text-sm text-[var(--text-primary)]">
               {isDE ? entry.termDe : entry.term}
             </span>
           </span>
 
-          <span className="block text-xs leading-relaxed text-gray-200 mb-2">
+          <span className="block text-xs leading-relaxed text-[var(--text-primary)] mb-2">
             {isDE ? entry.definitionDe : entry.definition}
           </span>
 

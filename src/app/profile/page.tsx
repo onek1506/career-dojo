@@ -381,7 +381,7 @@ export default function ProfilePage() {
             <select
               value={progress.dailyGoal}
               onChange={e => update({ dailyGoal: Number(e.target.value) })}
-              className="bg-[var(--duo-border)] text-white text-sm rounded-lg px-3 py-1.5 border-none"
+              className="bg-[var(--duo-border)] text-[var(--text-primary)] text-sm rounded-lg px-3 py-1.5 border-none"
             >
               <option value={1}>1/Tag</option>
               <option value={3}>3/Tag</option>

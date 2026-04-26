@@ -150,7 +150,7 @@ export default function ReviewPage() {
                 >
                   {character.name}:
                 </span>
-                <span className="text-gray-300 ml-1 italic">
+                <span className="text-[var(--text-secondary)] ml-1 italic">
                   {getFirstQuote(character, progress.language)}
                 </span>
               </div>
@@ -210,7 +210,7 @@ export default function ReviewPage() {
                 >
                   {character.name}:
                 </span>
-                <span className="text-gray-300 ml-1 italic">
+                <span className="text-[var(--text-secondary)] ml-1 italic">
                   {`"${introQuote}"`}
                 </span>
               </div>
@@ -504,7 +504,7 @@ export default function ReviewPage() {
 
         <div className="flex gap-3">
           <Link href="/" className="flex-1">
-            <button className="w-full py-3 rounded-xl border-2 border-[var(--duo-border)] text-white font-bold btn-press transition">
+            <button className="w-full py-3 rounded-xl border-2 border-[var(--duo-border)] text-[var(--text-primary)] font-bold btn-press transition">
               {t('Home', 'Start')}
             </button>
           </Link>

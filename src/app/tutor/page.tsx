@@ -410,7 +410,7 @@ export default function TutorPage() {
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && sendMessage(input)}
               placeholder={t('Ask a finance question...', 'Stelle eine Finance-Frage...')}
-              className="flex-1 px-4 py-3 rounded-xl bg-[var(--duo-card)] border-2 border-[var(--duo-border)] text-white placeholder-[var(--duo-text-muted)] focus:border-[var(--accent-info)] focus:outline-none transition text-sm"
+              className="flex-1 px-4 py-3 rounded-xl bg-[var(--duo-card)] border-2 border-[var(--duo-border)] text-[var(--text-primary)] placeholder-[var(--duo-text-muted)] focus:border-[var(--accent-info)] focus:outline-none transition text-sm"
             />
             <button
               onClick={() => sendMessage(input)}

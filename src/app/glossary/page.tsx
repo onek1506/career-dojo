@@ -107,7 +107,7 @@ export default function GlossaryPage() {
             >
               {character.name}:
             </span>
-            <span className="text-gray-300 ml-1 italic">
+            <span className="text-[var(--text-secondary)] ml-1 italic">
               {getFirstQuote(character, progress.language)}
             </span>
           </div>
@@ -127,7 +127,7 @@ export default function GlossaryPage() {
               'Search terms, definitions…',
               'Begriffe, Definitionen suchen…',
             )}
-            className="w-full pl-10 pr-10 py-3 rounded-xl bg-[var(--duo-card)] border-2 border-[var(--duo-border)] text-white text-sm placeholder-[var(--duo-text-muted)] focus:border-[var(--accent-info)] focus:outline-none"
+            className="w-full pl-10 pr-10 py-3 rounded-xl bg-[var(--duo-card)] border-2 border-[var(--duo-border)] text-[var(--text-primary)] text-sm placeholder-[var(--duo-text-muted)] focus:border-[var(--accent-info)] focus:outline-none"
           />
           {query && (
             <button
@@ -251,7 +251,7 @@ export default function GlossaryPage() {
 
                     {isOpen && (
                       <div className="mt-3 space-y-3">
-                        <p className="text-xs leading-relaxed text-gray-200">
+                        <p className="text-xs leading-relaxed text-[var(--text-primary)]">
                           {isDE ? entry.definitionDe : entry.definition}
                         </p>
 
@@ -270,7 +270,7 @@ export default function GlossaryPage() {
                           <div className="text-[9px] uppercase font-bold tracking-wide text-[var(--accent-purple)] mb-1">
                             {t('Example', 'Beispiel')}
                           </div>
-                          <p className="text-[11px] italic text-gray-200">
+                          <p className="text-[11px] italic text-[var(--text-primary)]">
                             {isDE ? entry.exampleDe : entry.example}
                           </p>
                         </div>

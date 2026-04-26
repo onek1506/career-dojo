@@ -40,7 +40,7 @@ export default function SolvePage() {
             <span className="font-bold" style={{ color: character.color }}>
               {character.name}:
             </span>
-            <span className="text-gray-300 ml-1 italic">
+            <span className="text-[var(--text-secondary)] ml-1 italic">
               {isDE
                 ? '"Wir bauen gerade die volle Übungssuite — McKinsey Solve, BCG Casey, Bain SOVA. Trag dich auf die Warteliste ein, damit du sofort Bescheid weißt, sobald es live geht."'
                 : '"We\'re building the full practice suite — McKinsey Solve, BCG Casey, Bain SOVA. Join the waitlist and you\'ll know the second it goes live."'}

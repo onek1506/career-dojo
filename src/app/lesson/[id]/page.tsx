@@ -711,7 +711,7 @@ export default function LessonPage() {
                           )}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-300">
+                  <p className="text-sm text-[var(--text-secondary)]">
                     {isDE
                       ? currentQuestion.explanationDe
                       : currentQuestion.explanation}
@@ -798,7 +798,7 @@ export default function LessonPage() {
                     setXpEarned(0);
                     setShowDetailedExample(false);
                   }}
-                  className="flex-1 py-3 rounded-xl border-2 border-[var(--duo-border)] text-white font-bold btn-press transition"
+                  className="flex-1 py-3 rounded-xl border-2 border-[var(--duo-border)] text-[var(--text-primary)] font-bold btn-press transition"
                 >
                   {t('Redo', 'Wiederholen')}
                 </button>
@@ -910,7 +910,7 @@ function LessonSlideView({
               >
                 {character.name}
               </div>
-              <p className="text-gray-200 italic">
+              <p className="text-[var(--text-primary)] italic">
                 {isDE
                   ? `"Lass uns ${lesson.titleDe} durchgehen. Das kommt fast immer im Interview!"`
                   : `"Let's go through ${lesson.title}. This comes up in almost every interview!"`}
@@ -944,7 +944,7 @@ function LessonSlideView({
         <h2 className="text-xl font-black leading-snug">
           {isDE ? section.headingDe : section.heading}
         </h2>
-        <div className="text-sm leading-relaxed text-gray-200 whitespace-pre-line">
+        <div className="text-sm leading-relaxed text-[var(--text-primary)] whitespace-pre-line">
           {wrapGlossaryTerms(isDE ? section.bodyDe : section.body, lang)}
         </div>
 
@@ -953,7 +953,7 @@ function LessonSlideView({
             <div className="text-[10px] text-[var(--accent-purple)] font-black uppercase mb-1 tracking-wider">
               {t('Example', 'Beispiel')}
             </div>
-            <pre className="text-sm font-mono text-gray-300 whitespace-pre-wrap">
+            <pre className="text-sm font-mono text-[var(--text-secondary)] whitespace-pre-wrap">
               {isDE
                 ? section.exampleDe || section.example
                 : section.example}
@@ -977,7 +977,7 @@ function LessonSlideView({
                   <Eye size={12} />
                   {t('Detailed Example', 'Ausführliches Beispiel')}
                 </div>
-                <div className="text-sm leading-relaxed text-gray-200 whitespace-pre-line">
+                <div className="text-sm leading-relaxed text-[var(--text-primary)] whitespace-pre-line">
                   {wrapGlossaryTerms(
                     isDE
                       ? section.detailedExampleDe || section.detailedExample
@@ -1022,7 +1022,7 @@ function LessonSlideView({
           <div className="text-[10px] text-[var(--accent-info)] font-black uppercase mb-2 tracking-wider">
             {t('What each symbol means', 'Was jede Variable bedeutet')}
           </div>
-          <p className="text-sm leading-relaxed text-gray-200">
+          <p className="text-sm leading-relaxed text-[var(--text-primary)]">
             {wrapGlossaryTerms(firstSentence, lang)}
           </p>
         </div>
@@ -1093,7 +1093,7 @@ function LessonSlideView({
                 size={18}
                 className="text-[var(--accent-streak)] mt-0.5 shrink-0"
               />
-              <p className="text-sm text-gray-200 leading-relaxed">
+              <p className="text-sm text-[var(--text-primary)] leading-relaxed">
                 {wrapGlossaryTerms(isDE ? item.de : item.en, lang)}
               </p>
             </div>

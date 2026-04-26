@@ -185,7 +185,7 @@ export default function SolveDetailPage() {
                 <span className="font-bold" style={{ color: character.color }}>
                   {character.name}:
                 </span>
-                <span className="text-gray-300 ml-1 italic">
+                <span className="text-[var(--text-secondary)] ml-1 italic">
                   {isDE
                     ? '"Timer läuft, Jungs und Mädels! Keine Panik — erst lesen, dann denken, dann klicken."'
                     : '"Timer is running, folks! Don\'t panic — read first, think, then click."'}
@@ -201,7 +201,7 @@ export default function SolveDetailPage() {
               >
                 {t('About this test', 'Über diesen Test')}
               </div>
-              <p className="text-sm leading-relaxed text-gray-200">
+              <p className="text-sm leading-relaxed text-[var(--text-primary)]">
                 {isDE ? test.descriptionDe : test.description}
               </p>
             </div>
@@ -216,7 +216,7 @@ export default function SolveDetailPage() {
               </div>
               <ul className="space-y-2">
                 {(isDE ? test.whatIsTestedDe : test.whatIsTested).map((item, i) => (
-                  <li key={i} className="flex gap-2 text-sm text-gray-300">
+                  <li key={i} className="flex gap-2 text-sm text-[var(--text-secondary)]">
                     <span className="shrink-0" style={{ color: test.color }}>
                       ✓
                     </span>
@@ -293,7 +293,7 @@ export default function SolveDetailPage() {
                 <div className="text-[10px] font-bold uppercase text-[var(--accent-info)] mb-1">
                   {t('Context', 'Kontext')}
                 </div>
-                <p className="text-xs text-gray-300 leading-relaxed">
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                   {isDE ? exercise.contextDe : exercise.context}
                 </p>
               </div>
@@ -301,7 +301,7 @@ export default function SolveDetailPage() {
 
             {/* Prompt */}
             <div className="duo-card p-5">
-              <p className="text-sm leading-relaxed text-gray-200 whitespace-pre-line">
+              <p className="text-sm leading-relaxed text-[var(--text-primary)] whitespace-pre-line">
                 {isDE ? exercise.promptDe : exercise.prompt}
               </p>
             </div>
@@ -310,7 +310,7 @@ export default function SolveDetailPage() {
             {timeUp && !showAnswer && (
               <div className="flex items-center gap-2 bg-[rgba(255,75,75,0.08)] border-2 border-[var(--duo-red)] rounded-xl p-3">
                 <AlertCircle size={16} className="text-[var(--duo-red)] shrink-0" />
-                <p className="text-xs text-gray-300">
+                <p className="text-xs text-[var(--text-secondary)]">
                   {t(
                     'Time up! In the real test, you would move on. Reveal the answer to learn.',
                     'Zeit abgelaufen! Im echten Test müsstest du weitermachen. Antwort aufdecken zum Lernen.',
@@ -342,7 +342,7 @@ export default function SolveDetailPage() {
                             ? 'border-[var(--duo-red)] bg-[rgba(255,75,75,0.12)] text-white'
                             : isSelected
                               ? 'border-[var(--accent-info)] bg-[rgba(28,176,246,0.08)] text-white'
-                              : 'border-[var(--duo-border)] text-gray-300 hover:border-[var(--accent-info)]'
+                              : 'border-[var(--duo-border)] text-[var(--text-primary)] hover:border-[var(--accent-info)]'
                       }`}
                     >
                       <span className="font-bold mr-2">{String.fromCharCode(65 + i)}.</span>
@@ -358,7 +358,7 @@ export default function SolveDetailPage() {
               <div className="text-center py-2">
                 <div className="flex items-start gap-3 duo-card p-3 text-left mb-4">
                   <span className="text-xl">{character.emoji}</span>
-                  <p className="text-xs italic text-gray-300">
+                  <p className="text-xs italic text-[var(--text-secondary)]">
                     {isDE
                       ? '"Schreib deine Antwort erst selbst auf (auf Papier oder im Kopf), DANN Musterlösung aufdecken. Kein Spicken!"'
                       : '"Write your answer first (on paper or mentally), THEN reveal the sample. No cheating!"'}
@@ -403,7 +403,7 @@ export default function SolveDetailPage() {
                     }`}
                   >
                     <span className="text-xl shrink-0">{character.emoji}</span>
-                    <p className="text-sm italic text-gray-200">
+                    <p className="text-sm italic text-[var(--text-primary)]">
                       {selectedIsCorrect && !timeUp
                         ? getRandomEncouragement(character, progress.language)
                         : getRandomWrongReaction(character, progress.language)}
@@ -416,7 +416,7 @@ export default function SolveDetailPage() {
                   <div className="text-xs text-[var(--accent-xp)] font-bold uppercase mb-2 flex items-center gap-1">
                     <CheckCircle size={12} /> {t('Sample Answer', 'Musterlösung')}
                   </div>
-                  <div className="text-sm leading-relaxed text-gray-200 whitespace-pre-line">
+                  <div className="text-sm leading-relaxed text-[var(--text-primary)] whitespace-pre-line">
                     {isDE ? exercise.sampleAnswerDe : exercise.sampleAnswer}
                   </div>
                 </div>
@@ -426,7 +426,7 @@ export default function SolveDetailPage() {
                   <div className="text-xs text-[var(--duo-yellow)] font-bold uppercase mb-2">
                     {t('Why this matters', 'Warum das wichtig ist')}
                   </div>
-                  <p className="text-sm leading-relaxed text-gray-200 whitespace-pre-line">
+                  <p className="text-sm leading-relaxed text-[var(--text-primary)] whitespace-pre-line">
                     {isDE ? exercise.explanationDe : exercise.explanation}
                   </p>
                 </div>
@@ -458,7 +458,7 @@ export default function SolveDetailPage() {
 
             <div className="flex items-start gap-3 duo-card p-4 text-left">
               <span className="text-2xl">{character.emoji}</span>
-              <p className="text-sm italic text-gray-200">
+              <p className="text-sm italic text-[var(--text-primary)]">
                 {getRandomEncouragement(character, progress.language)}
               </p>
             </div>
@@ -485,7 +485,7 @@ export default function SolveDetailPage() {
             <div className="flex gap-3">
               <button
                 onClick={restart}
-                className="flex-1 py-3 rounded-xl border-2 border-[var(--duo-border)] text-white font-bold btn-press transition flex items-center justify-center gap-2"
+                className="flex-1 py-3 rounded-xl border-2 border-[var(--duo-border)] text-[var(--text-primary)] font-bold btn-press transition flex items-center justify-center gap-2"
               >
                 <RotateCcw size={16} /> {t('Redo', 'Wiederholen')}
               </button>

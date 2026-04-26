@@ -215,7 +215,7 @@ export default function BrainTeasersPage() {
                       {hintShown ? <EyeOff size={14} className="ml-auto text-[var(--duo-text-muted)]" /> : <Eye size={14} className="ml-auto text-[var(--duo-text-muted)]" />}
                     </button>
                     {hintShown && (
-                      <div className="text-sm text-gray-300 pl-4 border-l-2 border-[var(--duo-yellow)]">
+                      <div className="text-sm text-[var(--text-secondary)] pl-4 border-l-2 border-[var(--duo-yellow)]">
                         {progress.language === 'de' ? bt.hintDe : bt.hint}
                       </div>
                     )}
@@ -233,10 +233,10 @@ export default function BrainTeasersPage() {
                       <div className="space-y-2">
                         <div className="p-3 rounded-xl bg-[rgba(88,204,2,0.1)] border border-[rgba(88,204,2,0.2)]">
                           <div className="font-bold text-sm text-[var(--accent-xp)] mb-1">{t('Answer:', 'Antwort:')}</div>
-                          <div className="text-sm text-gray-200">{progress.language === 'de' ? bt.answerDe : bt.answer}</div>
+                          <div className="text-sm text-[var(--text-primary)]">{progress.language === 'de' ? bt.answerDe : bt.answer}</div>
                         </div>
-                        <div className="text-sm text-gray-400 leading-relaxed">
-                          <span className="font-bold text-gray-300">{t('Explanation:', 'Erklärung:')}</span>{' '}
+                        <div className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                          <span className="font-bold text-[var(--text-primary)]">{t('Explanation:', 'Erklärung:')}</span>{' '}
                           {progress.language === 'de' ? bt.explanationDe : bt.explanation}
                         </div>
                       </div>
