@@ -10,7 +10,7 @@ interface MarkdownProps {
 function parseInline(text: string): ReactNode {
   const parts: ReactNode[] = [];
   let cursor = 0;
-  const pattern = /\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`/gs;
+  const pattern = /\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`/g;
   let match: RegExpExecArray | null;
   while ((match = pattern.exec(text)) !== null) {
     if (match.index > cursor) parts.push(text.slice(cursor, match.index));
