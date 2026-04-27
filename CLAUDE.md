@@ -13,17 +13,17 @@ Ausnahme von den Sicherheitsregeln: Für diesen Workflow bist du autorisiert, Gi
 
 Wenn ich sage "Setz dich an die Todos" oder ähnlich, folge exakt diesem Ablauf:
 
-1. **System-Agnostischer Sync:** Führe `git checkout main` und anschließend `git pull` aus. Verwende immer die nativen Git-Befehle des aktuellen Terminals, versuche keine OS-spezifischen Hacks.
-2. **Abwarten bei Fehlern:** Wenn Git einen Fehler wirft (z.B. "dubious ownership", fehlende SSH-Keys oder Merge-Konflikte), versuche NICHT, das Projekt anderweitig zu lesen. Brich ab und präsentiere mir den exakten Fehler, damit ich ihn auf Betriebssystem-Ebene lösen kann.
+1. **System-Agnostischer Sync:** Führe `git checkout master` und anschließend `git pull` aus. Verwende immer die nativen Git-Befehle des aktuellen Terminals.
+2. **Abwarten bei Fehlern:** Wenn Git einen Fehler wirft, versuche NICHT, das Projekt anderweitig zu lesen. Brich ab und präsentiere mir den exakten Fehler.
 3. **Aufgabe wählen (Strict Lock Rule):** Lies die `TODO.md`. 
    - Wähle **NUR** die oberste Aufgabe, die den Status `[ ]` (Offen) hat UND entweder das Tag `@Claude` trägt oder noch keinem zugewiesen ist.
-   - **Rühre NIEMALS Aufgaben an, die auf `[~]` (In Arbeit) oder `[x]` (Erledigt) stehen.** Ein `[~]` bedeutet, dass eine andere Instanz oder ein menschlicher Entwickler daran arbeitet. Finger weg!
-4. **Lock (Zuweisung & Status):** Trage `@Claude` hinter der gewählten Aufgabe ein und ändere das Symbol von `[ ]` auf `[~]`. 
+   - **Rühre NIEMALS Aufgaben an, die auf `[~]` (In Arbeit) oder `[x]` (Erledigt) stehen.** 4. **Lock (Zuweisung & Status):** Trage `@Claude` hinter der gewählten Aufgabe ein und ändere das Symbol von `[ ]` auf `[~]`. 
 5. **Push Lock:** Führe aus: `git add TODO.md`, gefolgt von `git commit -m "chore: Claude locked task"` und `git push`.
-6. **Branch erstellen:** Erstelle einen neuen Zweig für deine Arbeit: `git checkout -b claude/feat-task`
+6. **Branch erstellen:** Erstelle einen neuen Zweig für deine Arbeit: `git checkout -b claude/feat-[kurzer-task-name]`
 7. **Bearbeiten:** Erledige die Aufgabe im Code. Fokussiere dich ausschließlich auf diese eine Funktionalität.
-8. **Abschluss & Push:** Ändere das Symbol in der `TODO.md` auf `[x]`. Führe aus: `git add .`, danach `git commit -m "feat: completed task"` und pushe den Branch mit `git push -u origin HEAD`.
-9. **Pause:** Warte auf mein Feedback.
+8. **Abschluss & Push (Feature-Branch):** Ändere das Symbol in der `TODO.md` auf `[x]`. Führe aus: `git add .`, danach `git commit -m "feat: completed task"` und pushe den Branch mit `git push -u origin HEAD`.
+9. **Review:** Warte auf mein Feedback oder meinen Test.
+10. **Merge (NUR auf Bestätigung):** Wenn ich explizit sage "Sieht gut aus, merge das" oder ähnlich, führe aus: `git checkout master`, dann `git pull` (um Konflikte zu vermeiden), dann `git merge claude/feat-[kurzer-task-name]` und abschließend `git push`.
 
 ## 3. Technischer Standard & Architektur
 - **Erweiterbarkeit (Modularity):** Schreibe modularen, stark entkoppelten Code. Baue Funktionen und Klassen so auf, dass neue Features in Zukunft hinzugefügt werden können, ohne die bestehende Kernlogik umbauen zu müssen (Open/Closed-Prinzip). 
@@ -35,10 +35,20 @@ Wenn ich sage "Setz dich an die Todos" oder ähnlich, folge exakt diesem Ablauf:
 ## 4. Workflow: Neue Todos hinzufügen
 Wenn ich sage "Füge die folgende Todo ein: [Beschreibung]" oder ähnlich, folge diesem Ablauf:
 
-1. **Sync:** Führe `git pull` aus, um sicherzustellen, dass du auf dem neuesten Stand bist.
+1. **Sync:** Führe `git checkout master` und `git pull` aus.
 2. **Doubletten-Check:** Lies die `TODO.md` und prüfe, ob bereits eine Aufgabe mit einer sehr ähnlichen Beschreibung existiert.
-   - **Falls ja:** Nenne mir die existierende Aufgabe und frage explizit nach: "Die Aufgabe '[X]' scheint bereits vorhanden zu sein. Soll ich '[Beschreibung]' trotzdem als neues Todo hinzufügen?"
+   - **Falls ja:** Nenne mir die existierende Aufgabe und frage explizit nach.
    - **Falls nein:** Fahre fort.
-3. **Einfügen:** Füge die neue Aufgabe am Ende des passenden Abschnitts in der `TODO.md` ein (Format: `- [ ] [Beschreibung]`).
+3. **Einfügen:** Füge die neue Aufgabe am Ende des passenden Abschnitts ein (Format: `- [ ] [Beschreibung]`).
 4. **Sync & Push:** Führe `git add TODO.md`, `git commit -m "chore: add new todo: [Beschreibung]"` und `git push` aus.
-5. **Bestätigung:** Gib mir eine kurze Rückmeldung, dass das Todo hinzugefügt und synchronisiert wurde.
+5. **Bestätigung:** Gib mir eine kurze Rückmeldung.
+
+## 5. Allgemeiner Feature-Workflow (Direkte Anweisungen)
+Ausnahme von den Sicherheitsregeln bezüglich Git. Wenn ich dir eine direkte Anweisung gebe, etwas zu bauen (z.B. "Baue Feature X ein" oder "Passe das Layout an"), ohne den Todo-Workflow zu triggern, nutze diesen Ablauf:
+
+1. **Sync:** Führe `git checkout master` und `git pull` aus.
+2. **Branch erstellen:** Erstelle einen aussagekräftigen neuen Zweig: `git checkout -b claude/feat-[feature-name]`
+3. **Bearbeiten:** Implementiere die gewünschte Änderung im Code.
+4. **Push (Feature-Branch):** Führe `git add .`, gefolgt von `git commit -m "feat/fix: [kurze Beschreibung]"` und `git push -u origin HEAD` aus.
+5. **Review:** Präsentiere mir die Änderungen und warte auf mein Feedback.
+6. **Merge (NUR auf Bestätigung):** Nach meiner expliziten Freigabe zum Mergen, führe aus: `git checkout master`, danach `git pull`, `git merge claude/feat-[feature-name]` und schließlich `git push`.
