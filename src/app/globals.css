@@ -24,6 +24,26 @@
   --accent-purple: #CE82FF;
   --accent-xp-dark: #1ea34e;
 
+  /* ── Income-Statement-Lesson Design System (Bloomberg Terminal aesthetic) ── */
+  /* Dark mode tokens. Override below for light mode. */
+  --is-bg-primary: #0A0A0B;
+  --is-bg-secondary: #141416;
+  --is-bg-tertiary: #1C1C1F;
+  --is-bg-border: #2A2A2E;
+  --is-text-primary: #F5F5F0;
+  --is-text-secondary: #A3A3A8;
+  --is-text-muted: #6B6B70;
+  --is-accent: #FF6B00;
+  --is-accent-hover: #FF8124;
+  --is-accent-muted: rgba(255, 107, 0, 0.08);
+  --is-accent-glow: rgba(255, 107, 0, 0.3);
+  --is-gold: #D4AF37;
+  --is-gold-muted: rgba(212, 175, 55, 0.08);
+  --is-success: #00C853;
+  --is-success-muted: rgba(0, 200, 83, 0.08);
+  --is-error: #FF3B30;
+  --is-error-muted: rgba(255, 59, 48, 0.08);
+
   /* ── Legacy aliases (kept for non-migrated refs) ── */
   --duo-red: var(--accent-wrong);
   --duo-yellow: var(--accent-xp);
@@ -49,6 +69,15 @@
   --text-muted: #a0a0a0;
   --accent-primary: #0a0a0a;
   --accent-primary-text: #ffffff;
+
+  /* Income-Statement light-mode mapping: invert greys, keep accents identical */
+  --is-bg-primary: #FAFAFA;
+  --is-bg-secondary: #FFFFFF;
+  --is-bg-tertiary: #F2F2F0;
+  --is-bg-border: #E5E5E2;
+  --is-text-primary: #0A0A0B;
+  --is-text-secondary: #4A4A4F;
+  --is-text-muted: #8A8A8E;
 }
 
 @theme inline {
@@ -65,6 +94,28 @@
   --color-duo-gold: var(--duo-gold);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Income-Statement-Lesson tokens — make them available as Tailwind utilities */
+  --color-is-bg-primary: var(--is-bg-primary);
+  --color-is-bg-secondary: var(--is-bg-secondary);
+  --color-is-bg-tertiary: var(--is-bg-tertiary);
+  --color-is-bg-border: var(--is-bg-border);
+  --color-is-text-primary: var(--is-text-primary);
+  --color-is-text-secondary: var(--is-text-secondary);
+  --color-is-text-muted: var(--is-text-muted);
+  --color-is-accent: var(--is-accent);
+  --color-is-accent-hover: var(--is-accent-hover);
+  --color-is-accent-muted: var(--is-accent-muted);
+  --color-is-gold: var(--is-gold);
+  --color-is-gold-muted: var(--is-gold-muted);
+  --color-is-success: var(--is-success);
+  --color-is-success-muted: var(--is-success-muted);
+  --color-is-error: var(--is-error);
+  --color-is-error-muted: var(--is-error-muted);
+
+  --font-is-sans: var(--font-inter), system-ui, sans-serif;
+  --font-is-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-is-serif: var(--font-instrument), Georgia, serif;
 }
 
 /* Mobile-first base rules */
