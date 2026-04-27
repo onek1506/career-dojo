@@ -51,6 +51,7 @@ import Link from 'next/link';
 import GlossaryTooltip from '@/components/GlossaryTooltip';
 import Markdown from '@/components/Markdown';
 import { GLOSSARY, type GlossaryTerm } from '@/data/glossary';
+import IncomeStatementLesson from '@/components/lesson/income-statement/IncomeStatementLesson';
 
 const MAX_TIMES_SHOWN = 3; // show each question at most 3 times in a row
 
@@ -340,6 +341,18 @@ function TypeIndicator({
 // ============================================================
 
 export default function LessonPage() {
+  const params = useParams();
+  const lessonId = params.id as string;
+
+  // Income-Statement gets a redesigned, slide-based experience.
+  if (lessonId === 'acc-1-income-statement') {
+    return <IncomeStatementLesson />;
+  }
+
+  return <LegacyLessonPage />;
+}
+
+function LegacyLessonPage() {
   const params = useParams();
   const router = useRouter();
   const {
