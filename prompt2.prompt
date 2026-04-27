@@ -1,0 +1,399 @@
+# 🐺 Lektion-Redesign Phase 2: Slides 7–12 + Routing + State-Management
+
+Phase 1 ist abgeschlossen. Du arbeitest weiter im selben Branch `feature/lesson-income-statement-redesign`.
+
+## 🌿 GIT-WORKFLOW
+
+1. Stelle sicher, dass du noch im Branch `feature/lesson-income-statement-redesign` bist:
+```bash
+   git branch --show-current
+```
+2. Falls nicht: `git checkout feature/lesson-income-statement-redesign`
+3. Pull falls nötig: `git pull origin feature/lesson-income-statement-redesign` (falls schon gepusht)
+4. Committe weiter in logischen Schritten:
+   - `feat(lesson): implement slide 07 pro tips carousel`
+   - `feat(lesson): implement slide 08 quiz sort`
+   - `feat(lesson): implement slide 09 quiz calc`
+   - `feat(lesson): implement slide 10 quiz multi-select`
+   - `feat(lesson): implement slide 11 quiz hierarchy`
+   - `feat(lesson): implement slide 12 retention hub`
+   - `feat(lesson): wire up income statement lesson routing and state machine`
+   - `chore(lesson): polish animations and mobile layouts`
+5. Erst nach abgeschlossener Phase 2:
+```bash
+   git push origin feature/lesson-income-statement-redesign
+```
+6. Pull Request öffnen mit Titel: `feat(lesson): redesign income statement lesson with marcus coach`
+
+## 🛠️ ZUSÄTZLICHE DEPENDENCIES (falls nicht in Phase 1 installiert)
+
+```bash
+npm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
+npm install embla-carousel-react
+```
+
+## 🎨 DESIGN SYSTEM
+
+Bleibt identisch zu Phase 1. Nutze die gleichen Tailwind-Tokens, Fonts und `MarcusNote`/`LessonLayout`-Komponenten.
+
+**Erinnerung:** Keine Lila-, Pink- oder Standard-Blau-Töne. Keine 3D-Emojis. Keine Hype-Sprache. Marcus bleibt trocken-britisch-zynisch.
+
+## 📋 SLIDES 7–12
+
+### Slide 07 – Interview-Tipps (3 Pro-Cards, swipeable)
+
+Komponente: `components/lesson/income-statement/Slide07ProTips.tsx`
+
+Layout:
+
+1. Header: **"Drei Moves, die dich vom Rest abheben."** in `font-serif text-4xl`
+2. **Horizontaler Card-Carousel** mit `embla-carousel-react`, snap-x snap-mandatory, 3 Cards à `min-w-full`
+
+Card-Stil einheitlich:
+- Container: `bg-bg-secondary border border-bg-border rounded-xl p-6 min-h-[280px]`
+- Tag oben links: `font-mono text-xs text-accent uppercase tracking-wider`
+- Marcus-Avatar oben rechts (32px Kreis mit "MH")
+- Body: `font-sans text-text-primary leading-relaxed`
+
+**Card 1 – Tag: `STRATEGY`:**
+> *"Wenn ein MD fragt 'Walk me through the income statement', fang immer bei Revenue an, nicht bei Net Income. Top-down zeigt, dass du das System verstehst. Bottom-up zeigt, dass du Kennzahlen auswendig gelernt hast."*
+
+**Card 2 – Tag: `WARNING`:**
+> *"Wenn du EBITDA nennst, nenne immer im selben Atemzug, was es ausblendet: CapEx, Zinsen, Steuern, Working Capital. Sonst springt der MD darauf an: 'And what's wrong with EBITDA?' – und du stehst im Regen."*
+
+**Card 3 – Tag: `MISTAKE`:**
+> *"Verwechsle nie Brutto- mit Operativer Marge. Klassischer 1st-Year-Fehler. Brutto = nur direkte Kosten weg. Operativ = auch Vertrieb und Verwaltung weg."*
+
+3. **Swipe-Indikator unten:** drei Dots (8px), aktive `bg-accent`, andere `bg-bg-border`
+4. **CTA wechselt dynamisch:**
+   - Card 1, 2: `Nächster Tipp →`
+   - Card 3: `Quiz starten →`
+
+### Slide 08 – Quiz Frage 1: Drag-and-Sort
+
+Komponente: `Slide08QuizSort.tsx`
+
+Layout:
+
+1. Header oben: `Frage 1 / 4 · +10 XP` in `font-mono text-xs text-text-muted`
+2. Aufgabe: **"Bringe die GuV-Positionen in die richtige Reihenfolge."**
+3. **Sechs sortierbare Karten** via `@dnd-kit/sortable`:
+
+   Initialreihenfolge (zufällig gemischt): `SG&A`, `Net Income`, `Revenue`, `EBIT`, `Gross Profit`, `EBITDA`
+
+   Korrekte Reihenfolge (top to bottom): `Revenue → Gross Profit → SG&A → EBITDA → EBIT → Net Income`
+
+4. Karten-Stil:
+   - `bg-bg-secondary border border-bg-border rounded-lg p-4 mb-2`
+   - Drag-Handle links: `<GripVertical size={16} className="text-text-muted" />`
+   - Position-Name in `font-mono text-base`
+   - Im Drag-State: `opacity-50 border-accent`
+
+5. **State:** `useState<{correct: boolean | null, attempts: number}>({correct: null, attempts: 0})`
+
+6. **Bei "Antwort prüfen":**
+   - Richtige Positionen: `border-success bg-success/10`
+   - Falsche Positionen: `border-error bg-error/10` mit kleinem Pfeil-Indikator zur richtigen Position
+7. **MarcusNote bei Vollständig-Korrekt:** *"Sauber. Diese Reihenfolge musst du im Schlaf können."*
+8. **Streak-Pille unten** (erscheint nach Erfolg): `🔥 1 in Folge richtig` in `font-mono text-xs`
+
+CTA: `Antwort prüfen` → nach Prüfung: `Nächste Frage →`
+
+### Slide 09 – Quiz Frage 2: Bruttomarge berechnen
+
+Komponente: `Slide09QuizCalc.tsx`
+
+Layout:
+
+1. Header: `Frage 2 / 4 · +10 XP`
+2. Aufgabe: **"TechCo: Umsatz €200M, COGS €120M. Wie hoch ist die Bruttomarge?"**
+3. **Vier Antwort-Optionen** (Buchstaben A–D in mono links, Wert in regular):
+   - A) `60%`
+   - B) `40%` (richtig)
+   - C) `80%`
+   - D) `20%`
+
+4. Stil pro Option:
+   - Idle: `bg-bg-secondary border border-bg-border rounded-lg p-4 hover:bg-bg-tertiary cursor-pointer`
+   - Selected: `border-text-primary`
+   - Korrekt nach Submit: `border-success bg-success/10`
+   - Falsch nach Submit: `border-error bg-error/10`
+
+5. **Bei richtiger Antwort:**
+   - MarcusNote: *"Korrekt. Rechenweg: (200 − 120) / 200 = 40%."*
+   - Streak: `🔥 2 in Folge richtig`
+
+6. **Bei falscher Antwort:**
+   - Marcus zeigt Rechenweg
+   - **Wichtig:** Statt direkt weiter, biete "Hinweis"-Button + "Nochmal versuchen" an
+   - Erst nach zweitem Versuch geht's weiter (XP reduziert: +5 statt +10)
+
+CTA: `Antwort prüfen` / `Nächste Frage →`
+
+### Slide 10 – Quiz Frage 3: EBITDA-Komponenten (Multi-Select)
+
+Komponente: `Slide10QuizMultiSelect.tsx`
+
+Layout:
+
+1. Header: `Frage 3 / 4 · +15 XP` (höhere XP)
+2. Aufgabe: **"EBITDA = Earnings Before \_\_\_, \_\_\_, \_\_\_ und \_\_\_."**
+3. **8 Wort-Bausteine** als Toggle-Buttons (max. 4 wählbar):
+
+   Richtig: `Interest`, `Taxes`, `Depreciation`, `Amortization`
+
+   Distraktoren: `Income`, `Dividends`, `Equity`, `Inventory`
+
+4. Stil pro Button:
+   - Idle: `bg-bg-secondary border border-bg-border rounded-md px-4 py-3 font-mono text-sm`
+   - Selected: `border-accent bg-accent/10`
+   - Korrekt nach Submit: `border-success`
+   - Falsch nach Submit: `border-error`
+   - Vergessen-richtig nach Submit: `border-success border-dashed`
+
+5. Counter sichtbar: "X / 4 ausgewählt" in `font-mono text-text-muted`
+6. **MarcusNote bei voller Korrektheit:** *"Das musst du wörtlich im Interview aufsagen können. Üb das vor dem Spiegel. Ja, wirklich."*
+7. **Persistenter Hint unten** (immer sichtbar): *"D&A = Depreciation & Amortization. Eine Größe, zwei Wörter, weil Sachanlagen abgeschrieben und immaterielle Werte amortisiert werden."*
+
+CTA: `Antwort prüfen` (disabled bis 4 ausgewählt) / `Nächste Frage →`
+
+### Slide 11 – Quiz Frage 4: Margen-Hierarchie
+
+Komponente: `Slide11QuizHierarchy.tsx`
+
+Layout:
+
+1. Header: `Frage 4 / 4 · +15 XP`
+2. Aufgabe: **"Welche Marge ist immer am höchsten?"**
+3. Vier Optionen (Stil identisch zu Slide 09):
+   - A) `Net Margin`
+   - B) `Operating Margin`
+   - C) `Gross Margin` (richtig)
+   - D) `EBITDA Margin`
+4. **MarcusNote bei richtiger Antwort:** *"Korrekt. Bruttomarge ganz oben in der Hierarchie – nur direkte Kosten abgezogen. Wer das verwechselt, klingt wie ein Bachelor-Erstsemester."*
+5. **Streak-Update:** `🔥 4 in Folge richtig · Quiz abgeschlossen`
+
+CTA: `Ergebnis ansehen →`
+
+### Slide 12 – Retention Hub (DER WICHTIGSTE SLIDE)
+
+Komponente: `Slide12Retention.tsx`
+
+Dieser Slide entscheidet über Re-Engagement. Nimm dir besonders Zeit.
+
+Vier Sektionen, vertikal gestapelt:
+
+#### Sektion 1 – Result-Header
+
+- Animierter SVG-Kreis (Durchmesser 120px). Linie füllt sich von 0 auf 360° in 1.2s ease-out, Akzent-Farbe.
+- In der Mitte: **"4 / 4"** in `font-serif text-4xl`
+- Darunter: **"Modul 01 abgeschlossen."** in `font-serif text-3xl`
+- Drei Stats (`grid grid-cols-3 gap-4`):
+
+   | ACCURACY | TIME | XP EARNED |
+   |----------|------|-----------|
+   | 100% | 06:42 | +55 |
+
+   Werte in `font-mono text-3xl text-text-primary`, Labels in `font-mono text-xs text-text-muted uppercase`
+
+#### Sektion 2 – Streak & Level
+
+Zwei Cards (`grid grid-cols-2 gap-4`):
+
+**Card A – Streak:**
+- Header: `🔥 STREAK` in `font-mono text-xs text-gold uppercase`
+- Wert: **"Tag 1 / 7"** in `font-serif text-3xl`
+- Progress-Bar: 7 Segmente, 1 gefüllt (gold), Rest `bg-bg-border`
+- Footnote: "Komm morgen wieder, sonst startet's bei Null." in `text-xs text-text-muted`
+
+**Card B – Level:**
+- Header: `LEVEL`
+- Wert: **"Level 1 → Level 2"**
+- Linearer Progress-Bar: 55/200 XP, Akzent-Farbe
+- Footnote: "Noch 145 XP bis Level 2."
+
+#### Sektion 3 – Marcus-Feedback
+
+Volle MarcusNote:
+- Subject: `Re: Solid first session`
+- Body: *"Du hast die GuV-Mechanik in 6:42 durch. Realität: 80% der Bewerber verwechseln EBITDA und EBIT. Du nicht mehr. Morgen: Bilanz-Logik – das brauchst du für die DCF-Lektion in Woche 2."*
+
+#### Sektion 4 – Next Action (3 Cards)
+
+`grid grid-cols-3 gap-4` (Mobile gestapelt):
+
+**Card 1 (PRIMÄR – Akzent-Border):**
+- Tag: `EMPFOHLEN`
+- Titel: "Modul 02 – Balance Sheet"
+- Subtitle: "9 Min · +60 XP"
+- CTA-Button: `Jetzt starten`
+
+**Card 2 (SEKUNDÄR):**
+- Titel: "Cheat Sheet runterladen"
+- Subtitle: "PDF · Druckbar"
+- CTA: `Download`
+
+**Card 3 (SOZIAL):**
+- Titel: "Du bist im Top 18%"
+- Subtitle: "von 1.247 Nutzern dieser Woche"
+- CTA: `Leaderboard ansehen`
+
+> **Hinweis für Phase 2:** Da Supabase noch nicht integriert ist, sind die Werte (Top 18%, 1.247 Nutzer, Streak Tag 1/7, 55/200 XP) als Mock-Daten in einer `mockData.ts` zu definieren. Sobald Supabase integriert wird, werden diese durch echte Daten ersetzt.
+
+#### Footer-Banner (PWA-Install-Hint, dezent)
+
+- `bg-bg-secondary border border-bg-border rounded-md p-3`
+- Text: "💡 Installiere als App für Push-Reminder und Offline-Modus."
+- Rechts kleiner "Installieren"-Link in Akzent
+
+## 📦 ROUTING & STATE-MANAGEMENT
+
+### `app/lesson/income-statement/page.tsx`
+
+```tsx
+'use client'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { LessonLayout } from '@/components/lesson/LessonLayout'
+import Slide01Briefing from '@/components/lesson/income-statement/Slide01Briefing'
+// ... alle 12 Slide-Imports
+
+type QuizResult = { correct: boolean; attempts: number }
+type QuizResults = {
+  q1: QuizResult | null
+  q2: QuizResult | null
+  q3: QuizResult | null
+  q4: QuizResult | null
+}
+
+const SLIDES = [
+  Slide01Briefing,
+  Slide02BalanceVsIS,
+  Slide03Waterfall,
+  Slide04Margins,
+  Slide05FormulaDrill,
+  Slide06CheatSheet,
+  Slide07ProTips,
+  Slide08QuizSort,
+  Slide09QuizCalc,
+  Slide10QuizMultiSelect,
+  Slide11QuizHierarchy,
+  Slide12Retention,
+] as const
+
+export default function IncomeStatementLessonPage() {
+  const router = useRouter()
+  const [currentStep, setCurrentStep] = useState(0)
+  const [quizResults, setQuizResults] = useState<QuizResults>({
+    q1: null, q2: null, q3: null, q4: null
+  })
+  const [startTime] = useState(Date.now())
+  const [canProceed, setCanProceed] = useState(false)
+
+  const totalXp = calculateTotalXp(quizResults)
+  const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000)
+  const accuracy = calculateAccuracy(quizResults)
+
+  const Slide = SLIDES[currentStep]
+
+  return (
+    <LessonLayout
+      currentStep={currentStep + 1}
+      totalSteps={12}
+      onBack={() => currentStep > 0 ? setCurrentStep(s => s - 1) : router.back()}
+      onNext={() => setCurrentStep(s => s + 1)}
+      nextDisabled={!canProceed}
+    >
+      <Slide
+        onAnswer={(slideKey: keyof QuizResults, result: QuizResult) =>
+          setQuizResults(prev => ({ ...prev, [slideKey]: result }))
+        }
+        onCanProceed={setCanProceed}
+        onNext={() => setCurrentStep(s => s + 1)}
+        // Nur an Slide12 übergeben:
+        results={currentStep === 11 ? { quizResults, totalXp, elapsedSeconds, accuracy } : undefined}
+      />
+    </LessonLayout>
+  )
+}
+```
+
+### XP-Berechnungs-Logik
+
+```ts
+// lib/lesson/xp.ts
+export function calculateTotalXp(results: QuizResults): number {
+  let xp = 5 // Lesson-Completion-Bonus
+
+  const xpMap = {
+    q1: { full: 10, half: 5 },
+    q2: { full: 10, half: 5 },
+    q3: { full: 15, half: 8 },
+    q4: { full: 15, half: 8 },
+  }
+
+  for (const [key, result] of Object.entries(results)) {
+    if (!result || !result.correct) continue
+    const points = xpMap[key as keyof typeof xpMap]
+    xp += result.attempts === 1 ? points.full : points.half
+  }
+
+  return xp
+}
+
+export function calculateAccuracy(results: QuizResults): number {
+  const total = Object.values(results).filter(r => r !== null).length
+  if (total === 0) return 0
+  const correct = Object.values(results).filter(r => r?.correct).length
+  return Math.round((correct / total) * 100)
+}
+```
+
+### Mock-Daten für Slide 12
+
+```ts
+// components/lesson/income-statement/mockData.ts
+export const mockRetentionData = {
+  streak: { current: 1, target: 7 },
+  level: { current: 1, next: 2, currentXp: 55, requiredXp: 200 },
+  ranking: { percentile: 18, totalUsers: 1247 },
+  nextLesson: {
+    id: 'balance-sheet-01',
+    title: 'Balance Sheet',
+    duration: '9 Min',
+    xp: 60,
+  },
+}
+```
+
+## ✅ ACCEPTANCE CRITERIA Phase 2
+
+1. Im selben Branch `feature/lesson-income-statement-redesign` weitergearbeitet
+2. Slides 07–12 sind implementiert und einzeln testbar
+3. `app/lesson/income-statement/page.tsx` führt durch alle 12 Slides
+4. Quiz-State wird korrekt zwischen Slides propagiert
+5. XP-Berechnung funktioniert (siehe `xp.ts`)
+6. Mock-Daten für Retention-Hub (kein Supabase nötig)
+7. Mobile-First: alle Quiz-Interaktionen (Drag-Sort, Multi-Select) funktionieren auf Touch-Geräten
+8. Lighthouse Performance Score ≥ 90 auf Mobile
+9. Branch ist gepusht und Pull Request ist geöffnet
+
+## 🚀 IMPLEMENTIERUNGS-REIHENFOLGE
+
+1. **Im Branch bleiben** (siehe Git-Workflow)
+2. **Dependencies** installieren falls nicht vorhanden
+3. **Slide 07** Pro-Tips-Carousel
+4. **Slide 08** Quiz Sort (Drag-and-Drop)
+5. **Slide 09** Quiz Calc
+6. **Slide 10** Quiz Multi-Select
+7. **Slide 11** Quiz Hierarchy
+8. **Slide 12** Retention Hub (vier Sektionen, größter Slide)
+9. **Routing & State:** `page.tsx` + `xp.ts` + `mockData.ts`
+10. **Polishing:** Animationen feinjustieren, Mobile-Layouts checken, Lighthouse-Audit
+11. **Push & PR**
+
+Wenn du an einer Stelle einen besseren Vorschlag hast (elegantere Animation, sauberere State-Lösung), schlage ihn aktiv vor – aber halte dich strikt an Farben, Typografie und Tonfall.
+
+Frag mich nach jedem implementierten Slide, ob ich Änderungen will, bevor du zum nächsten gehst.
+
+Los geht's mit Slide 07.

@@ -1,0 +1,445 @@
+# 🐺 Lektion-Redesign Phase 1: Setup + Slides 1–6
+
+Du bist ein erfahrener Senior Frontend Developer mit Spezialisierung auf Premium-Edutech-Interfaces (Bloomberg Terminal Aesthetic, Linear, Stripe, Arc).
+
+Wir arbeiten an einer **Gamification-basierten Lern-Webapp für Investment-Banking-Interview-Vorbereitung** (Zielgruppe: deutsche Studenten, die sich auf IB-Spring-Weeks und Summer Internships bewerben).
+
+Die aktuelle erste Lektion nach dem Onboarding ("Die Gewinn- und Verlustrechnung / Income Statement") ist zu passiv (7 von 11 Slides nur Lese-Slides), visuell unmotiviert und wirkt wie ein schlecht kopiertes Duolingo. Wir bauen sie komplett neu.
+
+## 🌿 GIT-WORKFLOW (verbindlich)
+
+Bevor du auch nur eine einzige Datei änderst:
+
+1. Stelle sicher, dass du auf `main` (oder `master`) bist und der Branch sauber ist (`git status`).
+2. Erstelle einen neuen Feature-Branch:
+```bash
+   git checkout -b feature/lesson-income-statement-redesign
+```
+3. Arbeite ausschließlich in diesem Branch.
+4. Committe in logischen Schritten (siehe Implementierungs-Reihenfolge unten), z.B.:
+   - `feat(lesson): add design system tokens and fonts`
+   - `feat(lesson): add LessonLayout and MarcusNote components`
+   - `feat(lesson): implement slide 01 briefing`
+   - `feat(lesson): implement slide 02 balance vs income statement`
+   - `feat(lesson): implement slide 03 waterfall diagram`
+   - `feat(lesson): implement slide 04 margins comparison`
+   - `feat(lesson): implement slide 05 formula drill`
+   - `feat(lesson): implement slide 06 cheat sheet`
+5. Push den Branch noch nicht – Phase 2 folgt im selben Branch.
+
+## 🛠️ TECH-STACK
+
+- Next.js 14+ (App Router) mit TypeScript
+- React 18+
+- Tailwind CSS
+- Framer Motion für Animationen (`npm install framer-motion` falls noch nicht da)
+- lucide-react für Icons
+- `html-to-image` für PNG-Export der Cheat-Sheet (`npm install html-to-image`)
+- `@dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities` für Drag-and-Sort (Phase 2)
+
+**WICHTIG:** Supabase wird in dieser Phase NICHT integriert. Lokaler State (useState) reicht. Persistenz folgt später.
+
+## 🎨 DESIGN SYSTEM (verbindlich)
+
+Erweitere `tailwind.config.ts`:
+
+```ts
+// extend.colors
+colors: {
+  bg: {
+    primary: '#0A0A0B',
+    secondary: '#141416',
+    tertiary: '#1C1C1F',
+    border: '#2A2A2E',
+  },
+  text: {
+    primary: '#F5F5F0',
+    secondary: '#A3A3A8',
+    muted: '#6B6B70',
+  },
+  accent: {
+    DEFAULT: '#FF6B00',
+    hover: '#FF8124',
+    muted: '#FF6B0014',
+  },
+  gold: {
+    DEFAULT: '#D4AF37',
+    muted: '#D4AF3714',
+  },
+  success: {
+    DEFAULT: '#00C853',
+    muted: '#00C85314',
+  },
+  error: {
+    DEFAULT: '#FF3B30',
+    muted: '#FF3B3014',
+  },
+}
+```
+
+**ABSOLUTES VERBOT:** Keine Lila-, Pink- oder Standard-Blau-Töne. Nur die oben definierten Farben.
+
+### Typografie
+
+Drei Fonts via `next/font` in `lib/fonts.ts`:
+
+- Inter (`font-sans`) – UI-Standard
+- JetBrains Mono (`font-mono`) – Zahlen, Formeln, Metriken, Labels
+- Instrument Serif (`font-serif`) – nur große Headlines
+
+```ts
+fontFamily: {
+  sans: ['var(--font-inter)', 'system-ui'],
+  mono: ['var(--font-jetbrains)', 'monospace'],
+  serif: ['var(--font-instrument)', 'serif'],
+}
+```
+
+### Spacing & Borders
+
+- Card-Padding: `p-6` (24px)
+- Border-Radius: nur `rounded-lg` (8px) und `rounded-xl` (12px). KEIN `rounded-2xl` oder größer.
+- Borders: immer `border-bg-border` (1px), nie dicker.
+
+### Animations-Prinzipien
+
+- Übergänge: `transition-all duration-200 ease-out`
+- Hover: leichter `bg-bg-tertiary`-Wechsel, keine Skalierungen über 1.02
+- Erfolgs-Glow: `box-shadow: 0 0 24px rgba(255,107,0,0.3)`, 400ms
+- KEINE bouncenden Animationen, KEIN Konfetti, KEINE Cartoon-Effekte
+- Animationen nie länger als 600ms
+
+## 🐺 MASCOT / COACH
+
+Wolfgang der Wolf wird **ersetzt**. Stattdessen führt **Marcus Hart** als fiktiver Senior Coach durch die Lektionen.
+
+- Ehemaliger MD bei Goldman Sachs (fiktional), jetzt Coach
+- Tonfall: trocken, knapp, britisch-zynisch, professionell
+- NIEMALS Hype-Sprache ("Du bist ein Champion!")
+- NIEMALS Crypto-Bro-Slang ("closen", "Rudel", "MOIC" als Joke)
+- Kein 3D-Emoji, keine Cartoon-Figur
+- Avatar = monochromer Kreis mit Initialen "MH" in JetBrains Mono, Off-White auf dunklem Background, dünne Akzent-Border
+
+### Komponente: `components/lesson/MarcusNote.tsx`
+
+```tsx
+interface MarcusNoteProps {
+  subject?: string
+  body: string | React.ReactNode
+}
+```
+
+Stil:
+- Container: `bg-bg-secondary border-l-2 border-accent rounded-r-lg p-4`
+- Header: "From: Marcus Hart, Senior Coach" in `font-mono text-xs text-text-muted`
+- Subject (optional): `font-mono text-sm text-text-secondary`
+- Body: `font-sans text-text-primary italic`
+
+## 📐 LESSON-LAYOUT (Wrapper)
+
+### Komponente: `components/lesson/LessonLayout.tsx`
+
+```tsx
+interface LessonLayoutProps {
+  currentStep: number      // 1-12
+  totalSteps: number       // 12
+  onBack: () => void
+  onNext: () => void
+  nextLabel?: string       // default: "Weiter"
+  nextDisabled?: boolean
+  children: React.ReactNode
+}
+```
+
+Layout:
+
+**Top-Bar (fixed, height 56px):**
+- Links: Back-Arrow (`<ArrowLeft size={20} />`, text-text-secondary, hover:text-text-primary)
+- Mitte: Progress-Bar (height 3px, max-w-md), `bg-bg-border` mit Fill `bg-accent`, `transition-all duration-500 ease-out`
+- Rechts: Mute-Toggle + Step-Counter "01 / 12" in `font-mono text-text-muted`
+
+**Content-Bereich:**
+- `max-w-2xl mx-auto px-6 py-12`
+- Auf Mobile top-aligned, auf Desktop vertikal mittig
+
+**Bottom-CTA (fixed):**
+- Volle Breite, `max-w-2xl mx-auto`
+- Aktiv: `bg-accent text-bg-primary font-semibold py-4 rounded-lg`
+- Disabled: `bg-bg-tertiary text-text-muted cursor-not-allowed`
+
+## 📋 SLIDES 1–6
+
+### Slide 01 – Briefing Intro
+
+Komponente: `components/lesson/income-statement/Slide01Briefing.tsx`
+
+Layout (top to bottom):
+
+1. Modul-Label: `MODUL 01 · ACCOUNTING` in `font-mono text-xs text-text-muted tracking-wider uppercase`
+2. Großer Titel: **Income Statement** in `font-serif text-5xl font-medium text-text-primary`
+3. Untertitel: "Gewinn- und Verlustrechnung (GuV)" in `font-sans text-lg text-text-secondary`
+4. **MarcusNote:**
+   - Subject: `Re: Your first session`
+   - Body: *"Diese Lektion deckt 8 von 12 GuV-Fragen ab, die in 90% aller Spring-Week- und Summer-Internship-Interviews vorkommen. Mach sie ordentlich – beim zweiten Mal mit Live-Interviewer ist es zu spät."*
+5. **Lesson-Stat-Card** (`grid grid-cols-3 gap-4`, `bg-bg-secondary border border-bg-border rounded-lg p-4`):
+
+   | DAUER | XP | SCHWIERIG. |
+   |-------|-----|-----------|
+   | 8 MIN | +55 | ★☆☆☆☆ |
+
+   Werte in `font-mono text-2xl text-text-primary`, Labels in `font-mono text-xs text-text-muted uppercase`
+
+6. **Learning-Outcomes:** Header "Was du nach dieser Lektion können wirst:" in `text-sm text-text-secondary`. Drei Stichpunkte mit `→`-Pfeil (font-mono, accent-Farbe):
+   - GuV von Top zu Bottom durchgehen
+   - 4 Margen aus dem Kopf berechnen
+   - EBITDA vs. EBIT in 10 Sekunden erklären
+
+CTA: `Briefing starten →`
+
+### Slide 02 – Bilanz vs. GuV (Tap-to-reveal)
+
+Komponente: `Slide02BalanceVsIS.tsx`
+
+Layout:
+
+1. Header: **"Bilanz oder GuV?"** in `font-serif text-4xl`
+2. Subline: "Tippe an, was einen Zeitraum zeigt." in `text-text-secondary`
+3. **Zwei Karten** in `grid grid-cols-2 gap-4`, Höhe 200px:
+
+   **Karte links – Bilanz:**
+   - `<Camera size={32} className="text-text-muted" />`
+   - Titel: "Bilanz" in `font-serif text-2xl`
+   - Untertitel: "Stichtag · 31.12.2024" in `font-mono text-xs text-text-muted`
+
+   **Karte rechts – GuV:**
+   - `<Film size={32} />`
+   - Titel: "GuV"
+   - Untertitel: "Zeitraum · Q1–Q4 2024"
+
+4. Beide Karten: `bg-bg-secondary border border-bg-border rounded-xl p-6 cursor-pointer hover:bg-bg-tertiary hover:border-text-muted transition-all`
+
+5. **State Machine:** `useState<'idle' | 'correct' | 'wrong'>('idle')`
+
+6. **Feedback bei Klick:**
+   - **Richtig (rechts):** Karte glüht in Akzent (`border-accent shadow-[0_0_24px_rgba(255,107,0,0.3)]`). Mit Framer-Motion-Fade-In erscheint MarcusNote: *"Korrekt. GuV = Film über einen Zeitraum. Bilanz = Foto an einem Stichtag. Wer das verwechselt, fliegt im First Round."*
+   - **Falsch (links):** Kurz `border-error` pulsieren, dann beide Karten markieren (rechts grün, links rot), Marcus-Note mit Korrektur erscheint trotzdem.
+
+7. CTA: `Weiter →` (disabled bis Auswahl getroffen)
+
+### Slide 03 – Wasserfall-Diagramm (DER VISUELL WICHTIGSTE SLIDE)
+
+Komponente: `Slide03Waterfall.tsx`
+
+Nimm dir hier besonders Zeit. Das ist das mentale Bild, das jeder Banker im Kopf hat.
+
+Layout:
+
+1. Header: **"Vom Umsatz zum Gewinn"** in `font-serif text-4xl`
+2. Subline: "11 Stationen, 1 Logik."
+3. **Animierter Wasserfall** – progressives Mount mit 200ms-Delay zwischen Steps via Framer Motion `staggerChildren`.
+
+Daten in `data.ts`:
+
+```ts
+export const waterfallSteps = [
+  { type: 'start', label: 'Revenue',        de: 'Umsatzerlöse',       value: 200, barWidth: 100, section: 'operative' },
+  { type: 'minus', label: '− COGS',          de: 'Herstellungskosten', value: -120, barWidth: 60,  section: 'operative' },
+  { type: 'sum',   label: '= Gross Profit',  de: 'Bruttoergebnis',     value: 80,  barWidth: 40,  section: 'operative' },
+  { type: 'minus', label: '− SG&A',          de: 'Vertriebs-/Verw.',   value: -40, barWidth: 20,  section: 'operative' },
+  { type: 'sum',   label: '= EBITDA',        de: 'Op. Erg. vor D&A',   value: 40,  barWidth: 20,  section: 'operative' },
+  { type: 'minus', label: '− D&A',           de: 'Abschreibungen',     value: -10, barWidth: 5,   section: 'operative' },
+  { type: 'sum',   label: '= EBIT',          de: 'Operatives Ergebn.', value: 30,  barWidth: 15,  section: 'operative' },
+  { type: 'minus', label: '− Interest',      de: 'Zinsaufwand',        value: -5,  barWidth: 2.5, section: 'finanz'    },
+  { type: 'sum',   label: '= EBT',           de: 'Erg. vor Steuern',   value: 25,  barWidth: 12.5,section: 'finanz'    },
+  { type: 'minus', label: '− Taxes',         de: 'Steuern',            value: -7,  barWidth: 3.5, section: 'staat'     },
+  { type: 'sum',   label: '= Net Income',    de: 'Jahresüberschuss',   value: 18,  barWidth: 9,   section: 'staat',  highlighted: true },
+]
+```
+
+Jede Zeile:
+- 60% Breite Balken-Bereich, 40% Wert in `font-mono` rechtsbündig
+- Balken: `bg-text-primary` (für sum/start), `bg-error/40` (für minus), Akzent für `highlighted: true`
+- Höhe pro Zeile: 40px
+
+**Drei Section-Trenner** mit horizontaler Linie + Label (`font-mono text-xs text-text-muted uppercase tracking-wider`):
+1. `OPERATIVE PERFORMANCE`
+2. `FINANZIERUNGSEBENE`
+3. `STAATSANTEIL`
+
+**Tooltip-Interaktion:** Beim Klick auf eine Position öffnet sich ein Tooltip (`@radix-ui/react-tooltip` ODER simpler absolute-positionierter Container) mit Ein-Satz-Erklärung.
+
+Beispiele:
+- COGS: "Direkte Kosten der Produktion: Material, Fertigungslöhne, Maschinenstunden."
+- SG&A: "Vertriebs- und Verwaltungskosten: Gehälter, Marketing, Büro."
+- D&A: "Abschreibungen auf Sachanlagen + Amortisation immaterieller Werte."
+- EBITDA: "Operative Profitabilität ohne Kapitalstruktur und Abschreibungen."
+
+CTA: `Verstanden →`
+
+### Slide 04 – Margen-Vergleich
+
+Komponente: `Slide04Margins.tsx`
+
+Layout:
+
+1. Header: **"Vier Margen, eine Geschichte."**
+2. Subline: "Beispiel: TechCo, FY24, Umsatz €100M" in `font-mono text-text-muted`
+3. **Vier horizontale Balken** untereinander, Container-Breite identisch:
+   - Background-Track: `bg-bg-secondary rounded-md h-12`
+   - Fill-Bar: `bg-text-primary` (Bruttomarge zusätzlich `bg-accent`)
+   - Innen links: Label in `font-mono text-sm`
+   - Am Ende des Fills: Wert + abs in `font-mono text-sm`
+
+Daten:
+
+```ts
+const margins = [
+  { key: 'gross',  label: 'Gross Margin',     value: 40, abs: '€40M', highlighted: true,
+    explanation: 'Was nach den direkten Produktionskosten übrig bleibt. Hoher Wert = Pricing Power oder günstige Produktion.' },
+  { key: 'ebitda', label: 'EBITDA Margin',    value: 20, abs: '€20M',
+    explanation: 'Profitabilität ohne Kapitalstruktur und Abschreibungen. Lieblings-Kennzahl von PE-Funds, weil branchenübergreifend vergleichbar.' },
+  { key: 'ebit',   label: 'Operating Margin', value: 15, abs: '€15M',
+    explanation: 'Operative Profitabilität nach Abschreibungen. Realistischer als EBITDA, weil CapEx-Realität reflektiert wird.' },
+  { key: 'net',    label: 'Net Margin',       value: 9,  abs: '€9M',
+    explanation: 'Was am Ende für die Aktionäre übrig bleibt. Final Score nach allen Abzügen.' },
+]
+```
+
+4. **Tap-to-reveal:** Klick auf Balken öffnet Akkordeon-Panel darunter mit Erklärung.
+
+5. **MarcusNote unten:** *"Im Interview erwartet niemand, dass du Margen exakt nennst. Aber du musst die Hierarchie kennen: Brutto > EBITDA > EBIT > Netto. Immer."*
+
+CTA: `Weiter →`
+
+### Slide 05 – Formel-Drill (Fill-in-the-blank)
+
+Komponente: `Slide05FormulaDrill.tsx`
+
+Layout:
+
+1. Header: **"Schreib die Formel."**
+2. Subline: "Bruttomarge in 4 Bausteinen."
+3. **Formel mit Lücken** in `font-mono text-2xl`:
+```
+   Gross Margin = ( ___ − ___ ) / ___ × 100%
+```
+   Slot-Stil: `border-2 border-dashed border-bg-border rounded-md w-32 h-10 inline-flex items-center justify-center`
+
+4. **Wortpool** (4 Buttons in zufälliger Reihenfolge):
+   - `Revenue`, `COGS`, `Revenue` (zweimal!), `EBIT` (Distraktor)
+   - Stil: `bg-bg-secondary border border-bg-border rounded-md px-4 py-2 font-mono text-sm hover:bg-bg-tertiary cursor-pointer`
+
+5. **Logik:**
+   - Klick auf Baustein → wandert in nächste freie Slot via Framer-Motion `layoutId`
+   - Korrekte Reihenfolge: Revenue → COGS → Revenue
+   - Bei Vollständig-richtig: Slots glühen (`border-accent`), MarcusNote: *"Im echten Interview wirst du diese Formel mündlich aufsagen müssen. Übe das laut. Ja, wirklich."*
+   - Bei falsch: betroffener Slot pulsiert `border-error`, Baustein springt zurück
+   - Reset-Button "Nochmal" in der Box oben rechts
+
+CTA: `Weiter →` (disabled bis Formel komplett UND korrekt)
+
+### Slide 06 – Cheat Sheet
+
+Komponente: `Slide06CheatSheet.tsx`
+
+Layout:
+
+1. Header: **"Cheat Sheet"**
+2. Subline: "Screenshot-tauglich." in `italic text-text-secondary`
+3. **Cheat-Sheet-Card** im Bloomberg-Terminal-Look:
+   - Container: `bg-bg-secondary border border-bg-border rounded-xl p-6 font-mono text-sm text-text-primary`
+   - Code-Anzeige oben rechts: `[01]` in `text-text-muted`
+   - Inhalt mit `<pre>` für Ausrichtung:
+
+```
+GUV CHEAT SHEET                       [01]
+──────────────────────────────────────────
+REVENUE                              €200M
+ − COGS                              −120M
+ = GROSS PROFIT                       €80M
+ − SG&A                               −40M
+ = EBITDA                             €40M
+ − D&A                                −10M
+ = EBIT                               €30M
+ − INTEREST                            −5M
+ = EBT                                €25M
+ − TAXES                               −7M
+ = NET INCOME                         €18M
+──────────────────────────────────────────
+GROSS MARGIN  = (REV − COGS) / REV
+EBITDA MARGIN = EBITDA / REV
+OP. MARGIN    = EBIT / REV
+NET MARGIN    = NET INCOME / REV
+──────────────────────────────────────────
+RULE OF THUMB
+EBITDA blendet CapEx aus.
+Buffett hasst EBITDA. Du auch.
+```
+
+4. **Drei Buttons** (`grid grid-cols-3 gap-4`):
+   - **"Als PNG speichern"** → `html-to-image` konvertiert die Card und triggert Download
+   - **"In Notion kopieren"** → kopiert formatierten Text in Clipboard via `navigator.clipboard.writeText()`
+   - **"Weiter →"** → primärer CTA in Akzent
+
+Stelle sicher, dass die Card als eigenständiger Screenshot funktioniert (ausreichend Padding, keine abgeschnittenen Elemente).
+
+## 📁 EMPFOHLENE DATEISTRUKTUR (Phase 1)
+
+```
+app/
+  lesson/
+    income-statement/
+      page.tsx                    // Wird in Phase 2 zusammengebaut
+components/
+  lesson/
+    LessonLayout.tsx
+    MarcusNote.tsx
+    income-statement/
+      Slide01Briefing.tsx
+      Slide02BalanceVsIS.tsx
+      Slide03Waterfall.tsx
+      Slide04Margins.tsx
+      Slide05FormulaDrill.tsx
+      Slide06CheatSheet.tsx
+      data.ts
+lib/
+  fonts.ts
+```
+
+## ✅ ACCEPTANCE CRITERIA Phase 1
+
+Bevor du Phase 1 als fertig betrachtest:
+
+1. Branch `feature/lesson-income-statement-redesign` existiert und ist aktiv
+2. Tailwind-Config enthält das vollständige Farbsystem
+3. Drei Fonts sind via `next/font` eingebunden
+4. `MarcusNote` und `LessonLayout` funktionieren als Standalone-Komponenten
+5. Slides 01–06 sind als einzelne Komponenten implementiert und können in einer Demo-Page einzeln aufgerufen werden
+6. Keine Lila-, Pink- oder Standard-Blau-Töne irgendwo im Code
+7. Keine 3D-Emojis, kein Wolfgang, kein "Rudel"
+8. Mobile-First: alle Slides funktionieren auf 375px Breite ohne horizontalen Scroll
+9. Keyboard-Accessibility: Tab-Navigation funktioniert, Enter triggert primäre CTAs
+10. Alle Texte konsistent: englische Fachbegriffe (Revenue, COGS, EBITDA) bleiben Englisch, Erklärungen auf Deutsch
+11. Saubere Commit-History mit den oben genannten Commit-Messages
+
+## 🚀 IMPLEMENTIERUNGS-REIHENFOLGE
+
+Arbeite in dieser Reihenfolge ab und committe nach jedem Schritt. Frag mich nach jedem Schritt, ob ich Änderungen will:
+
+1. **Branch erstellen** (siehe Git-Workflow oben)
+2. **Setup:** Dependencies installieren, Tailwind-Config erweitern, Fonts in `lib/fonts.ts` einbinden, Root-Layout aktualisieren
+3. **Shared Components:** `MarcusNote.tsx`, `LessonLayout.tsx`
+4. **Slide 01** Briefing
+5. **Slide 02** Bilanz vs. GuV
+6. **Slide 03** Wasserfall (zeitintensivster Slide – nimm dir Zeit)
+7. **Slide 04** Margen
+8. **Slide 05** Formel-Drill
+9. **Slide 06** Cheat Sheet
+
+Optional: Erstelle eine temporäre `/dev/lesson-preview`-Route, in der du die einzelnen Slides isoliert testen kannst.
+
+Wenn du an einer Stelle einen besseren Vorschlag hast (z.B. elegantere Animation, sauberere State-Lösung), schlage ihn aktiv vor – aber halte dich strikt an Farben, Typografie und Tonfall.
+
+Phase 2 (Slides 07–12 + Routing + State-Management) folgt im selben Branch nach deiner Bestätigung, dass Phase 1 fertig ist.
+
+Los geht's mit Schritt 1 (Branch erstellen).
