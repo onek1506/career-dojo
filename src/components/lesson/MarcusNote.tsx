@@ -2,12 +2,17 @@
 
 import type { ReactNode } from 'react';
 
+export type MarcusTone = 'gentle' | 'sharp';
+
 export interface MarcusNoteProps {
   subject?: string;
   body: string | ReactNode;
+  tone?: MarcusTone;
 }
 
 export default function MarcusNote({ subject, body }: MarcusNoteProps) {
+  // tone is currently only a content-side hint for callers; visuals are
+  // identical so beginners and pros experience the same UI.
   return (
     <div
       className="bg-is-bg-secondary border-l-2 border-is-accent rounded-r-lg p-4"

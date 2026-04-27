@@ -2,7 +2,6 @@
 
 import { useMemo, useState, type ComponentType } from 'react';
 import { useRouter } from 'next/navigation';
-import LessonLayout from '../LessonLayout';
 import Slide01Briefing from './Slide01Briefing';
 import Slide02BalanceVsIS from './Slide02BalanceVsIS';
 import Slide03Waterfall from './Slide03Waterfall';
@@ -12,12 +11,11 @@ import Slide06CheatSheet from './Slide06CheatSheet';
 import Slide07ProTips from './Slide07ProTips';
 import Slide08QuizSort from './Slide08QuizSort';
 import Slide09QuizCalc from './Slide09QuizCalc';
-import Slide10QuizMultiSelect from './Slide10QuizMultiSelect';
-import Slide11QuizHierarchy from './Slide11QuizHierarchy';
+import Slide10EbitdaPreview from './Slide10EbitdaPreview';
 import Slide12Retention from './Slide12Retention';
+import SidePanel from './SidePanel';
 import { useStore } from '@/lib/store';
 import { calculateAccuracy, calculateTotalXp } from '@/lib/lesson/xp';
-import { playClickSound, playCompleteSound, unlockAudioContext } from '@/lib/sounds';
 import type {
   QuizResult,
   QuizResults,
@@ -36,13 +34,9 @@ const SLIDES: ComponentType<SlideProps>[] = [
   Slide07ProTips,
   Slide08QuizSort,
   Slide09QuizCalc,
-  Slide10QuizMultiSelect,
-  Slide11QuizHierarchy,
+  Slide10EbitdaPreview,
   Slide12Retention,
 ];
-
-// Slides that render their own primary CTA inline.
-const HIDE_BOTTOM_CTA = new Set<number>([5, 6, 11]);
 
 const LESSON_ID = 'acc-1-income-statement';
 
@@ -54,10 +48,7 @@ export default function IncomeStatementLesson() {
   const [quizResults, setQuizResults] = useState<QuizResults>({
     q1: null,
     q2: null,
-    q3: null,
-    q4: null,
   });
-  const [canProceed, setCanProceed] = useState(false);
   const [startTime] = useState<number>(() => Date.now());
   const [finalElapsed, setFinalElapsed] = useState<number | null>(null);
   const [completionFinalized, setCompletionFinalized] = useState(false);
@@ -79,28 +70,15 @@ export default function IncomeStatementLesson() {
 
   const goNext = () => {
     if (currentStep >= SLIDES.length - 1) {
-      // From retention slide: go to next recommended lesson or skill tree
       router.push('/skill-tree');
       return;
-    }
-    try {
-      playClickSound();
-    } catch {
-      // ignore
     }
     const enteringRetention = currentStep === SLIDES.length - 2;
     if (enteringRetention && !completionFinalized) {
       setFinalElapsed(Math.floor((Date.now() - startTime) / 1000));
       completeLesson(LESSON_ID, totalXp);
       setCompletionFinalized(true);
-      try {
-        unlockAudioContext();
-        playCompleteSound();
-      } catch {
-        // ignore audio errors
-      }
     }
-    setCanProceed(false);
     setCurrentStep((s) => s + 1);
   };
 
@@ -109,27 +87,24 @@ export default function IncomeStatementLesson() {
       router.back();
       return;
     }
-    setCanProceed(false);
     setCurrentStep((s) => s - 1);
   };
 
+  const sidePanel = (
+    <SidePanel currentStep={currentStep + 1} totalSteps={SLIDES.length} sessionXp={totalXp} />
+  );
+
   return (
-    <LessonLayout
+    <Slide
+      key={currentStep}
       currentStep={currentStep + 1}
       totalSteps={SLIDES.length}
       onBack={goBack}
       onNext={goNext}
-      nextDisabled={!canProceed}
-      hideNext={HIDE_BOTTOM_CTA.has(currentStep) || isRetention}
-    >
-      <Slide
-        key={currentStep}
-        onAnswer={handleAnswer}
-        onCanProceed={setCanProceed}
-        onNext={goNext}
-        quizResults={quizResults}
-        results={retentionResults}
-      />
-    </LessonLayout>
+      sidePanel={sidePanel}
+      onAnswer={handleAnswer}
+      quizResults={quizResults}
+      results={retentionResults}
+    />
   );
 }

@@ -1,101 +1,129 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Film } from 'lucide-react';
+import { Camera, Film, ArrowRight } from 'lucide-react';
+import LessonLayout from '../LessonLayout';
+import LessonFooterCTA from '../LessonFooterCTA';
 import MarcusNote from '../MarcusNote';
+import { playClickSound, playCorrectSound, playWrongSound, playRevealSound } from '@/lib/sounds';
 import type { SlideProps } from './types';
 
 type State = 'idle' | 'correct' | 'wrong';
 
-export default function Slide02BalanceVsIS({ onCanProceed }: SlideProps) {
+export default function Slide02BalanceVsIS({
+  currentStep,
+  totalSteps,
+  onBack,
+  onNext,
+  sidePanel,
+}: SlideProps) {
   const [state, setState] = useState<State>('idle');
-
-  useEffect(() => {
-    onCanProceed?.(state !== 'idle');
-  }, [state, onCanProceed]);
 
   const onPick = (choice: 'balance' | 'income') => {
     if (state !== 'idle') return;
-    setState(choice === 'income' ? 'correct' : 'wrong');
+    const correct = choice === 'income';
+    if (correct) {
+      playCorrectSound();
+      setState('correct');
+    } else {
+      playWrongSound();
+      setState('wrong');
+      // After a short delay, also reveal the right answer
+      window.setTimeout(() => playRevealSound(), 250);
+    }
+  };
+
+  const handleNext = () => {
+    playClickSound();
+    onNext();
   };
 
   const showFeedback = state !== 'idle';
   const balanceMarkedWrong = state === 'wrong';
   const incomeMarkedRight = showFeedback;
 
+  const footer = (
+    <LessonFooterCTA
+      onClick={handleNext}
+      label="Weiter"
+      disabled={state === 'idle'}
+      icon={<ArrowRight size={16} />}
+    />
+  );
+
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <h2 className="font-[family-name:var(--font-is-serif)] text-4xl font-medium text-is-text-primary leading-tight">
-          Bilanz oder GuV?
-        </h2>
-        <p className="font-[family-name:var(--font-is-sans)] text-is-text-secondary">
-          Tippe an, was einen Zeitraum zeigt.
-        </p>
-      </div>
+    <LessonLayout currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} sidePanel={sidePanel} footer={footer}>
+      <div className="flex flex-col gap-5 sm:gap-6">
+        <div className="flex flex-col gap-2">
+          <h2 className="font-[family-name:var(--font-is-serif)] text-3xl sm:text-4xl font-medium text-is-text-primary leading-tight">
+            Bilanz oder GuV?
+          </h2>
+          <p className="font-[family-name:var(--font-is-sans)] text-is-text-secondary">
+            Tippe an, was einen Zeitraum zeigt.
+          </p>
+        </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
-        <Card
-          icon={<Camera size={32} className="text-is-text-muted" aria-hidden />}
-          title="Bilanz"
-          subtitle="Stichtag · 31.12.2024"
-          onClick={() => onPick('balance')}
-          state={
-            !showFeedback
-              ? 'idle'
-              : balanceMarkedWrong
-                ? 'wrong'
-                : 'neutral-wrong'
-          }
-        />
-        <Card
-          icon={<Film size={32} className="text-is-text-muted" aria-hidden />}
-          title="GuV"
-          subtitle="Zeitraum · Q1–Q4 2024"
-          onClick={() => onPick('income')}
-          state={!showFeedback ? 'idle' : incomeMarkedRight ? 'correct' : 'idle'}
-        />
-      </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <Card
+            icon={<Camera size={28} className="text-is-text-muted" aria-hidden />}
+            title="Bilanz"
+            subtitle="Stichtag · 31.12.2024"
+            onClick={() => onPick('balance')}
+            state={
+              !showFeedback ? 'idle' : balanceMarkedWrong ? 'wrong' : 'neutral-wrong'
+            }
+          />
+          <Card
+            icon={<Film size={28} className="text-is-text-muted" aria-hidden />}
+            title="GuV"
+            subtitle="Zeitraum · Q1–Q4 2024"
+            onClick={() => onPick('income')}
+            state={!showFeedback ? 'idle' : incomeMarkedRight ? 'correct' : 'idle'}
+          />
+        </div>
 
-      <AnimatePresence>
-        {state === 'correct' && (
-          <motion.div
-            key="correct"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-          >
-            <MarcusNote
-              body={
-                <>
-                  Korrekt. GuV = Film über einen Zeitraum. Bilanz = Foto an einem Stichtag. Wer das verwechselt, fliegt im First Round.
-                </>
-              }
-            />
-          </motion.div>
-        )}
-        {state === 'wrong' && (
-          <motion.div
-            key="wrong"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-          >
-            <MarcusNote
-              subject="Re: Korrektur"
-              body={
-                <>
-                  Andersrum. Die <strong className="not-italic">GuV</strong> zeigt einen Zeitraum (Film), die Bilanz einen Stichtag (Foto). Merk dir: Income <em>Statement</em> = Story über Zeit. Balance <em>Sheet</em> = Snapshot.
-                </>
-              }
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+        <AnimatePresence>
+          {state === 'correct' && (
+            <motion.div
+              key="correct"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+            >
+              <MarcusNote
+                tone="gentle"
+                body={
+                  <>
+                    Genau. Eine GuV erzählt eine Geschichte über einen Zeitraum — wie ein Film. Eine Bilanz zeigt einen einzigen Moment — wie ein Foto. Diese Unterscheidung ist der wichtigste erste Schritt.
+                  </>
+                }
+              />
+            </motion.div>
+          )}
+          {state === 'wrong' && (
+            <motion.div
+              key="wrong"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+            >
+              <MarcusNote
+                tone="gentle"
+                subject="Re: Kein Stress"
+                body={
+                  <>
+                    Andersrum. Die <strong className="not-italic">GuV</strong> zeigt einen Zeitraum (Film), die Bilanz einen Stichtag (Foto). Merk dir: Income <em>Statement</em> = Story über Zeit. Balance <em>Sheet</em> = Snapshot.
+                  </>
+                }
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </LessonLayout>
   );
 }
 
@@ -129,17 +157,17 @@ function Card({
       onClick={onClick}
       disabled={state !== 'idle'}
       className={[
-        'flex flex-col items-start justify-between min-h-[180px] sm:min-h-[200px]',
-        'bg-is-bg-secondary border rounded-xl p-5 sm:p-6 text-left cursor-pointer',
+        'flex sm:flex-col items-center sm:items-start justify-between sm:justify-between min-h-[120px] sm:min-h-[180px] gap-4 sm:gap-0',
+        'bg-is-bg-secondary border rounded-xl p-4 sm:p-6 text-left',
         'transition-all duration-200 ease-out',
         state === 'idle' ? 'cursor-pointer' : 'cursor-default',
         styles,
       ].join(' ')}
       aria-pressed={state === 'correct'}
     >
-      <div>{icon}</div>
-      <div className="flex flex-col gap-1">
-        <span className="font-[family-name:var(--font-is-serif)] text-2xl text-is-text-primary">
+      <div className="shrink-0 sm:mb-2">{icon}</div>
+      <div className="flex flex-col gap-1 flex-1 sm:flex-none">
+        <span className="font-[family-name:var(--font-is-serif)] text-xl sm:text-2xl text-is-text-primary">
           {title}
         </span>
         <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted">

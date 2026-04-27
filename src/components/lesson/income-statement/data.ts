@@ -1,124 +1,106 @@
 // ============================================================
-// Income Statement Lesson — static lesson data
+// Income Statement Lesson — beginner-friendly content
 // ============================================================
 
 export type WaterfallStep = {
-  type: 'start' | 'minus' | 'sum';
-  label: string;
-  de: string;
-  value: number;
-  barWidth: number; // percentage, 0-100, relative to revenue (max)
-  section: 'operative' | 'finanz' | 'staat';
+  type: 'main' | 'preview';
+  label: string; // German-first per Phase 3b
+  en: string; // English term shown smaller
+  value: number; // signed millions
+  barWidth?: number; // 0-100, only for main rows
   highlighted?: boolean;
   tooltip: string;
+  lessonHint?: string; // shown for preview rows ("Lektion X")
 };
 
 export const waterfallSteps: WaterfallStep[] = [
   {
-    type: 'start',
-    label: 'Revenue',
-    de: 'Umsatzerlöse',
-    value: 200,
+    type: 'main',
+    label: 'Umsatz',
+    en: 'Revenue',
+    value: 100,
     barWidth: 100,
-    section: 'operative',
-    tooltip: 'Alle Erlöse aus dem Verkauf von Produkten und Dienstleistungen — vor jeglichen Abzügen.',
+    tooltip: 'Alles, was die Firma verkauft hat. Der Top-Line-Wert — bevor irgendwelche Kosten abgezogen werden.',
   },
   {
-    type: 'minus',
-    label: '− COGS',
-    de: 'Herstellungskosten',
-    value: -120,
-    barWidth: 60,
-    section: 'operative',
+    type: 'preview',
+    label: '− Herstellungskosten',
+    en: 'COGS',
+    value: -50,
     tooltip: 'Direkte Kosten der Produktion: Material, Fertigungslöhne, Maschinenstunden.',
+    lessonHint: 'Mehr dazu in Lektion 2.',
   },
   {
-    type: 'sum',
-    label: '= Gross Profit',
-    de: 'Bruttoergebnis',
-    value: 80,
-    barWidth: 40,
-    section: 'operative',
+    type: 'main',
+    label: 'Bruttoergebnis',
+    en: 'Gross Profit',
+    value: 50,
+    barWidth: 50,
     tooltip: 'Was nach den direkten Produktionskosten übrig bleibt — Indikator für Pricing Power.',
   },
   {
-    type: 'minus',
-    label: '− SG&A',
-    de: 'Vertriebs-/Verw.',
-    value: -40,
-    barWidth: 20,
-    section: 'operative',
-    tooltip: 'Vertriebs- und Verwaltungskosten: Gehälter, Marketing, Büro.',
-  },
-  {
-    type: 'sum',
-    label: '= EBITDA',
-    de: 'Op. Erg. vor D&A',
-    value: 40,
-    barWidth: 20,
-    section: 'operative',
-    tooltip: 'Operative Profitabilität ohne Kapitalstruktur und Abschreibungen.',
-  },
-  {
-    type: 'minus',
-    label: '− D&A',
-    de: 'Abschreibungen',
+    type: 'preview',
+    label: '− Vertrieb & Verwaltung',
+    en: 'SG&A',
     value: -10,
-    barWidth: 5,
-    section: 'operative',
-    tooltip: 'Abschreibungen auf Sachanlagen + Amortisation immaterieller Werte.',
+    tooltip: 'Vertriebs- und Verwaltungskosten: Gehälter, Marketing, Büro.',
+    lessonHint: 'Mehr dazu in Lektion 2.',
   },
   {
-    type: 'sum',
-    label: '= EBIT',
-    de: 'Operatives Ergebn.',
+    type: 'main',
+    label: 'EBITDA',
+    en: 'Op. Erg. vor Abschr.',
+    value: 40,
+    barWidth: 40,
+    tooltip: 'Operative Profitabilität ohne Kapitalstruktur und Abschreibungen. Lieblings-Kennzahl in der Praxis.',
+  },
+  {
+    type: 'preview',
+    label: '− Abschreibungen',
+    en: 'D&A',
+    value: -10,
+    tooltip: 'Kosten für Maschinen und Software, die über mehrere Jahre verteilt werden.',
+    lessonHint: 'Mehr dazu in Lektion 3.',
+  },
+  {
+    type: 'main',
+    label: 'EBIT',
+    en: 'Operatives Ergebnis',
     value: 30,
-    barWidth: 15,
-    section: 'operative',
-    tooltip: 'Operatives Ergebnis nach Abschreibungen — realistischer als EBITDA.',
+    barWidth: 30,
+    tooltip: 'EBITDA minus Abschreibungen. Realistisches Bild der operativen Profitabilität.',
   },
   {
-    type: 'minus',
-    label: '− Interest',
-    de: 'Zinsaufwand',
+    type: 'preview',
+    label: '− Zinsaufwand',
+    en: 'Interest',
     value: -5,
-    barWidth: 2.5,
-    section: 'finanz',
-    tooltip: 'Zinsaufwand auf Fremdkapital — abhängig von Verschuldung und Zinssatz.',
+    tooltip: 'Zinsen auf Fremdkapital — abhängig von Verschuldung und Zinssatz.',
+    lessonHint: 'Mehr dazu in Lektion 4.',
   },
   {
-    type: 'sum',
-    label: '= EBT',
-    de: 'Erg. vor Steuern',
-    value: 25,
-    barWidth: 12.5,
-    section: 'finanz',
-    tooltip: 'Ergebnis vor Steuern — Bemessungsgrundlage für die Steuerlast.',
-  },
-  {
-    type: 'minus',
-    label: '− Taxes',
-    de: 'Steuern',
+    type: 'preview',
+    label: '− Steuern',
+    en: 'Taxes',
     value: -7,
-    barWidth: 3.5,
-    section: 'staat',
-    tooltip: 'Effektive Steuerlast (Körperschaft + Gewerbe in DE: ~30%).',
+    tooltip: 'Effektive Steuerlast. In Deutschland ~30% (Körperschaft + Gewerbe).',
+    lessonHint: 'Mehr dazu in Lektion 4.',
   },
   {
-    type: 'sum',
-    label: '= Net Income',
-    de: 'Jahresüberschuss',
+    type: 'main',
+    label: 'Jahresüberschuss',
+    en: 'Net Income',
     value: 18,
-    barWidth: 9,
-    section: 'staat',
+    barWidth: 18,
     highlighted: true,
-    tooltip: 'Was am Ende für die Aktionäre übrig bleibt — die "Bottom Line".',
+    tooltip: 'Was am Ende für die Aktionäre übrig bleibt. Die "Bottom Line".',
   },
 ];
 
 export type MarginItem = {
-  key: 'gross' | 'ebitda' | 'ebit' | 'net';
-  label: string;
+  key: 'gross' | 'net';
+  label: string; // German-first
+  enLabel: string;
   value: number;
   abs: string;
   highlighted?: boolean;
@@ -128,78 +110,49 @@ export type MarginItem = {
 export const margins: MarginItem[] = [
   {
     key: 'gross',
-    label: 'Gross Margin',
+    label: 'Bruttomarge',
+    enLabel: 'Gross Margin',
     value: 40,
     abs: '€40M',
     highlighted: true,
     explanation:
-      'Was nach den direkten Produktionskosten übrig bleibt. Hoher Wert = Pricing Power oder günstige Produktion.',
-  },
-  {
-    key: 'ebitda',
-    label: 'EBITDA Margin',
-    value: 20,
-    abs: '€20M',
-    explanation:
-      'Profitabilität ohne Kapitalstruktur und Abschreibungen. Lieblings-Kennzahl von PE-Funds, weil branchenübergreifend vergleichbar.',
-  },
-  {
-    key: 'ebit',
-    label: 'Operating Margin',
-    value: 15,
-    abs: '€15M',
-    explanation:
-      'Operative Profitabilität nach Abschreibungen. Realistischer als EBITDA, weil CapEx-Realität reflektiert wird.',
+      'Was nach den Produktionskosten übrig bleibt — im Verhältnis zum Umsatz. Apple hat hohe Bruttomargen (~40%), Walmart niedrige (~25%).',
   },
   {
     key: 'net',
-    label: 'Net Margin',
+    label: 'Nettomarge',
+    enLabel: 'Net Margin',
     value: 9,
     abs: '€9M',
     explanation:
-      'Was am Ende für die Aktionäre übrig bleibt. Final Score nach allen Abzügen.',
+      'Was am Ende für die Aktionäre übrig bleibt — im Verhältnis zum Umsatz. Tech-Firmen oft 20%+, Supermärkte 2-3%.',
   },
 ];
 
+export type CompanyMargin = { name: string; netMargin: string };
+
+export const companyExamples: CompanyMargin[] = [
+  { name: 'APPLE', netMargin: '~25%' },
+  { name: 'NETFLIX', netMargin: '~15%' },
+  { name: 'WALMART', netMargin: '~3%' },
+];
+
 export type ProTip = {
-  tag: 'STRATEGY' | 'WARNING' | 'MISTAKE';
+  tag: 'LERNTIPP' | 'MERKE' | 'NÄCHSTER SCHRITT';
   body: string;
 };
 
 export const proTips: ProTip[] = [
   {
-    tag: 'STRATEGY',
-    body: "Wenn ein MD fragt 'Walk me through the income statement', fang immer bei Revenue an, nicht bei Net Income. Top-down zeigt, dass du das System verstehst. Bottom-up zeigt, dass du Kennzahlen auswendig gelernt hast.",
+    tag: 'LERNTIPP',
+    body: 'Wenn du einen englischen Begriff zum ersten Mal siehst, sag ihn dir laut vor. EBITDA = "I-bitt-da". Dein Gehirn merkt sich Dinge besser, wenn du sie hörst, nicht nur liest.',
   },
   {
-    tag: 'WARNING',
-    body: "Wenn du EBITDA nennst, nenne immer im selben Atemzug, was es ausblendet: CapEx, Zinsen, Steuern, Working Capital. Sonst springt der MD darauf an: 'And what's wrong with EBITDA?' – und du stehst im Regen.",
+    tag: 'MERKE',
+    body: 'Brutto und Netto: Stell dir Brutto wie deinen Bruttogehalt vor — das, was am Anfang draufsteht. Netto ist, was am Ende auf deinem Konto landet. Bei Firmen ist das genauso.',
   },
   {
-    tag: 'MISTAKE',
-    body: 'Verwechsle nie Brutto- mit Operativer Marge. Klassischer 1st-Year-Fehler. Brutto = nur direkte Kosten weg. Operativ = auch Vertrieb und Verwaltung weg.',
+    tag: 'NÄCHSTER SCHRITT',
+    body: 'In Lektion 2 schauen wir uns an, was "Aufwendungen" eigentlich sind. Spoiler: Es gibt mehr als nur Materialkosten. Bis dahin reicht es zu wissen: Aufwendungen reduzieren den Gewinn.',
   },
 ];
-
-export const sortQuizCorrectOrder = [
-  'Revenue',
-  'Gross Profit',
-  'SG&A',
-  'EBITDA',
-  'EBIT',
-  'Net Income',
-] as const;
-
-export const sortQuizInitialOrder = [
-  'SG&A',
-  'Net Income',
-  'Revenue',
-  'EBIT',
-  'Gross Profit',
-  'EBITDA',
-];
-
-export const ebitdaWords = {
-  correct: ['Interest', 'Taxes', 'Depreciation', 'Amortization'] as const,
-  distractors: ['Income', 'Dividends', 'Equity', 'Inventory'] as const,
-};

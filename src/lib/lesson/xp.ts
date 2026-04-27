@@ -1,10 +1,9 @@
 import type { QuizResults } from '@/components/lesson/income-statement/types';
 
+// Beginner variant: 2 questions × 10 XP + 5 completion bonus = 25 XP max.
 const XP_MAP = {
   q1: { full: 10, half: 5 },
   q2: { full: 10, half: 5 },
-  q3: { full: 15, half: 8 },
-  q4: { full: 15, half: 8 },
 } as const;
 
 const COMPLETION_BONUS = 5;

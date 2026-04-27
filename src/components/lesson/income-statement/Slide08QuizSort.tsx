@@ -1,202 +1,186 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GripVertical, ArrowUp, ArrowDown } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import LessonLayout from '../LessonLayout';
 import MarcusNote from '../MarcusNote';
-import { sortQuizCorrectOrder, sortQuizInitialOrder } from './data';
+import { playClickSound, playCorrectSound, playWrongSound, playStreakSound } from '@/lib/sounds';
 import { priorStreakFor, type SlideProps } from './types';
 
-type CardCheck = { ok: boolean; correctIdx: number; currentIdx: number };
+// Slide 08 in the beginner variant: a single multiple-choice question that
+// asks the most important conceptual takeaway from slide 02. The original
+// drag-and-sort with 6 statements proved too hard for fresh beginners
+// who had only seen the order once on slide 03.
+const OPTIONS = [
+  { letter: 'A', value: 'Bilanz' },
+  { letter: 'B', value: 'Gewinn- und Verlustrechnung' },
+  { letter: 'C', value: 'Eigenkapitalveränderungsrechnung' },
+  { letter: 'D', value: 'Kapitalflussrechnung' },
+] as const;
 
-export default function Slide08QuizSort({ onAnswer, onCanProceed, onNext, quizResults }: SlideProps) {
-  const [order, setOrder] = useState<string[]>(sortQuizInitialOrder);
-  const [checked, setChecked] = useState(false);
+const CORRECT_LETTER = 'B';
+
+export default function Slide08QuizSort({
+  currentStep,
+  totalSteps,
+  onBack,
+  onNext,
+  onAnswer,
+  quizResults,
+  sidePanel,
+}: SlideProps) {
+  const [selected, setSelected] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState<{ letter: string; correct: boolean } | null>(null);
   const [attempts, setAttempts] = useState(0);
-  const [cardChecks, setCardChecks] = useState<Record<string, CardCheck>>({});
 
-  const allCorrect = order.every((label, i) => label === sortQuizCorrectOrder[i]);
+  const isCorrect = submitted?.correct === true;
   const priorStreak = priorStreakFor('q1', quizResults);
 
-  useEffect(() => {
-    onCanProceed?.(checked && allCorrect);
-  }, [checked, allCorrect, onCanProceed]);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 6 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  );
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    if (checked && allCorrect) return;
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    setOrder((prev) => {
-      const oldIndex = prev.indexOf(active.id as string);
-      const newIndex = prev.indexOf(over.id as string);
-      return arrayMove(prev, oldIndex, newIndex);
-    });
-    if (checked) {
-      // user is retrying after a check — clear marks
-      setChecked(false);
-      setCardChecks({});
-    }
-  };
-
-  const handleCheck = () => {
+  const handleSubmit = () => {
+    if (!selected) return;
+    const correct = selected === CORRECT_LETTER;
     const nextAttempts = attempts + 1;
     setAttempts(nextAttempts);
-    const map: Record<string, CardCheck> = {};
-    order.forEach((label, i) => {
-      const correctIdx = sortQuizCorrectOrder.indexOf(label as (typeof sortQuizCorrectOrder)[number]);
-      map[label] = { ok: label === sortQuizCorrectOrder[i], correctIdx, currentIdx: i };
-    });
-    setCardChecks(map);
-    setChecked(true);
-    if (allCorrect) {
+    setSubmitted({ letter: selected, correct });
+    if (correct) {
+      playCorrectSound();
+      window.setTimeout(() => playStreakSound(), 250);
       onAnswer?.('q1', { correct: true, attempts: nextAttempts });
     } else {
-      onAnswer?.('q1', { correct: false, attempts: nextAttempts });
+      playWrongSound();
+      // Wrong submissions stay in 'wrong' state until the user retries,
+      // they do not lock in q1 yet — beginner can correct themselves.
     }
   };
 
-  const handleProceed = () => onNext?.();
-
-  return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted tracking-wider uppercase">
-          Frage 1 / 4 · +10 XP
-        </span>
-      </div>
-
-      <h2 className="font-[family-name:var(--font-is-serif)] text-3xl sm:text-4xl font-medium text-is-text-primary leading-tight">
-        Bringe die GuV-Positionen in die richtige Reihenfolge.
-      </h2>
-
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={order} strategy={verticalListSortingStrategy}>
-          <ul className="flex flex-col gap-2">
-            {order.map((label) => (
-              <SortableCard key={label} id={label} check={checked ? cardChecks[label] : undefined} disabled={checked && allCorrect} />
-            ))}
-          </ul>
-        </SortableContext>
-      </DndContext>
-
-      <AnimatePresence>
-        {checked && allCorrect && (
-          <motion.div
-            key="ok"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="flex flex-col gap-3"
-          >
-            <MarcusNote body={<>Sauber. Diese Reihenfolge musst du im Schlaf können.</>} />
-            <StreakPill count={priorStreak + 1} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <button
-        type="button"
-        onClick={checked && allCorrect ? handleProceed : handleCheck}
-        className="w-full py-4 rounded-lg bg-is-accent text-is-bg-primary font-semibold font-[family-name:var(--font-is-sans)] hover:bg-is-accent-hover transition-all duration-200"
-      >
-        {checked && allCorrect ? 'Nächste Frage' : 'Antwort prüfen'}
-      </button>
-    </div>
-  );
-}
-
-function SortableCard({
-  id,
-  check,
-  disabled,
-}: {
-  id: string;
-  check?: CardCheck;
-  disabled?: boolean;
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id,
-    disabled,
-  });
-
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
+  const handleRetry = () => {
+    setSubmitted(null);
+    setSelected(null);
   };
 
-  const stateClass = check
-    ? check.ok
-      ? 'border-is-success bg-is-success-muted'
-      : 'border-is-error bg-is-error-muted'
-    : isDragging
-      ? 'border-is-accent opacity-50'
-      : 'border-is-bg-border';
+  const handleNext = () => {
+    playClickSound();
+    onNext();
+  };
 
-  const moveDir = check && !check.ok ? Math.sign(check.correctIdx - check.currentIdx) : 0;
+  const ctaLabel = isCorrect ? 'Nächste Frage' : submitted ? 'Nochmal versuchen' : 'Antwort prüfen';
+  const ctaAction = isCorrect ? handleNext : submitted ? handleRetry : handleSubmit;
+  const ctaDisabled = !isCorrect && !submitted && !selected;
 
-  return (
-    <li
-      ref={setNodeRef}
-      style={style}
+  const footer = (
+    <button
+      type="button"
+      onClick={ctaAction}
+      disabled={ctaDisabled}
       className={[
-        'flex items-center gap-3 bg-is-bg-secondary border rounded-lg p-3 sm:p-4',
-        'transition-colors duration-200 select-none touch-none',
-        stateClass,
+        'w-full min-h-[44px] py-3 sm:py-4 rounded-lg font-semibold font-[family-name:var(--font-is-sans)] transition-all duration-200 flex items-center justify-center gap-2',
+        ctaDisabled
+          ? 'bg-is-bg-tertiary text-is-text-muted cursor-not-allowed'
+          : 'bg-is-accent text-is-bg-primary hover:bg-is-accent-hover',
       ].join(' ')}
-      {...attributes}
     >
-      <button
-        type="button"
-        {...listeners}
-        className="text-is-text-muted hover:text-is-text-primary cursor-grab active:cursor-grabbing p-1 -ml-1"
-        aria-label={`${id} verschieben`}
-      >
-        <GripVertical size={16} />
-      </button>
-      <span className="font-[family-name:var(--font-is-mono)] text-sm sm:text-base text-is-text-primary flex-1">
-        {id}
-      </span>
-      {moveDir !== 0 && (
-        <span className="text-is-error" aria-hidden>
-          {moveDir < 0 ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
-        </span>
-      )}
-    </li>
+      {ctaLabel}
+      {isCorrect && <ArrowRight size={16} />}
+    </button>
   );
-}
 
-function StreakPill({ count }: { count: number }) {
   return (
-    <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-bg-border">
-      <span aria-hidden className="text-is-accent">🔥</span>
-      <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-secondary">
-        {count} in Folge richtig
-      </span>
-    </div>
+    <LessonLayout currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} sidePanel={sidePanel} footer={footer}>
+      <div className="flex flex-col gap-5">
+        <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted tracking-wider uppercase">
+          Frage 1 / 2 · +10 XP
+        </span>
+
+        <h2 className="font-[family-name:var(--font-is-serif)] text-xl sm:text-3xl font-medium text-is-text-primary leading-tight">
+          Welcher Bericht zeigt einen Zeitraum (z.B. das ganze Jahr 2024)?
+        </h2>
+
+        <div className="flex flex-col gap-2">
+          {OPTIONS.map((opt) => {
+            const isSelected = selected === opt.letter;
+            const isSubmittedThis = submitted?.letter === opt.letter;
+            const isCorrectOpt = opt.letter === CORRECT_LETTER;
+
+            let stateClass = 'border-is-bg-border hover:bg-is-bg-tertiary';
+            if (submitted) {
+              if (isCorrectOpt && submitted.correct) {
+                stateClass = 'border-is-success bg-is-success-muted';
+              } else if (isSubmittedThis && !submitted.correct) {
+                stateClass = 'border-is-error bg-is-error-muted';
+              } else {
+                stateClass = 'border-is-bg-border opacity-60';
+              }
+            } else if (isSelected) {
+              stateClass = 'border-is-text-primary';
+            }
+
+            return (
+              <button
+                key={opt.letter}
+                type="button"
+                onClick={() => !submitted && setSelected(opt.letter)}
+                disabled={!!submitted}
+                className={[
+                  'flex items-center gap-4 p-4 min-h-[44px] rounded-lg bg-is-bg-secondary border text-left',
+                  'transition-all duration-200 cursor-pointer disabled:cursor-default',
+                  stateClass,
+                ].join(' ')}
+              >
+                <span className="font-[family-name:var(--font-is-mono)] text-sm text-is-text-muted w-4 shrink-0">
+                  {opt.letter}
+                </span>
+                <span className="font-[family-name:var(--font-is-sans)] text-base text-is-text-primary">
+                  {opt.value}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <AnimatePresence>
+          {submitted && submitted.correct && (
+            <motion.div
+              key="ok"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="flex flex-col gap-3"
+            >
+              <MarcusNote
+                tone="gentle"
+                body={<>Genau das. Diese Unterscheidung ist der wichtigste Punkt aus Lektion 1.</>}
+              />
+              <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-bg-border">
+                <span aria-hidden className="text-is-accent">🔥</span>
+                <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-secondary">
+                  {priorStreak + 1} in Folge richtig
+                </span>
+              </div>
+            </motion.div>
+          )}
+          {submitted && !submitted.correct && (
+            <motion.div
+              key="wrong"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              <MarcusNote
+                tone="gentle"
+                subject="Re: Kein Stress"
+                body={
+                  <>
+                    Das verwechselt fast jeder am Anfang. Die Bilanz zeigt einen einzigen <strong className="not-italic">Stichtag</strong>. Die GuV zeigt einen <strong className="not-italic">Zeitraum</strong>. Versuch&apos;s nochmal.
+                  </>
+                }
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </LessonLayout>
   );
 }

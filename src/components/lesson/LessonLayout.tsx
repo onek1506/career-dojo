@@ -101,16 +101,18 @@ export default function LessonLayout({
         )}
       </div>
 
-      {/* Footer */}
-      <footer
-        className="flex-shrink-0 border-t border-is-bg-border"
-        style={{
-          background: 'var(--is-bg-primary)',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-        }}
-      >
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 sm:py-4">{footer}</div>
-      </footer>
+      {/* Footer (omitted when no CTA — e.g. Retention Hub) */}
+      {footer && (
+        <footer
+          className="flex-shrink-0 border-t border-is-bg-border"
+          style={{
+            background: 'var(--is-bg-primary)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+          }}
+        >
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 sm:py-4">{footer}</div>
+        </footer>
+      )}
     </div>
   );
 }
