@@ -1,445 +1,491 @@
-# 🐺 Lektion-Redesign Phase 1: Setup + Slides 1–6
+# 🛠️ Phase 3a: Plattform-Stabilisierung (Bug-Fixes + Responsive + Sounds)
 
-Du bist ein erfahrener Senior Frontend Developer mit Spezialisierung auf Premium-Edutech-Interfaces (Bloomberg Terminal Aesthetic, Linear, Stripe, Arc).
+Du arbeitest weiter an der Lern-Webapp für IB-Interview-Vorbereitung. Die erste Lektion ("Income Statement") ist inhaltlich fertig, hat aber kritische Plattform-Bugs, die User-Tests zeigen. Diese Phase behebt sie, bevor wir den Content anpassen.
 
-Wir arbeiten an einer **Gamification-basierten Lern-Webapp für Investment-Banking-Interview-Vorbereitung** (Zielgruppe: deutsche Studenten, die sich auf IB-Spring-Weeks und Summer Internships bewerben).
+## 🌿 GIT-WORKFLOW
 
-Die aktuelle erste Lektion nach dem Onboarding ("Die Gewinn- und Verlustrechnung / Income Statement") ist zu passiv (7 von 11 Slides nur Lese-Slides), visuell unmotiviert und wirkt wie ein schlecht kopiertes Duolingo. Wir bauen sie komplett neu.
-
-## 🌿 GIT-WORKFLOW (verbindlich)
-
-Bevor du auch nur eine einzige Datei änderst:
-
-1. Stelle sicher, dass du auf `main` (oder `master`) bist und der Branch sauber ist (`git status`).
-2. Erstelle einen neuen Feature-Branch:
+1. Erstelle einen neuen Feature-Branch vom aktuellen `main` (oder vom Branch, in dem die Lektion liegt):
 ```bash
-   git checkout -b feature/lesson-income-statement-redesign
+   git checkout main
+   git pull
+   git checkout -b feature/lesson-platform-stability
 ```
-3. Arbeite ausschließlich in diesem Branch.
-4. Committe in logischen Schritten (siehe Implementierungs-Reihenfolge unten), z.B.:
-   - `feat(lesson): add design system tokens and fonts`
-   - `feat(lesson): add LessonLayout and MarcusNote components`
-   - `feat(lesson): implement slide 01 briefing`
-   - `feat(lesson): implement slide 02 balance vs income statement`
-   - `feat(lesson): implement slide 03 waterfall diagram`
-   - `feat(lesson): implement slide 04 margins comparison`
-   - `feat(lesson): implement slide 05 formula drill`
-   - `feat(lesson): implement slide 06 cheat sheet`
-5. Push den Branch noch nicht – Phase 2 folgt im selben Branch.
-
-## 🛠️ TECH-STACK
-
-- Next.js 14+ (App Router) mit TypeScript
-- React 18+
-- Tailwind CSS
-- Framer Motion für Animationen (`npm install framer-motion` falls noch nicht da)
-- lucide-react für Icons
-- `html-to-image` für PNG-Export der Cheat-Sheet (`npm install html-to-image`)
-- `@dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities` für Drag-and-Sort (Phase 2)
-
-**WICHTIG:** Supabase wird in dieser Phase NICHT integriert. Lokaler State (useState) reicht. Persistenz folgt später.
-
-## 🎨 DESIGN SYSTEM (verbindlich)
-
-Erweitere `tailwind.config.ts`:
-
-```ts
-// extend.colors
-colors: {
-  bg: {
-    primary: '#0A0A0B',
-    secondary: '#141416',
-    tertiary: '#1C1C1F',
-    border: '#2A2A2E',
-  },
-  text: {
-    primary: '#F5F5F0',
-    secondary: '#A3A3A8',
-    muted: '#6B6B70',
-  },
-  accent: {
-    DEFAULT: '#FF6B00',
-    hover: '#FF8124',
-    muted: '#FF6B0014',
-  },
-  gold: {
-    DEFAULT: '#D4AF37',
-    muted: '#D4AF3714',
-  },
-  success: {
-    DEFAULT: '#00C853',
-    muted: '#00C85314',
-  },
-  error: {
-    DEFAULT: '#FF3B30',
-    muted: '#FF3B3014',
-  },
-}
+2. Committe in logischen Schritten:
+   - `fix(layout): replace fixed bottom CTA with footer slot pattern`
+   - `fix(layout): use h-screen flex layout to prevent page scroll`
+   - `feat(layout): add responsive breakpoints for mobile/tablet/desktop`
+   - `feat(layout): add desktop side-panel with streak and quick stats`
+   - `fix(slides): mobile layout for waterfall, cheat sheet, pro tips`
+   - `fix(slides): pro tips card layout and touch targets`
+   - `fix(quiz): wrong answer feedback and second attempt logic`
+   - `feat(sounds): add sound system with mute toggle`
+   - `chore(slides): reduce marcus quote frequency`
+3. Push nach Abschluss:
+```bash
+   git push origin feature/lesson-platform-stability
 ```
 
-**ABSOLUTES VERBOT:** Keine Lila-, Pink- oder Standard-Blau-Töne. Nur die oben definierten Farben.
+## 🐛 KRITISCHE BUGS (höchste Priorität)
 
-### Typografie
+### Bug 1: Doppelter Bottom-CTA-Button
 
-Drei Fonts via `next/font` in `lib/fonts.ts`:
+**Symptom:** Auf Quiz-Slides (Slides 8, 9, 10, 11) sind gleichzeitig zwei primäre Action-Buttons sichtbar – ein "Antwort prüfen"/"Nächste Frage" innerhalb des Content-Bereichs UND der fixed Bottom-Bar-"Weiter"-Button vom `LessonLayout`-Wrapper.
 
-- Inter (`font-sans`) – UI-Standard
-- JetBrains Mono (`font-mono`) – Zahlen, Formeln, Metriken, Labels
-- Instrument Serif (`font-serif`) – nur große Headlines
+**Ursache:** `LessonLayout` rendert den Bottom-CTA selbst, aber Quiz-Slides brauchen eigene Submit-Logik.
 
-```ts
-fontFamily: {
-  sans: ['var(--font-inter)', 'system-ui'],
-  mono: ['var(--font-jetbrains)', 'monospace'],
-  serif: ['var(--font-instrument)', 'serif'],
-}
-```
-
-### Spacing & Borders
-
-- Card-Padding: `p-6` (24px)
-- Border-Radius: nur `rounded-lg` (8px) und `rounded-xl` (12px). KEIN `rounded-2xl` oder größer.
-- Borders: immer `border-bg-border` (1px), nie dicker.
-
-### Animations-Prinzipien
-
-- Übergänge: `transition-all duration-200 ease-out`
-- Hover: leichter `bg-bg-tertiary`-Wechsel, keine Skalierungen über 1.02
-- Erfolgs-Glow: `box-shadow: 0 0 24px rgba(255,107,0,0.3)`, 400ms
-- KEINE bouncenden Animationen, KEIN Konfetti, KEINE Cartoon-Effekte
-- Animationen nie länger als 600ms
-
-## 🐺 MASCOT / COACH
-
-Wolfgang der Wolf wird **ersetzt**. Stattdessen führt **Marcus Hart** als fiktiver Senior Coach durch die Lektionen.
-
-- Ehemaliger MD bei Goldman Sachs (fiktional), jetzt Coach
-- Tonfall: trocken, knapp, britisch-zynisch, professionell
-- NIEMALS Hype-Sprache ("Du bist ein Champion!")
-- NIEMALS Crypto-Bro-Slang ("closen", "Rudel", "MOIC" als Joke)
-- Kein 3D-Emoji, keine Cartoon-Figur
-- Avatar = monochromer Kreis mit Initialen "MH" in JetBrains Mono, Off-White auf dunklem Background, dünne Akzent-Border
-
-### Komponente: `components/lesson/MarcusNote.tsx`
+**Fix:** Ändere `LessonLayout` von "rendert eigenen CTA" zu "akzeptiert Footer-Slot":
 
 ```tsx
-interface MarcusNoteProps {
-  subject?: string
-  body: string | React.ReactNode
-}
-```
-
-Stil:
-- Container: `bg-bg-secondary border-l-2 border-accent rounded-r-lg p-4`
-- Header: "From: Marcus Hart, Senior Coach" in `font-mono text-xs text-text-muted`
-- Subject (optional): `font-mono text-sm text-text-secondary`
-- Body: `font-sans text-text-primary italic`
-
-## 📐 LESSON-LAYOUT (Wrapper)
-
-### Komponente: `components/lesson/LessonLayout.tsx`
-
-```tsx
+// VORHER (FALSCH):
 interface LessonLayoutProps {
-  currentStep: number      // 1-12
-  totalSteps: number       // 12
+  currentStep: number
+  totalSteps: number
   onBack: () => void
   onNext: () => void
-  nextLabel?: string       // default: "Weiter"
+  nextLabel?: string
   nextDisabled?: boolean
+  children: React.ReactNode
+}
+
+// NACHHER (RICHTIG):
+interface LessonLayoutProps {
+  currentStep: number
+  totalSteps: number
+  onBack: () => void
+  footer: React.ReactNode  // Slide bestimmt selbst, was unten steht
   children: React.ReactNode
 }
 ```
 
-Layout:
+Erstelle eine wiederverwendbare `<LessonFooterCTA>`-Komponente, die der **Default** für alle Slides ist, die nur einen "Weiter"-Button brauchen:
 
-**Top-Bar (fixed, height 56px):**
-- Links: Back-Arrow (`<ArrowLeft size={20} />`, text-text-secondary, hover:text-text-primary)
-- Mitte: Progress-Bar (height 3px, max-w-md), `bg-bg-border` mit Fill `bg-accent`, `transition-all duration-500 ease-out`
-- Rechts: Mute-Toggle + Step-Counter "01 / 12" in `font-mono text-text-muted`
+```tsx
+// components/lesson/LessonFooterCTA.tsx
+interface Props {
+  onClick: () => void
+  label?: string
+  disabled?: boolean
+  variant?: 'primary' | 'secondary'
+}
+export function LessonFooterCTA({ onClick, label = 'Weiter', disabled, variant = 'primary' }: Props) {
+  // Stil: bg-accent (primary) oder bg-bg-secondary (secondary)
+}
+```
 
-**Content-Bereich:**
-- `max-w-2xl mx-auto px-6 py-12`
-- Auf Mobile top-aligned, auf Desktop vertikal mittig
+Quiz-Slides bauen ihren Footer dann selbst (z.B. mit "Antwort prüfen" + nach Submission "Nächste Frage").
 
-**Bottom-CTA (fixed):**
-- Volle Breite, `max-w-2xl mx-auto`
-- Aktiv: `bg-accent text-bg-primary font-semibold py-4 rounded-lg`
-- Disabled: `bg-bg-tertiary text-text-muted cursor-not-allowed`
+### Bug 2: Page-Scrolling auf kleinen Bildschirmen
 
-## 📋 SLIDES 1–6
+**Symptom:** Auf manchen Bildschirmen scrollt die ganze Page, der Bottom-CTA überdeckt Content.
 
-### Slide 01 – Briefing Intro
+**Fix:** Korrekte Viewport-Struktur mit `h-screen flex flex-col`:
 
-Komponente: `components/lesson/income-statement/Slide01Briefing.tsx`
+```tsx
+// LessonLayout.tsx neue Struktur:
+<div className="h-screen flex flex-col bg-bg-primary">
+  {/* Header (fixed height) */}
+  <header className="h-14 flex-shrink-0 border-b border-bg-border">
+    <TopBar currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} />
+  </header>
 
-Layout (top to bottom):
+  {/* Main (scrollable, takes remaining space) */}
+  <main className="flex-1 overflow-y-auto">
+    <div className="max-w-2xl mx-auto px-6 py-8 lg:py-12">
+      {children}
+    </div>
+  </main>
 
-1. Modul-Label: `MODUL 01 · ACCOUNTING` in `font-mono text-xs text-text-muted tracking-wider uppercase`
-2. Großer Titel: **Income Statement** in `font-serif text-5xl font-medium text-text-primary`
-3. Untertitel: "Gewinn- und Verlustrechnung (GuV)" in `font-sans text-lg text-text-secondary`
-4. **MarcusNote:**
-   - Subject: `Re: Your first session`
-   - Body: *"Diese Lektion deckt 8 von 12 GuV-Fragen ab, die in 90% aller Spring-Week- und Summer-Internship-Interviews vorkommen. Mach sie ordentlich – beim zweiten Mal mit Live-Interviewer ist es zu spät."*
-5. **Lesson-Stat-Card** (`grid grid-cols-3 gap-4`, `bg-bg-secondary border border-bg-border rounded-lg p-4`):
+  {/* Footer (fixed height, no overlap) */}
+  <footer className="flex-shrink-0 border-t border-bg-border bg-bg-primary">
+    <div className="max-w-2xl mx-auto px-6 py-4">
+      {footer}
+    </div>
+  </footer>
+</div>
+```
 
-   | DAUER | XP | SCHWIERIG. |
-   |-------|-----|-----------|
-   | 8 MIN | +55 | ★☆☆☆☆ |
+Dadurch scrollt **nur der Main-Bereich**, nie die ganze Page. Footer bleibt immer sichtbar, ohne Content zu überdecken.
 
-   Werte in `font-mono text-2xl text-text-primary`, Labels in `font-mono text-xs text-text-muted uppercase`
+### Bug 3: Falsch-Antwort-Feedback fehlt / unvollständig
 
-6. **Learning-Outcomes:** Header "Was du nach dieser Lektion können wirst:" in `text-sm text-text-secondary`. Drei Stichpunkte mit `→`-Pfeil (font-mono, accent-Farbe):
-   - GuV von Top zu Bottom durchgehen
-   - 4 Margen aus dem Kopf berechnen
-   - EBITDA vs. EBIT in 10 Sekunden erklären
+Auf Quiz-Slides (besonders Slide 9 Calc): Implementiere die Zweit-Versuch-Logik korrekt.
 
-CTA: `Briefing starten →`
+```tsx
+// In Slide09QuizCalc.tsx:
+type State = 'idle' | 'submitted-wrong-1' | 'submitted-wrong-2' | 'submitted-correct'
 
-### Slide 02 – Bilanz vs. GuV (Tap-to-reveal)
+const [state, setState] = useState<State>('idle')
+const [selected, setSelected] = useState<string | null>(null)
 
-Komponente: `Slide02BalanceVsIS.tsx`
+const handleSubmit = () => {
+  const isCorrect = selected === '40%'
+  if (isCorrect) {
+    setState('submitted-correct')
+    onAnswer('q2', { correct: true, attempts: state === 'submitted-wrong-1' ? 2 : 1 })
+  } else if (state === 'idle') {
+    setState('submitted-wrong-1')
+    // Zeige Hinweis, biete zweiten Versuch
+  } else {
+    setState('submitted-wrong-2')
+    onAnswer('q2', { correct: false, attempts: 2 })
+  }
+}
+```
 
-Layout:
+Visuelles Feedback bei falsch:
+- Falsche Option: `border-error bg-error/10`
+- Hinweis-Box (nur bei wrong-1): "Tipp: Bruttomarge = (Umsatz - COGS) / Umsatz"
+- Footer-CTA wechselt von "Antwort prüfen" zu "Nochmal versuchen" → nach 2. Versuch zu "Nächste Frage"
 
-1. Header: **"Bilanz oder GuV?"** in `font-serif text-4xl`
-2. Subline: "Tippe an, was einen Zeitraum zeigt." in `text-text-secondary`
-3. **Zwei Karten** in `grid grid-cols-2 gap-4`, Höhe 200px:
+## 📱 RESPONSIVE DESIGN (komplette Neuauslegung)
 
-   **Karte links – Bilanz:**
-   - `<Camera size={32} className="text-text-muted" />`
-   - Titel: "Bilanz" in `font-serif text-2xl`
-   - Untertitel: "Stichtag · 31.12.2024" in `font-mono text-xs text-text-muted`
+Aktueller Zustand: feste Container-Breite, keine echten Breakpoints. Das muss in jedem Slide angepasst werden.
 
-   **Karte rechts – GuV:**
-   - `<Film size={32} />`
-   - Titel: "GuV"
-   - Untertitel: "Zeitraum · Q1–Q4 2024"
-
-4. Beide Karten: `bg-bg-secondary border border-bg-border rounded-xl p-6 cursor-pointer hover:bg-bg-tertiary hover:border-text-muted transition-all`
-
-5. **State Machine:** `useState<'idle' | 'correct' | 'wrong'>('idle')`
-
-6. **Feedback bei Klick:**
-   - **Richtig (rechts):** Karte glüht in Akzent (`border-accent shadow-[0_0_24px_rgba(255,107,0,0.3)]`). Mit Framer-Motion-Fade-In erscheint MarcusNote: *"Korrekt. GuV = Film über einen Zeitraum. Bilanz = Foto an einem Stichtag. Wer das verwechselt, fliegt im First Round."*
-   - **Falsch (links):** Kurz `border-error` pulsieren, dann beide Karten markieren (rechts grün, links rot), Marcus-Note mit Korrektur erscheint trotzdem.
-
-7. CTA: `Weiter →` (disabled bis Auswahl getroffen)
-
-### Slide 03 – Wasserfall-Diagramm (DER VISUELL WICHTIGSTE SLIDE)
-
-Komponente: `Slide03Waterfall.tsx`
-
-Nimm dir hier besonders Zeit. Das ist das mentale Bild, das jeder Banker im Kopf hat.
-
-Layout:
-
-1. Header: **"Vom Umsatz zum Gewinn"** in `font-serif text-4xl`
-2. Subline: "11 Stationen, 1 Logik."
-3. **Animierter Wasserfall** – progressives Mount mit 200ms-Delay zwischen Steps via Framer Motion `staggerChildren`.
-
-Daten in `data.ts`:
+### Breakpoint-Strategie
 
 ```ts
-export const waterfallSteps = [
-  { type: 'start', label: 'Revenue',        de: 'Umsatzerlöse',       value: 200, barWidth: 100, section: 'operative' },
-  { type: 'minus', label: '− COGS',          de: 'Herstellungskosten', value: -120, barWidth: 60,  section: 'operative' },
-  { type: 'sum',   label: '= Gross Profit',  de: 'Bruttoergebnis',     value: 80,  barWidth: 40,  section: 'operative' },
-  { type: 'minus', label: '− SG&A',          de: 'Vertriebs-/Verw.',   value: -40, barWidth: 20,  section: 'operative' },
-  { type: 'sum',   label: '= EBITDA',        de: 'Op. Erg. vor D&A',   value: 40,  barWidth: 20,  section: 'operative' },
-  { type: 'minus', label: '− D&A',           de: 'Abschreibungen',     value: -10, barWidth: 5,   section: 'operative' },
-  { type: 'sum',   label: '= EBIT',          de: 'Operatives Ergebn.', value: 30,  barWidth: 15,  section: 'operative' },
-  { type: 'minus', label: '− Interest',      de: 'Zinsaufwand',        value: -5,  barWidth: 2.5, section: 'finanz'    },
-  { type: 'sum',   label: '= EBT',           de: 'Erg. vor Steuern',   value: 25,  barWidth: 12.5,section: 'finanz'    },
-  { type: 'minus', label: '− Taxes',         de: 'Steuern',            value: -7,  barWidth: 3.5, section: 'staat'     },
-  { type: 'sum',   label: '= Net Income',    de: 'Jahresüberschuss',   value: 18,  barWidth: 9,   section: 'staat',  highlighted: true },
-]
+// Tailwind defaults sind ok, nutze:
+// - default (< 640px): Mobile
+// - sm: (≥ 640px): Large mobile
+// - md: (≥ 768px): Tablet
+// - lg: (≥ 1024px): Desktop
+// - xl: (≥ 1280px): Wide desktop
 ```
 
-Jede Zeile:
-- 60% Breite Balken-Bereich, 40% Wert in `font-mono` rechtsbündig
-- Balken: `bg-text-primary` (für sum/start), `bg-error/40` (für minus), Akzent für `highlighted: true`
-- Höhe pro Zeile: 40px
+### Mobile (< 640px)
 
-**Drei Section-Trenner** mit horizontaler Linie + Label (`font-mono text-xs text-text-muted uppercase tracking-wider`):
-1. `OPERATIVE PERFORMANCE`
-2. `FINANZIERUNGSEBENE`
-3. `STAATSANTEIL`
+**LessonLayout:**
+- Top-Bar: `h-12` statt `h-14`
+- Content: `px-4 py-6`
+- Footer: `px-4 py-3`
 
-**Tooltip-Interaktion:** Beim Klick auf eine Position öffnet sich ein Tooltip (`@radix-ui/react-tooltip` ODER simpler absolute-positionierter Container) mit Ein-Satz-Erklärung.
+**Slide 01 Briefing:**
+- Headline `text-3xl` statt `text-5xl`
+- Stat-Card: `grid-cols-1` statt `grid-cols-3` (untereinander)
 
-Beispiele:
-- COGS: "Direkte Kosten der Produktion: Material, Fertigungslöhne, Maschinenstunden."
-- SG&A: "Vertriebs- und Verwaltungskosten: Gehälter, Marketing, Büro."
-- D&A: "Abschreibungen auf Sachanlagen + Amortisation immaterieller Werte."
-- EBITDA: "Operative Profitabilität ohne Kapitalstruktur und Abschreibungen."
+**Slide 02 Bilanz/GuV:**
+- Karten: `grid-cols-1` statt `grid-cols-2` (untereinander), Höhe je 140px
 
-CTA: `Verstanden →`
+**Slide 03 Wasserfall:**
+- Schrift kleiner: `text-xs` für Labels
+- Position-Layout: Englisches Label oben, deutsches darunter (statt nebeneinander)
+- Werte rechts kleiner: `text-sm`
+- Sektion-Trennlinien dünner
 
-### Slide 04 – Margen-Vergleich
+**Slide 04 Margen:**
+- Balken-Höhe: `h-10` statt `h-12`
+- Werte am Ende: kleinere Schrift, ggf. unter den Balken bei Platzmangel
 
-Komponente: `Slide04Margins.tsx`
+**Slide 05 Formel-Drill:**
+- Formel: `text-lg` statt `text-2xl`, ggf. mit Zeilenumbruch nach `/`
+- Slots: `w-24 h-9` statt `w-32 h-10`
+- Wortpool: 2 Spalten statt 4
 
-Layout:
+**Slide 06 Cheat Sheet:**
+- KOMPLETT NEUES MOBILE-LAYOUT (siehe unten):
 
-1. Header: **"Vier Margen, eine Geschichte."**
-2. Subline: "Beispiel: TechCo, FY24, Umsatz €100M" in `font-mono text-text-muted`
-3. **Vier horizontale Balken** untereinander, Container-Breite identisch:
-   - Background-Track: `bg-bg-secondary rounded-md h-12`
-   - Fill-Bar: `bg-text-primary` (Bruttomarge zusätzlich `bg-accent`)
-   - Innen links: Label in `font-mono text-sm`
-   - Am Ende des Fills: Wert + abs in `font-mono text-sm`
-
-Daten:
-
-```ts
-const margins = [
-  { key: 'gross',  label: 'Gross Margin',     value: 40, abs: '€40M', highlighted: true,
-    explanation: 'Was nach den direkten Produktionskosten übrig bleibt. Hoher Wert = Pricing Power oder günstige Produktion.' },
-  { key: 'ebitda', label: 'EBITDA Margin',    value: 20, abs: '€20M',
-    explanation: 'Profitabilität ohne Kapitalstruktur und Abschreibungen. Lieblings-Kennzahl von PE-Funds, weil branchenübergreifend vergleichbar.' },
-  { key: 'ebit',   label: 'Operating Margin', value: 15, abs: '€15M',
-    explanation: 'Operative Profitabilität nach Abschreibungen. Realistischer als EBITDA, weil CapEx-Realität reflektiert wird.' },
-  { key: 'net',    label: 'Net Margin',       value: 9,  abs: '€9M',
-    explanation: 'Was am Ende für die Aktionäre übrig bleibt. Final Score nach allen Abzügen.' },
-]
+```tsx
+// Auf Mobile: Eine quadratische "Card-zum-Screenshotten"
+// Statt monospace-Tabelle, eine vertikale Liste mit größerer Typo
+// Größe: 320×450px, designt zum direkten Screenshot
+<div className="lg:hidden">
+  <CheatSheetMobile />  // Neue Komponente, vertikal, lesbar
+</div>
+<div className="hidden lg:block">
+  <CheatSheetDesktop /> // Aktuelles Bloomberg-Layout
+</div>
 ```
 
-4. **Tap-to-reveal:** Klick auf Balken öffnet Akkordeon-Panel darunter mit Erklärung.
+`CheatSheetMobile`-Layout:
+- Header: "GuV-Cheat-Sheet" in Serif, mittig
+- Drei Sektionen mit dünnen Trennlinien:
+  1. **Reihenfolge** (Revenue → Net Income), je Position eine Zeile mit `text-sm`
+  2. **Margen-Formeln**, je 2 Zeilen pro Formel
+  3. **Rule of Thumb** in italic
+- Padding: `p-5`, Background: `bg-bg-secondary`, Border: `border border-bg-border rounded-xl`
+- Optimiert für 375px-Display, kein horizontaler Scroll
 
-5. **MarcusNote unten:** *"Im Interview erwartet niemand, dass du Margen exakt nennst. Aber du musst die Hierarchie kennen: Brutto > EBITDA > EBIT > Netto. Immer."*
+**Slide 07 Pro-Tips:**
+- Cards: `min-h-[180px]` statt fester Höhe
+- Tag und Avatar in Body-Bereich integriert (kein leerer Header-Bereich)
+- Body-Text `text-sm`
 
-CTA: `Weiter →`
+**Slides 08–11 Quiz:**
+- Antwort-Optionen: voll-breit, höher (`py-4` statt `py-3`)
+- Frage-Text: `text-xl` statt `text-2xl`
 
-### Slide 05 – Formel-Drill (Fill-in-the-blank)
+**Slide 12 Retention:**
+- Stats-Cards: `grid-cols-1` (untereinander)
+- Streak/Level-Cards: `grid-cols-1`
+- Next-Action-Cards: `grid-cols-1`
+- Trophäen-Kreis: 80px statt 120px
 
-Komponente: `Slide05FormulaDrill.tsx`
+### Desktop (≥ 1024px)
 
-Layout:
+**LessonLayout bekommt ein optionales Side-Panel rechts** für mehr Bildschirmnutzung:
 
-1. Header: **"Schreib die Formel."**
-2. Subline: "Bruttomarge in 4 Bausteinen."
-3. **Formel mit Lücken** in `font-mono text-2xl`:
-```
-   Gross Margin = ( ___ − ___ ) / ___ × 100%
-```
-   Slot-Stil: `border-2 border-dashed border-bg-border rounded-md w-32 h-10 inline-flex items-center justify-center`
-
-4. **Wortpool** (4 Buttons in zufälliger Reihenfolge):
-   - `Revenue`, `COGS`, `Revenue` (zweimal!), `EBIT` (Distraktor)
-   - Stil: `bg-bg-secondary border border-bg-border rounded-md px-4 py-2 font-mono text-sm hover:bg-bg-tertiary cursor-pointer`
-
-5. **Logik:**
-   - Klick auf Baustein → wandert in nächste freie Slot via Framer-Motion `layoutId`
-   - Korrekte Reihenfolge: Revenue → COGS → Revenue
-   - Bei Vollständig-richtig: Slots glühen (`border-accent`), MarcusNote: *"Im echten Interview wirst du diese Formel mündlich aufsagen müssen. Übe das laut. Ja, wirklich."*
-   - Bei falsch: betroffener Slot pulsiert `border-error`, Baustein springt zurück
-   - Reset-Button "Nochmal" in der Box oben rechts
-
-CTA: `Weiter →` (disabled bis Formel komplett UND korrekt)
-
-### Slide 06 – Cheat Sheet
-
-Komponente: `Slide06CheatSheet.tsx`
-
-Layout:
-
-1. Header: **"Cheat Sheet"**
-2. Subline: "Screenshot-tauglich." in `italic text-text-secondary`
-3. **Cheat-Sheet-Card** im Bloomberg-Terminal-Look:
-   - Container: `bg-bg-secondary border border-bg-border rounded-xl p-6 font-mono text-sm text-text-primary`
-   - Code-Anzeige oben rechts: `[01]` in `text-text-muted`
-   - Inhalt mit `<pre>` für Ausrichtung:
-
-```
-GUV CHEAT SHEET                       [01]
-──────────────────────────────────────────
-REVENUE                              €200M
- − COGS                              −120M
- = GROSS PROFIT                       €80M
- − SG&A                               −40M
- = EBITDA                             €40M
- − D&A                                −10M
- = EBIT                               €30M
- − INTEREST                            −5M
- = EBT                                €25M
- − TAXES                               −7M
- = NET INCOME                         €18M
-──────────────────────────────────────────
-GROSS MARGIN  = (REV − COGS) / REV
-EBITDA MARGIN = EBITDA / REV
-OP. MARGIN    = EBIT / REV
-NET MARGIN    = NET INCOME / REV
-──────────────────────────────────────────
-RULE OF THUMB
-EBITDA blendet CapEx aus.
-Buffett hasst EBITDA. Du auch.
+```tsx
+<div className="h-screen flex flex-col bg-bg-primary">
+  <header>...</header>
+  <div className="flex-1 flex overflow-hidden">
+    {/* Main Content */}
+    <main className="flex-1 overflow-y-auto">
+      <div className="max-w-2xl mx-auto px-6 py-12">
+        {children}
+      </div>
+    </main>
+    
+    {/* Side-Panel: nur ab lg sichtbar */}
+    <aside className="hidden lg:flex w-72 flex-shrink-0 border-l border-bg-border flex-col">
+      <SidePanel currentStep={currentStep} totalSteps={totalSteps} />
+    </aside>
+  </div>
+  <footer>...</footer>
+</div>
 ```
 
-4. **Drei Buttons** (`grid grid-cols-3 gap-4`):
-   - **"Als PNG speichern"** → `html-to-image` konvertiert die Card und triggert Download
-   - **"In Notion kopieren"** → kopiert formatierten Text in Clipboard via `navigator.clipboard.writeText()`
-   - **"Weiter →"** → primärer CTA in Akzent
+`SidePanel`-Inhalt:
+- Oben: Lektions-Title "Income Statement" (small, monospace)
+- **Streak-Card:** `🔥 Tag 1 / 7` mit Mini-Progress
+- **XP-Card:** "Diese Session: +XX XP" (live-update)
+- **Lesson-Map:** Liste aller 12 Slides als Mini-Indikatoren (1 abgeschlossen = filled, current = highlighted, kommend = empty)
+- Unten: Marcus-Avatar mit "Brauchst du Hilfe?" → öffnet Hint-Modal (nice-to-have, kann später kommen)
 
-Stelle sicher, dass die Card als eigenständiger Screenshot funktioniert (ausreichend Padding, keine abgeschnittenen Elemente).
+Dadurch wirkt Desktop nicht mehr wie eine Mobile-Webview.
 
-## 📁 EMPFOHLENE DATEISTRUKTUR (Phase 1)
+## 🔊 SOUND-SYSTEM
+
+Implementiere ein zentrales Sound-System. Sounds müssen:
+- Subtil und premium klingen (kein Cartoon, keine Game-Sounds)
+- Per Mute-Toggle deaktivierbar sein (Persistierung in localStorage)
+- Nicht beim ersten Page-Load triggern (User-Interaction-Anforderung der Browser)
+
+### Sound-Files
+
+Lege diese Files an unter `public/sounds/`:
 
 ```
-app/
-  lesson/
-    income-statement/
-      page.tsx                    // Wird in Phase 2 zusammengebaut
-components/
-  lesson/
-    LessonLayout.tsx
-    MarcusNote.tsx
-    income-statement/
-      Slide01Briefing.tsx
-      Slide02BalanceVsIS.tsx
-      Slide03Waterfall.tsx
-      Slide04Margins.tsx
-      Slide05FormulaDrill.tsx
-      Slide06CheatSheet.tsx
-      data.ts
-lib/
-  fonts.ts
+public/sounds/
+  click.mp3              // Subtle UI tick (~50ms, sehr leise)
+  correct.mp3            // Kurzer "ping" für richtige Antwort (~200ms)
+  wrong.mp3              // Tiefer "thud" für falsche Antwort (~300ms)
+  complete.mp3           // Belohnungs-Chime für Lektion-Ende (~800ms)
+  reveal.mp3             // Soft "swoosh" für Tap-to-reveal (~150ms)
+  streak.mp3             // Subtiler "shing" für Streak-Increase (~400ms)
 ```
 
-## ✅ ACCEPTANCE CRITERIA Phase 1
+**Hinweis:** Da wir keine echten Sound-Files haben, dokumentiere im Code, welche Sounds erwartet werden, und nutze Platzhalter. Empfehle dem User, kostenlose Sounds von Quellen wie freesound.org, zapsplat.com oder Mixkit zu beziehen. Teste die Implementierung mit Beep-Tönen oder dummy-Files.
 
-Bevor du Phase 1 als fertig betrachtest:
+### Sound-Hook
 
-1. Branch `feature/lesson-income-statement-redesign` existiert und ist aktiv
-2. Tailwind-Config enthält das vollständige Farbsystem
-3. Drei Fonts sind via `next/font` eingebunden
-4. `MarcusNote` und `LessonLayout` funktionieren als Standalone-Komponenten
-5. Slides 01–06 sind als einzelne Komponenten implementiert und können in einer Demo-Page einzeln aufgerufen werden
-6. Keine Lila-, Pink- oder Standard-Blau-Töne irgendwo im Code
-7. Keine 3D-Emojis, kein Wolfgang, kein "Rudel"
-8. Mobile-First: alle Slides funktionieren auf 375px Breite ohne horizontalen Scroll
-9. Keyboard-Accessibility: Tab-Navigation funktioniert, Enter triggert primäre CTAs
-10. Alle Texte konsistent: englische Fachbegriffe (Revenue, COGS, EBITDA) bleiben Englisch, Erklärungen auf Deutsch
-11. Saubere Commit-History mit den oben genannten Commit-Messages
+Erstelle `hooks/useSounds.ts`:
+
+```tsx
+'use client'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+export type SoundType = 'click' | 'correct' | 'wrong' | 'complete' | 'reveal' | 'streak'
+
+const SOUND_FILES: Record<SoundType, string> = {
+  click: '/sounds/click.mp3',
+  correct: '/sounds/correct.mp3',
+  wrong: '/sounds/wrong.mp3',
+  complete: '/sounds/complete.mp3',
+  reveal: '/sounds/reveal.mp3',
+  streak: '/sounds/streak.mp3',
+}
+
+const VOLUMES: Record<SoundType, number> = {
+  click: 0.15,
+  correct: 0.4,
+  wrong: 0.35,
+  complete: 0.5,
+  reveal: 0.25,
+  streak: 0.4,
+}
+
+export function useSounds() {
+  const [muted, setMuted] = useState(false)
+  const audioCache = useRef<Partial<Record<SoundType, HTMLAudioElement>>>({})
+
+  // Init from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem('sounds-muted')
+    if (stored === 'true') setMuted(true)
+  }, [])
+
+  const toggleMute = useCallback(() => {
+    setMuted(prev => {
+      const next = !prev
+      localStorage.setItem('sounds-muted', String(next))
+      return next
+    })
+  }, [])
+
+  const play = useCallback((sound: SoundType) => {
+    if (muted) return
+    if (typeof window === 'undefined') return
+    
+    try {
+      let audio = audioCache.current[sound]
+      if (!audio) {
+        audio = new Audio(SOUND_FILES[sound])
+        audio.volume = VOLUMES[sound]
+        audioCache.current[sound] = audio
+      }
+      audio.currentTime = 0
+      audio.play().catch(() => { /* Browser blocked autoplay – ignore */ })
+    } catch (e) {
+      // Sound file might not exist yet
+    }
+  }, [muted])
+
+  return { play, muted, toggleMute }
+}
+```
+
+### Integration
+
+Verbinde den Mute-Toggle in der Top-Bar mit dem Hook:
+
+```tsx
+// LessonLayout.tsx
+const { muted, toggleMute } = useSounds()
+
+<button onClick={toggleMute} aria-label={muted ? 'Sound an' : 'Sound aus'}>
+  {muted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+</button>
+```
+
+Triggere Sounds an folgenden Stellen (Beispiele):
+
+```tsx
+// Beim Klick auf primären CTA
+<button onClick={() => { play('click'); onNext() }}>Weiter</button>
+
+// In Slide02 (Tap-to-reveal):
+const handleSelect = (option: 'left' | 'right') => {
+  const correct = option === 'right'
+  play(correct ? 'correct' : 'wrong')
+  // ...
+}
+
+// In Slide03 (Wasserfall): bei Tap auf Position
+play('reveal')
+
+// In Slide12 (Result-Screen): beim Mount
+useEffect(() => { play('complete') }, [])
+
+// Bei Streak-Update:
+play('streak')
+```
+
+**Wichtig:** Sound-Volume sollte zurückhaltend sein. IB-Studenten lernen oft im Café/Lib – laute Sounds sind disqualifizierend.
+
+## 🎨 WEITERE FIXES (mittlere Priorität)
+
+### Fix 4: Marcus-Frequenz reduzieren
+
+Aktuell spricht Marcus auf fast jeder Slide. Reduzieren auf max. 1 von 3 Slides. Konkret:
+
+- **Slide 1:** Marcus (Intro) – behalten
+- **Slide 2:** Marcus (Erklärung) – behalten
+- **Slide 3:** KEIN Marcus – nur Wasserfall mit Tooltips
+- **Slide 4:** Marcus (Hierarchie-Quote) – behalten
+- **Slide 5:** KEIN Marcus – Formel-Erfolg reicht visuell
+- **Slide 6:** KEIN Marcus
+- **Slide 7:** Marcus auf jeder Card (das ist sein Bereich) – behalten
+- **Slides 8–11:** Marcus nur bei Quiz-Lösung (richtig oder falsch), nicht in der Frage
+- **Slide 12:** Marcus (Final-Email) – behalten
+
+Total: Marcus auf ca. 6 von 12 Slides statt 11 von 12.
+
+### Fix 5: Pro-Tip-Cards Layout
+
+Aktuell zu viel Leerraum oben. Refactor:
+
+```tsx
+// VORHER: Tag oben links, Avatar oben rechts, riesiger leerer Bereich, Body unten
+// NACHHER: 
+<Card className="min-h-[200px] p-6 flex flex-col gap-4">
+  <div className="flex items-center justify-between">
+    <Tag color="strategy">STRATEGY</Tag>
+    {/* KEIN Avatar oben */}
+  </div>
+  <p className="text-base leading-relaxed flex-1">{body}</p>
+  <div className="flex items-center gap-2 pt-3 border-t border-bg-border">
+    <MarcusAvatar size="sm" />
+    <span className="text-xs text-text-muted font-mono">— Marcus Hart</span>
+  </div>
+</Card>
+```
+
+Tag-Farben differenzieren:
+- `STRATEGY` → Akzent-Orange
+- `WARNING` → Amber `#FFB800`
+- `MISTAKE` → Error-Rot
+
+### Fix 6: Stat-Card auf Slide 1 verkleinern
+
+Aktuelle Höhe ca. 100px. Reduzieren auf ~70px durch:
+- `py-3` statt `py-4`
+- Werte `text-xl` statt `text-2xl`
+- Labels noch kleiner: `text-[10px]` mit `tracking-widest`
+
+### Fix 7: "EBIT"-Distraktor in Formel-Drill (Slide 5)
+
+Pool-Bereich klar als "übrig" kennzeichnen:
+
+```tsx
+<div className="mt-4 pt-4 border-t border-bg-border">
+  <p className="text-xs text-text-muted font-mono uppercase mb-2">Nicht verwendet</p>
+  <div className="flex flex-wrap gap-2">
+    {unusedTokens.map(token => <Token>{token}</Token>)}
+  </div>
+</div>
+```
+
+### Fix 8: Subline-Inkonsistenz
+
+Slide 5: "Bruttomarge in 3 Bausteinen" → korrigieren zu "Bruttomarge in 4 Bausteinen" (Revenue, COGS, Revenue, Operator).
+
+### Fix 9: Touch-Targets
+
+Alle interaktiven Elemente min. `min-h-[44px]` und `min-w-[44px]`. Besonders die Drag-Handles in Slide 8 sind aktuell zu klein.
+
+## 🧪 ACCEPTANCE CRITERIA
+
+Bevor du Phase 3a als fertig betrachtest, teste:
+
+1. **Bug 1 weg:** Auf KEINEM Slide sind zwei primäre CTA-Buttons gleichzeitig sichtbar
+2. **Bug 2 weg:** Auf Bildschirmen 600px–1200px Höhe scrollt die Page niemals, nur der Main-Bereich
+3. **Mobile (375px Breite):** Alle 12 Slides sind ohne horizontalen Scroll lesbar und bedienbar
+4. **Tablet (768px):** Layout passt sich an, alles bedienbar
+5. **Desktop (1440px):** Side-Panel ist sichtbar, kein leerer Raum mehr links/rechts
+6. **Quiz-Slide 9:** Falsche Antwort führt zu Hint + Nochmal-Versuch, erst zweite falsche zu nächster Frage
+7. **Sound-System:** Mute-Toggle funktioniert, persistiert in localStorage, Sounds spielen bei den definierten Events
+8. **Marcus-Frequenz:** Max. auf 6 von 12 Slides
+9. **Lighthouse Mobile:** Performance ≥ 85, Accessibility ≥ 90
+10. **Keyboard-Navigation:** Tab durch alle Slides, Enter triggert primäre CTAs
 
 ## 🚀 IMPLEMENTIERUNGS-REIHENFOLGE
 
-Arbeite in dieser Reihenfolge ab und committe nach jedem Schritt. Frag mich nach jedem Schritt, ob ich Änderungen will:
+1. **Branch erstellen** (siehe Git-Workflow)
+2. **LessonLayout refactoren** (Footer-Slot-Pattern + h-screen-Struktur)
+3. **LessonFooterCTA-Komponente** anlegen
+4. **Alle 12 Slides anpassen** an neuen Footer-Pattern (sehr wichtig: keine internen primären CTAs mehr, immer als Footer übergeben)
+5. **Responsive Breakpoints** Slide für Slide umsetzen
+6. **Side-Panel-Komponente** (Desktop) bauen
+7. **CheatSheetMobile** als separate Komponente bauen
+8. **Quiz-Slides:** Falsch-Antwort-Logik mit Zweit-Versuch
+9. **Sound-System:** Hook + Integration in alle relevanten Slides
+10. **Marcus-Reduzierung:** Quote-Komponenten aus Slides entfernen, wo nicht mehr nötig
+11. **Polishing-Fixes** (Pro-Tip-Cards, Stat-Card, Distraktor, Touch-Targets)
+12. **Manuelles Testen** auf 3 Viewport-Größen (375, 768, 1440)
+13. **Push & PR**
 
-1. **Branch erstellen** (siehe Git-Workflow oben)
-2. **Setup:** Dependencies installieren, Tailwind-Config erweitern, Fonts in `lib/fonts.ts` einbinden, Root-Layout aktualisieren
-3. **Shared Components:** `MarcusNote.tsx`, `LessonLayout.tsx`
-4. **Slide 01** Briefing
-5. **Slide 02** Bilanz vs. GuV
-6. **Slide 03** Wasserfall (zeitintensivster Slide – nimm dir Zeit)
-7. **Slide 04** Margen
-8. **Slide 05** Formel-Drill
-9. **Slide 06** Cheat Sheet
+Frag mich nach jedem implementierten Schritt, ob du mit den Änderungen weitermachen oder Anpassungen vornehmen sollst.
 
-Optional: Erstelle eine temporäre `/dev/lesson-preview`-Route, in der du die einzelnen Slides isoliert testen kannst.
+Phase 3b (Inhaltliche Vereinfachung für Beginner-Niveau) folgt im selben Branch nach Bestätigung.
 
-Wenn du an einer Stelle einen besseren Vorschlag hast (z.B. elegantere Animation, sauberere State-Lösung), schlage ihn aktiv vor – aber halte dich strikt an Farben, Typografie und Tonfall.
-
-Phase 2 (Slides 07–12 + Routing + State-Management) folgt im selben Branch nach deiner Bestätigung, dass Phase 1 fertig ist.
-
-Los geht's mit Schritt 1 (Branch erstellen).
+Los geht's mit Schritt 1 (Branch erstellen + LessonLayout refactoren).

@@ -1,399 +1,442 @@
-# 🐺 Lektion-Redesign Phase 2: Slides 7–12 + Routing + State-Management
+# 🎓 Phase 3b: Inhaltliche Vereinfachung für echtes Beginner-Niveau
 
-Phase 1 ist abgeschlossen. Du arbeitest weiter im selben Branch `feature/lesson-income-statement-redesign`.
+Phase 3a (Plattform-Stabilisierung) ist abgeschlossen. Du arbeitest weiter im selben Branch `feature/lesson-platform-stability`.
+
+## 🎯 ZIEL DIESER PHASE
+
+Die aktuelle Lektion "Income Statement" ist zu schwer für einen echten Beginner (Profil A: BWL-Erstsemester oder fachfremder Student, hat noch nie EBITDA, COGS, Margin gehört). Sie wirft 11 Konzepte auf einen Slide, mischt Englisch/Deutsch, und Marcus' zynischer Tonfall schreckt Anfänger ab.
+
+Wir bauen die Lektion um auf das echte Beginner-Niveau, **OHNE die Premium-Optik zu verlieren**. Die App bleibt visuell identisch – nur Content, Konzept-Dichte und Marcus-Tonfall werden angepasst.
 
 ## 🌿 GIT-WORKFLOW
 
-1. Stelle sicher, dass du noch im Branch `feature/lesson-income-statement-redesign` bist:
-```bash
-   git branch --show-current
-```
-2. Falls nicht: `git checkout feature/lesson-income-statement-redesign`
-3. Pull falls nötig: `git pull origin feature/lesson-income-statement-redesign` (falls schon gepusht)
-4. Committe weiter in logischen Schritten:
-   - `feat(lesson): implement slide 07 pro tips carousel`
-   - `feat(lesson): implement slide 08 quiz sort`
-   - `feat(lesson): implement slide 09 quiz calc`
-   - `feat(lesson): implement slide 10 quiz multi-select`
-   - `feat(lesson): implement slide 11 quiz hierarchy`
-   - `feat(lesson): implement slide 12 retention hub`
-   - `feat(lesson): wire up income statement lesson routing and state machine`
-   - `chore(lesson): polish animations and mobile layouts`
-5. Erst nach abgeschlossener Phase 2:
-```bash
-   git push origin feature/lesson-income-statement-redesign
-```
-6. Pull Request öffnen mit Titel: `feat(lesson): redesign income statement lesson with marcus coach`
+1. Du bleibst im Branch `feature/lesson-platform-stability` (oder erstelle einen neuen Branch `feature/lesson-beginner-content` aus diesem)
+2. Committe in logischen Schritten:
+   - `refactor(lesson): simplify waterfall to 5 core positions`
+   - `refactor(lesson): reduce margins to gross and net for beginner`
+   - `feat(lesson): add gentle marcus persona for first lessons`
+   - `refactor(quiz): reduce to 2 quiz questions for first lesson`
+   - `feat(lesson): add ebitda cliffhanger preview at end`
+   - `refactor(content): simplify wording and add german-first labels`
+3. Push nach Abschluss + PR
 
-## 🛠️ ZUSÄTZLICHE DEPENDENCIES (falls nicht in Phase 1 installiert)
+## 📚 KONZEPTIONELLE ÄNDERUNGEN
 
-```bash
-npm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
-npm install embla-carousel-react
-```
+### Marcus' Persona-Wechsel: "Onboarding Marcus"
 
-## 🎨 DESIGN SYSTEM
+Marcus bleibt als Coach, aber sein Tonfall ist in den ersten 3 Lektionen **freundlicher und einladender**, weniger zynisch. Das ist nicht "weichgespült" – das ist einfach didaktisch korrekt: Du brauchst Vertrauen, bevor du Druck ausübst.
 
-Bleibt identisch zu Phase 1. Nutze die gleichen Tailwind-Tokens, Fonts und `MarcusNote`/`LessonLayout`-Komponenten.
+**Regel:** In den ersten 3 Lektionen verwendet Marcus:
+- Begrüßung statt Drohung ("Schön, dass du da bist." statt "Mach das ordentlich, sonst...")
+- Konkretes, ermutigendes Lob ("Genau das wollte ich hören." statt "Sauber. Diese Reihenfolge musst du im Schlaf können.")
+- Hilfsangebote bei Fehlern ("Kein Stress – das ist genau die Stelle, an der die meisten stolpern. Hier ist der Trick:...")
 
-**Erinnerung:** Keine Lila-, Pink- oder Standard-Blau-Töne. Keine 3D-Emojis. Keine Hype-Sprache. Marcus bleibt trocken-britisch-zynisch.
+**Ab Lektion 4** (Bilanz-Vertiefung) wird Marcus dann der zynische MD, den wir kennen. Das gibt eine echte Charakterentwicklung und einen Anreiz, weiterzumachen.
 
-## 📋 SLIDES 7–12
-
-### Slide 07 – Interview-Tipps (3 Pro-Cards, swipeable)
-
-Komponente: `components/lesson/income-statement/Slide07ProTips.tsx`
-
-Layout:
-
-1. Header: **"Drei Moves, die dich vom Rest abheben."** in `font-serif text-4xl`
-2. **Horizontaler Card-Carousel** mit `embla-carousel-react`, snap-x snap-mandatory, 3 Cards à `min-w-full`
-
-Card-Stil einheitlich:
-- Container: `bg-bg-secondary border border-bg-border rounded-xl p-6 min-h-[280px]`
-- Tag oben links: `font-mono text-xs text-accent uppercase tracking-wider`
-- Marcus-Avatar oben rechts (32px Kreis mit "MH")
-- Body: `font-sans text-text-primary leading-relaxed`
-
-**Card 1 – Tag: `STRATEGY`:**
-> *"Wenn ein MD fragt 'Walk me through the income statement', fang immer bei Revenue an, nicht bei Net Income. Top-down zeigt, dass du das System verstehst. Bottom-up zeigt, dass du Kennzahlen auswendig gelernt hast."*
-
-**Card 2 – Tag: `WARNING`:**
-> *"Wenn du EBITDA nennst, nenne immer im selben Atemzug, was es ausblendet: CapEx, Zinsen, Steuern, Working Capital. Sonst springt der MD darauf an: 'And what's wrong with EBITDA?' – und du stehst im Regen."*
-
-**Card 3 – Tag: `MISTAKE`:**
-> *"Verwechsle nie Brutto- mit Operativer Marge. Klassischer 1st-Year-Fehler. Brutto = nur direkte Kosten weg. Operativ = auch Vertrieb und Verwaltung weg."*
-
-3. **Swipe-Indikator unten:** drei Dots (8px), aktive `bg-accent`, andere `bg-bg-border`
-4. **CTA wechselt dynamisch:**
-   - Card 1, 2: `Nächster Tipp →`
-   - Card 3: `Quiz starten →`
-
-### Slide 08 – Quiz Frage 1: Drag-and-Sort
-
-Komponente: `Slide08QuizSort.tsx`
-
-Layout:
-
-1. Header oben: `Frage 1 / 4 · +10 XP` in `font-mono text-xs text-text-muted`
-2. Aufgabe: **"Bringe die GuV-Positionen in die richtige Reihenfolge."**
-3. **Sechs sortierbare Karten** via `@dnd-kit/sortable`:
-
-   Initialreihenfolge (zufällig gemischt): `SG&A`, `Net Income`, `Revenue`, `EBIT`, `Gross Profit`, `EBITDA`
-
-   Korrekte Reihenfolge (top to bottom): `Revenue → Gross Profit → SG&A → EBITDA → EBIT → Net Income`
-
-4. Karten-Stil:
-   - `bg-bg-secondary border border-bg-border rounded-lg p-4 mb-2`
-   - Drag-Handle links: `<GripVertical size={16} className="text-text-muted" />`
-   - Position-Name in `font-mono text-base`
-   - Im Drag-State: `opacity-50 border-accent`
-
-5. **State:** `useState<{correct: boolean | null, attempts: number}>({correct: null, attempts: 0})`
-
-6. **Bei "Antwort prüfen":**
-   - Richtige Positionen: `border-success bg-success/10`
-   - Falsche Positionen: `border-error bg-error/10` mit kleinem Pfeil-Indikator zur richtigen Position
-7. **MarcusNote bei Vollständig-Korrekt:** *"Sauber. Diese Reihenfolge musst du im Schlaf können."*
-8. **Streak-Pille unten** (erscheint nach Erfolg): `🔥 1 in Folge richtig` in `font-mono text-xs`
-
-CTA: `Antwort prüfen` → nach Prüfung: `Nächste Frage →`
-
-### Slide 09 – Quiz Frage 2: Bruttomarge berechnen
-
-Komponente: `Slide09QuizCalc.tsx`
-
-Layout:
-
-1. Header: `Frage 2 / 4 · +10 XP`
-2. Aufgabe: **"TechCo: Umsatz €200M, COGS €120M. Wie hoch ist die Bruttomarge?"**
-3. **Vier Antwort-Optionen** (Buchstaben A–D in mono links, Wert in regular):
-   - A) `60%`
-   - B) `40%` (richtig)
-   - C) `80%`
-   - D) `20%`
-
-4. Stil pro Option:
-   - Idle: `bg-bg-secondary border border-bg-border rounded-lg p-4 hover:bg-bg-tertiary cursor-pointer`
-   - Selected: `border-text-primary`
-   - Korrekt nach Submit: `border-success bg-success/10`
-   - Falsch nach Submit: `border-error bg-error/10`
-
-5. **Bei richtiger Antwort:**
-   - MarcusNote: *"Korrekt. Rechenweg: (200 − 120) / 200 = 40%."*
-   - Streak: `🔥 2 in Folge richtig`
-
-6. **Bei falscher Antwort:**
-   - Marcus zeigt Rechenweg
-   - **Wichtig:** Statt direkt weiter, biete "Hinweis"-Button + "Nochmal versuchen" an
-   - Erst nach zweitem Versuch geht's weiter (XP reduziert: +5 statt +10)
-
-CTA: `Antwort prüfen` / `Nächste Frage →`
-
-### Slide 10 – Quiz Frage 3: EBITDA-Komponenten (Multi-Select)
-
-Komponente: `Slide10QuizMultiSelect.tsx`
-
-Layout:
-
-1. Header: `Frage 3 / 4 · +15 XP` (höhere XP)
-2. Aufgabe: **"EBITDA = Earnings Before \_\_\_, \_\_\_, \_\_\_ und \_\_\_."**
-3. **8 Wort-Bausteine** als Toggle-Buttons (max. 4 wählbar):
-
-   Richtig: `Interest`, `Taxes`, `Depreciation`, `Amortization`
-
-   Distraktoren: `Income`, `Dividends`, `Equity`, `Inventory`
-
-4. Stil pro Button:
-   - Idle: `bg-bg-secondary border border-bg-border rounded-md px-4 py-3 font-mono text-sm`
-   - Selected: `border-accent bg-accent/10`
-   - Korrekt nach Submit: `border-success`
-   - Falsch nach Submit: `border-error`
-   - Vergessen-richtig nach Submit: `border-success border-dashed`
-
-5. Counter sichtbar: "X / 4 ausgewählt" in `font-mono text-text-muted`
-6. **MarcusNote bei voller Korrektheit:** *"Das musst du wörtlich im Interview aufsagen können. Üb das vor dem Spiegel. Ja, wirklich."*
-7. **Persistenter Hint unten** (immer sichtbar): *"D&A = Depreciation & Amortization. Eine Größe, zwei Wörter, weil Sachanlagen abgeschrieben und immaterielle Werte amortisiert werden."*
-
-CTA: `Antwort prüfen` (disabled bis 4 ausgewählt) / `Nächste Frage →`
-
-### Slide 11 – Quiz Frage 4: Margen-Hierarchie
-
-Komponente: `Slide11QuizHierarchy.tsx`
-
-Layout:
-
-1. Header: `Frage 4 / 4 · +15 XP`
-2. Aufgabe: **"Welche Marge ist immer am höchsten?"**
-3. Vier Optionen (Stil identisch zu Slide 09):
-   - A) `Net Margin`
-   - B) `Operating Margin`
-   - C) `Gross Margin` (richtig)
-   - D) `EBITDA Margin`
-4. **MarcusNote bei richtiger Antwort:** *"Korrekt. Bruttomarge ganz oben in der Hierarchie – nur direkte Kosten abgezogen. Wer das verwechselt, klingt wie ein Bachelor-Erstsemester."*
-5. **Streak-Update:** `🔥 4 in Folge richtig · Quiz abgeschlossen`
-
-CTA: `Ergebnis ansehen →`
-
-### Slide 12 – Retention Hub (DER WICHTIGSTE SLIDE)
-
-Komponente: `Slide12Retention.tsx`
-
-Dieser Slide entscheidet über Re-Engagement. Nimm dir besonders Zeit.
-
-Vier Sektionen, vertikal gestapelt:
-
-#### Sektion 1 – Result-Header
-
-- Animierter SVG-Kreis (Durchmesser 120px). Linie füllt sich von 0 auf 360° in 1.2s ease-out, Akzent-Farbe.
-- In der Mitte: **"4 / 4"** in `font-serif text-4xl`
-- Darunter: **"Modul 01 abgeschlossen."** in `font-serif text-3xl`
-- Drei Stats (`grid grid-cols-3 gap-4`):
-
-   | ACCURACY | TIME | XP EARNED |
-   |----------|------|-----------|
-   | 100% | 06:42 | +55 |
-
-   Werte in `font-mono text-3xl text-text-primary`, Labels in `font-mono text-xs text-text-muted uppercase`
-
-#### Sektion 2 – Streak & Level
-
-Zwei Cards (`grid grid-cols-2 gap-4`):
-
-**Card A – Streak:**
-- Header: `🔥 STREAK` in `font-mono text-xs text-gold uppercase`
-- Wert: **"Tag 1 / 7"** in `font-serif text-3xl`
-- Progress-Bar: 7 Segmente, 1 gefüllt (gold), Rest `bg-bg-border`
-- Footnote: "Komm morgen wieder, sonst startet's bei Null." in `text-xs text-text-muted`
-
-**Card B – Level:**
-- Header: `LEVEL`
-- Wert: **"Level 1 → Level 2"**
-- Linearer Progress-Bar: 55/200 XP, Akzent-Farbe
-- Footnote: "Noch 145 XP bis Level 2."
-
-#### Sektion 3 – Marcus-Feedback
-
-Volle MarcusNote:
-- Subject: `Re: Solid first session`
-- Body: *"Du hast die GuV-Mechanik in 6:42 durch. Realität: 80% der Bewerber verwechseln EBITDA und EBIT. Du nicht mehr. Morgen: Bilanz-Logik – das brauchst du für die DCF-Lektion in Woche 2."*
-
-#### Sektion 4 – Next Action (3 Cards)
-
-`grid grid-cols-3 gap-4` (Mobile gestapelt):
-
-**Card 1 (PRIMÄR – Akzent-Border):**
-- Tag: `EMPFOHLEN`
-- Titel: "Modul 02 – Balance Sheet"
-- Subtitle: "9 Min · +60 XP"
-- CTA-Button: `Jetzt starten`
-
-**Card 2 (SEKUNDÄR):**
-- Titel: "Cheat Sheet runterladen"
-- Subtitle: "PDF · Druckbar"
-- CTA: `Download`
-
-**Card 3 (SOZIAL):**
-- Titel: "Du bist im Top 18%"
-- Subtitle: "von 1.247 Nutzern dieser Woche"
-- CTA: `Leaderboard ansehen`
-
-> **Hinweis für Phase 2:** Da Supabase noch nicht integriert ist, sind die Werte (Top 18%, 1.247 Nutzer, Streak Tag 1/7, 55/200 XP) als Mock-Daten in einer `mockData.ts` zu definieren. Sobald Supabase integriert wird, werden diese durch echte Daten ersetzt.
-
-#### Footer-Banner (PWA-Install-Hint, dezent)
-
-- `bg-bg-secondary border border-bg-border rounded-md p-3`
-- Text: "💡 Installiere als App für Push-Reminder und Offline-Modus."
-- Rechts kleiner "Installieren"-Link in Akzent
-
-## 📦 ROUTING & STATE-MANAGEMENT
-
-### `app/lesson/income-statement/page.tsx`
+Erstelle einen `tone`-Parameter für Marcus:
 
 ```tsx
-'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { LessonLayout } from '@/components/lesson/LessonLayout'
-import Slide01Briefing from '@/components/lesson/income-statement/Slide01Briefing'
-// ... alle 12 Slide-Imports
-
-type QuizResult = { correct: boolean; attempts: number }
-type QuizResults = {
-  q1: QuizResult | null
-  q2: QuizResult | null
-  q3: QuizResult | null
-  q4: QuizResult | null
-}
-
-const SLIDES = [
-  Slide01Briefing,
-  Slide02BalanceVsIS,
-  Slide03Waterfall,
-  Slide04Margins,
-  Slide05FormulaDrill,
-  Slide06CheatSheet,
-  Slide07ProTips,
-  Slide08QuizSort,
-  Slide09QuizCalc,
-  Slide10QuizMultiSelect,
-  Slide11QuizHierarchy,
-  Slide12Retention,
-] as const
-
-export default function IncomeStatementLessonPage() {
-  const router = useRouter()
-  const [currentStep, setCurrentStep] = useState(0)
-  const [quizResults, setQuizResults] = useState<QuizResults>({
-    q1: null, q2: null, q3: null, q4: null
-  })
-  const [startTime] = useState(Date.now())
-  const [canProceed, setCanProceed] = useState(false)
-
-  const totalXp = calculateTotalXp(quizResults)
-  const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000)
-  const accuracy = calculateAccuracy(quizResults)
-
-  const Slide = SLIDES[currentStep]
-
-  return (
-    <LessonLayout
-      currentStep={currentStep + 1}
-      totalSteps={12}
-      onBack={() => currentStep > 0 ? setCurrentStep(s => s - 1) : router.back()}
-      onNext={() => setCurrentStep(s => s + 1)}
-      nextDisabled={!canProceed}
-    >
-      <Slide
-        onAnswer={(slideKey: keyof QuizResults, result: QuizResult) =>
-          setQuizResults(prev => ({ ...prev, [slideKey]: result }))
-        }
-        onCanProceed={setCanProceed}
-        onNext={() => setCurrentStep(s => s + 1)}
-        // Nur an Slide12 übergeben:
-        results={currentStep === 11 ? { quizResults, totalXp, elapsedSeconds, accuracy } : undefined}
-      />
-    </LessonLayout>
-  )
+// components/lesson/MarcusNote.tsx erweitern:
+interface MarcusNoteProps {
+  subject?: string
+  body: string | React.ReactNode
+  tone?: 'gentle' | 'sharp'  // gentle = Lektion 1-3, sharp = ab Lektion 4
 }
 ```
 
-### XP-Berechnungs-Logik
+Visuell ändert sich nichts – nur der Inhalt der Quotes folgt dem Tone.
+
+### Konzept-Dichte: Aus 11 wird 5
+
+Die Wasserfall-Slide wird radikal reduziert. Statt 11 Positionen (Revenue, COGS, Gross Profit, SG&A, EBITDA, D&A, EBIT, Interest, EBT, Taxes, Net Income) zeigen wir nur 5:
+
+1. **Revenue** (Umsatz)
+2. **Gross Profit** (Bruttoergebnis)
+3. **EBITDA**
+4. **EBIT**
+5. **Net Income** (Jahresüberschuss)
+
+Die Abzüge (COGS, SG&A, D&A, Interest, Taxes) werden als kleine `+`-Symbole zwischen den 5 Hauptpositionen angedeutet, mit Tooltip-Text wie:
+
+> *"Hier werden die Herstellungskosten (COGS) abgezogen. Mehr dazu in Lektion 2."*
+
+Das schafft eine klare Hierarchie: 5 muss-wissen-Konzepte, 6 hier-ist-eine-Vorschau-Konzepte.
+
+## 📋 SLIDE-FÜR-SLIDE-ÄNDERUNGEN
+
+### Slide 1 – Briefing (sanftere Einleitung)
+
+**Marcus-Quote ändern:**
+
+VORHER:
+> "Diese Lektion deckt 8 von 12 GuV-Fragen ab, die in 90% aller Spring-Week- und Summer-Internship-Interviews vorkommen. Mach sie ordentlich – beim zweiten Mal mit Live-Interviewer ist es zu spät."
+
+NACHHER (gentle tone):
+> "Willkommen bei Lektion 1. Wir starten mit der GuV – dem ersten Bericht, den jeder IB-Analyst lesen muss. Ich gehe das Schritt für Schritt mit dir durch. Keine Vorkenntnisse nötig."
+
+**Stat-Card-Wert ändern:** "DAUER 6 MIN" (statt 8 – realistisch für vereinfachte Lektion).
+
+**Learning Outcomes umformulieren** (von "können" zu "verstehen"):
+- VORHER: "GuV von Top zu Bottom durchgehen"
+- NACHHER: "Verstehen, was eine GuV überhaupt zeigt"
+- VORHER: "4 Margen aus dem Kopf berechnen"
+- NACHHER: "Den Unterschied zwischen Brutto- und Nettogewinn kennen"
+- VORHER: "EBITDA vs. EBIT in 10 Sekunden erklären"
+- NACHHER: "Wissen, wann man EBITDA hört (und warum es jeder nennt)"
+
+### Slide 2 – Bilanz vs. GuV (bleibt fast gleich)
+
+Marcus-Quote bei Korrekt anpassen:
+
+VORHER:
+> "Korrekt. GuV = Film über einen Zeitraum. Bilanz = Foto an einem Stichtag. Wer das verwechselt, fliegt im First Round."
+
+NACHHER (gentle):
+> "Genau. Eine GuV erzählt eine Geschichte über einen Zeitraum – wie ein Film. Eine Bilanz zeigt einen einzigen Moment – wie ein Foto. Diese Unterscheidung ist der wichtigste erste Schritt."
+
+### Slide 3 – Wasserfall (KOMPLETTE NEUSTRUKTURIERUNG)
+
+**Header bleibt:** "Vom Umsatz zum Gewinn"
+**Subline ändern:** "5 Stationen, die du kennen musst." (statt "11 Stationen")
+
+Neue Daten-Struktur:
 
 ```ts
-// lib/lesson/xp.ts
-export function calculateTotalXp(results: QuizResults): number {
-  let xp = 5 // Lesson-Completion-Bonus
-
-  const xpMap = {
-    q1: { full: 10, half: 5 },
-    q2: { full: 10, half: 5 },
-    q3: { full: 15, half: 8 },
-    q4: { full: 15, half: 8 },
-  }
-
-  for (const [key, result] of Object.entries(results)) {
-    if (!result || !result.correct) continue
-    const points = xpMap[key as keyof typeof xpMap]
-    xp += result.attempts === 1 ? points.full : points.half
-  }
-
-  return xp
-}
-
-export function calculateAccuracy(results: QuizResults): number {
-  const total = Object.values(results).filter(r => r !== null).length
-  if (total === 0) return 0
-  const correct = Object.values(results).filter(r => r?.correct).length
-  return Math.round((correct / total) * 100)
-}
-```
-
-### Mock-Daten für Slide 12
-
-```ts
-// components/lesson/income-statement/mockData.ts
-export const mockRetentionData = {
-  streak: { current: 1, target: 7 },
-  level: { current: 1, next: 2, currentXp: 55, requiredXp: 200 },
-  ranking: { percentile: 18, totalUsers: 1247 },
-  nextLesson: {
-    id: 'balance-sheet-01',
-    title: 'Balance Sheet',
-    duration: '9 Min',
-    xp: 60,
+// data.ts
+export const waterfallSteps = [
+  {
+    type: 'main',
+    label: 'Revenue',
+    de: 'Umsatzerlöse',
+    explanation: 'Alles, was die Firma verkauft hat. Der Top-Line-Wert.',
+    value: 100,
+    barWidth: 100,
   },
-}
+  {
+    type: 'preview',
+    label: '−Aufwendungen',
+    de: 'COGS, SG&A, etc.',
+    explanation: 'Hier werden alle Kosten abgezogen. In Lektion 2 schauen wir uns die einzelnen Aufwandsarten an.',
+    value: -60,
+  },
+  {
+    type: 'main',
+    label: 'EBITDA',
+    de: 'Op. Ergebnis vor Abschreibungen',
+    explanation: 'Was übrig bleibt, bevor Abschreibungen, Zinsen und Steuern abgezogen werden. Wichtigste Profit-Kennzahl in der Praxis.',
+    value: 40,
+    barWidth: 40,
+  },
+  {
+    type: 'preview',
+    label: '−Abschreibungen',
+    de: 'D&A',
+    explanation: 'Kosten für Maschinen und Software, die über mehrere Jahre verteilt werden. Lektion 3.',
+    value: -10,
+  },
+  {
+    type: 'main',
+    label: 'EBIT',
+    de: 'Operatives Ergebnis',
+    explanation: 'EBITDA minus Abschreibungen. Realistisches Bild der operativen Profitabilität.',
+    value: 30,
+    barWidth: 30,
+  },
+  {
+    type: 'preview',
+    label: '−Zinsen + Steuern',
+    de: 'Interest + Taxes',
+    explanation: 'Bank und Staat wollen auch was. Lektion 4.',
+    value: -12,
+  },
+  {
+    type: 'main',
+    label: 'Net Income',
+    de: 'Jahresüberschuss',
+    explanation: 'Was am Ende für die Aktionäre übrig bleibt. Bottom-Line.',
+    value: 18,
+    barWidth: 18,
+    highlighted: true,
+  },
+]
 ```
 
-## ✅ ACCEPTANCE CRITERIA Phase 2
+**Visuelle Differenzierung:**
 
-1. Im selben Branch `feature/lesson-income-statement-redesign` weitergearbeitet
-2. Slides 07–12 sind implementiert und einzeln testbar
-3. `app/lesson/income-statement/page.tsx` führt durch alle 12 Slides
-4. Quiz-State wird korrekt zwischen Slides propagiert
-5. XP-Berechnung funktioniert (siehe `xp.ts`)
-6. Mock-Daten für Retention-Hub (kein Supabase nötig)
-7. Mobile-First: alle Quiz-Interaktionen (Drag-Sort, Multi-Select) funktionieren auf Touch-Geräten
-8. Lighthouse Performance Score ≥ 90 auf Mobile
-9. Branch ist gepusht und Pull Request ist geöffnet
+`type: 'main'` (5 Hauptpositionen):
+- Volle Balken-Höhe (`h-12`)
+- Volle Schrift-Größe
+- Akzent-Farbe oder Off-White-Balken
+- Klickbar mit ausführlichem Tooltip
+
+`type: 'preview'` (6 Vorschau-Abzüge):
+- Halbe Balken-Höhe (`h-6`)
+- Schrift `text-xs text-text-muted`
+- Dünner roter Akzent statt voller Balken
+- Klickbar mit Tooltip "→ Mehr dazu in Lektion X"
+
+**Sektion-Trenner ENTFERNEN** (zu komplex für Beginner). Stattdessen: durchgängiger Wasserfall mit visueller Hierarchie.
+
+**Marcus-Quote unter dem Wasserfall** (gentle):
+> "Diese 5 Stationen sind alles, was du heute brauchst. Die kleineren Posten dazwischen lernst du in den nächsten Lektionen kennen – jeder einzeln, mit Beispielen. Niemand erwartet, dass du das schon alles kannst."
+
+### Slide 4 – Margen (NUR NOCH 2)
+
+**Header:** "Zwei Margen, die jeder kennt." (statt "Vier Margen, eine Geschichte.")
+
+Reduzierte Daten:
+
+```ts
+const margins = [
+  {
+    key: 'gross',
+    label: 'Bruttomarge',
+    enLabel: 'Gross Margin',
+    value: 40,
+    abs: '€40M',
+    highlighted: true,
+    explanation: 'Was nach den Produktionskosten übrig bleibt – im Verhältnis zum Umsatz. Apple hat hohe Bruttomargen (~40%), Walmart niedrige (~25%).',
+  },
+  {
+    key: 'net',
+    label: 'Nettomarge',
+    enLabel: 'Net Margin',
+    value: 9,
+    abs: '€9M',
+    explanation: 'Was am Ende für die Aktionäre übrig bleibt – im Verhältnis zum Umsatz. Tech-Firmen oft 20%+, Supermärkte 2-3%.',
+  },
+]
+```
+
+EBITDA-Marge und Operating Margin werden in Lektion 3 eingeführt.
+
+**Marcus-Quote:**
+> "Diese zwei Margen reichen für den Anfang. Brutto = wie viel bleibt nach den Produktionskosten. Netto = wie viel bleibt am Ende. Apple hat hohe Margen, Supermärkte niedrige. Mehr braucht es heute nicht."
+
+**Mit konkreten Firmenbeispielen** unter dem Diagramm einen kleinen Vergleich:
+
+```
+APPLE             ~25% Net Margin
+WALMART           ~3%  Net Margin
+NETFLIX           ~15% Net Margin
+```
+
+Das gibt Beginnern einen Anker an reale Firmen statt abstrakter Zahlen.
+
+### Slide 5 – Formel-Drill (vereinfacht)
+
+**Header bleibt:** "Schreib die Formel."
+**Subline:** "Bruttomarge in 4 Bausteinen."
+
+Formel bleibt: `Gross Margin = ( ___ − ___ ) / ___ × 100%`
+
+Wortpool reduzieren auf 3 (kein Distraktor mehr):
+
+```ts
+const tokens = ['Revenue', 'COGS', 'Revenue']
+```
+
+Begründung: Distraktoren sind didaktisch wertvoll für Fortgeschrittene, aber für Beginner frustrierend, wenn sie noch nicht sicher sind, was COGS überhaupt heißt.
+
+**Marcus-Quote bei Erfolg (gentle):**
+> "Stark. Diese Formel siehst du immer wieder. Wenn du sie einmal verstehst, hast du den Schlüssel zu allen anderen Margen."
+
+### Slide 6 – Cheat Sheet (vereinfacht)
+
+Aktuelle Cheat-Sheet-Card mit 11 Positionen ist Overload. Reduziere auf:
+
+```
+GUV CHEAT SHEET                       [01]
+──────────────────────────────────────────
+DIE 5 STATIONEN
+Revenue  →  Gross Profit  →  EBITDA
+         →  EBIT  →  Net Income
+
+DIE 2 MARGEN
+Bruttomarge = Gross Profit / Revenue
+Nettomarge  = Net Income  / Revenue
+
+REGEL
+Marge in % zeigt, wie effizient ein
+Unternehmen Geld verdient.
+──────────────────────────────────────────
+```
+
+Buttons "Als PNG speichern" und "Weiter" bleiben. "In Notion kopieren" entfernen (zu nischig für Beginner).
+
+### Slide 7 – Pro-Tipps (KOMPLETT NEUE INHALTE)
+
+Aktuelle Tipps sind Profi-Niveau ("Walk me through the income statement"). Beginner-Tipps sind anders – sie helfen beim **Lernen**, nicht beim Performen.
+
+**Header ändern:** "Drei Dinge, die dir das Lernen leichter machen." (statt "Drei Moves, die dich vom Rest abheben.")
+
+**Card 1 – Tag: `LERNTIPP`**
+> "Wenn du einen englischen Begriff zum ersten Mal siehst, sag ihn dir laut vor. EBITDA = 'I-bitt-da'. Dein Gehirn merkt sich Dinge besser, wenn du sie hörst, nicht nur liest."
+
+**Card 2 – Tag: `MERKE`**
+> "Brutto und Netto: Stell dir Brutto wie deinen Bruttogehalt vor – das, was am Anfang draufsteht. Netto ist, was am Ende auf deinem Konto landet. Bei Firmen ist das genauso."
+
+**Card 3 – Tag: `NÄCHSTER SCHRITT`**
+> "In Lektion 2 schauen wir uns an, was 'Aufwendungen' eigentlich sind. Spoiler: Es gibt mehr als nur Materialkosten. Bis dahin reicht es zu wissen: Aufwendungen reduzieren den Gewinn."
+
+Alle drei Tipps sind ermutigend, konkret, beginner-relevant.
+
+### Slide 8 – Quiz Frage 1 (vereinfacht: ENTFÄLLT der Drag-Sort)
+
+Drag-Sort mit 6 Positionen ist für Beginner zu schwer (sie haben gerade die Reihenfolge zum ersten Mal gesehen). Ersetze durch eine Multiple-Choice-Frage:
+
+**Frage:** "Welcher Bericht zeigt einen Zeitraum (z.B. das ganze Jahr 2024)?"
+
+Optionen:
+- A) Bilanz
+- B) Gewinn- und Verlustrechnung (richtig)
+- C) Eigenkapitalveränderungsrechnung
+- D) Kapitalflussrechnung
+
+Das ist die wichtigste konzeptionelle Erkenntnis aus Slide 2 – ideal als erste Quiz-Frage.
+
+**Marcus-Feedback (gentle, korrekt):**
+> "Genau das. Diese Unterscheidung ist der wichtigste Punkt aus Lektion 1."
+
+**Marcus-Feedback (gentle, falsch):**
+> "Kein Stress – das verwechselt fast jeder am Anfang. Die Bilanz zeigt einen einzigen Stichtag. Die GuV zeigt einen Zeitraum. Versuch's nochmal."
+
+### Slide 9 – Quiz Frage 2 (Bruttomarge bleibt, aber sanfter)
+
+Frage und Optionen bleiben:
+> "TechCo: Umsatz €200M, COGS €120M. Wie hoch ist die Bruttomarge?"
+- 60%, **40%** (richtig), 80%, 20%
+
+**Aber:** Beim ersten Klick auf "Antwort prüfen" zeigt der Hint **immer**, auch wenn richtig:
+
+> "Rechenweg: (Umsatz − COGS) / Umsatz = (200 − 120) / 200 = 80/200 = 40%"
+
+Das bestätigt Beginner und gibt ihnen die Logik mit, nicht nur das Ergebnis.
+
+**Marcus (gentle, korrekt):**
+> "Sehr gut. Du hast gerade deine erste Margen-Berechnung gemacht – genau so läuft das in echten Pitchbooks."
+
+### Slides 10 + 11 – ENTFALLEN (in Beginner-Lektion)
+
+EBITDA-Auflösung (Slide 10) und Margen-Hierarchie (Slide 11) sind für Beginner zu früh. Sie kommen in Lektion 3 (EBITDA-Vertiefung).
+
+Stattdessen wird Slide 10 zur **Cliffhanger-Slide:**
+
+**Slide 10 (NEU) – EBITDA-Vorschau**
+
+Komponente: `Slide10EbitdaPreview.tsx`
+
+Layout:
+
+1. Header: **"Da war noch ein Begriff: EBITDA."** in `font-serif text-3xl`
+2. Subline: "Den hast du im Wasserfall gesehen. Hier ein Vorgeschmack."
+3. **Mini-Erklärungs-Card:**
+
+```
+EBITDA  /ˈiː.bɪt.dɑː/  Substantiv
+Earnings Before Interest, Taxes,
+Depreciation and Amortization
+
+= Gewinn bevor Bank, Staat und Buchhalter
+  ihren Anteil bekommen haben.
+```
+
+4. **Kontext-Box:**
+> "Warum jeder EBITDA nennt: Es zeigt die operative Profitabilität, unabhängig davon, wie eine Firma finanziert ist oder wo sie steuerlich sitzt. Perfekt zum Vergleichen.
+> 
+> Warum manche es hassen: Es blendet echte Kosten aus (z.B. für Maschinen). Warren Buffett ist berühmt dafür, EBITDA als 'BS-Kennzahl' zu bezeichnen.
+>
+> **Lektion 3 widmet sich komplett EBITDA. Heute reicht es zu wissen: Du wirst diesen Begriff täglich hören.**"
+
+CTA: `Lektion abschließen →`
+
+Diese Slide schafft genau den Pull-Effekt, den wir wollen: User verstehen, dass es noch mehr gibt, und wollen weiter.
+
+### Slide 11 wird zu Slide 10 → Slide 12 wird Slide 11 (Retention Hub bleibt strukturell gleich)
+
+**Total reduziert: von 12 auf 11 Slides.**
+
+Anpassungen am Retention Hub (Slide 11):
+
+- "Modul 01 abgeschlossen." bleibt
+- Stats: `4/4` → ändern zu `2/2` (nur noch 2 Quiz-Fragen)
+- XP-Wert anpassen: aus 55 wird 25 (10 + 10 + 5 Completion-Bonus)
+- Marcus-Email (gentle):
+
+> **Re:** Erste Lektion geschafft
+> "Gut gemacht. Du verstehst jetzt, was eine GuV ist und wie Brutto- und Nettomarge funktionieren. Das ist die Basis für alles, was kommt. In Lektion 2 schauen wir uns die einzelnen Aufwandsarten an – COGS, SG&A und was sonst noch alles vom Umsatz abgezogen wird. Bis dann."
+
+- Next-Action-Card: "Modul 02 — Aufwendungen" (5 Min · +30 XP)
+
+## 🎨 SPRACHLICHE ÄNDERUNGEN GLOBAL
+
+### Englisch-Deutsch-Hierarchie umkehren für Beginner
+
+In der Profi-Variante zeigen wir "Revenue" groß, "Umsatzerlöse" klein. Für Beginner umkehren:
+
+```tsx
+// VORHER (Profi):
+<span className="text-base font-mono text-text-primary">Revenue</span>
+<span className="text-xs font-mono text-text-muted">Umsatzerlöse</span>
+
+// NACHHER (Beginner, Lektion 1-3):
+<span className="text-base font-mono text-text-primary">Umsatz</span>
+<span className="text-xs font-mono text-text-muted">(engl. Revenue)</span>
+```
+
+Begründung: Beginner muss sich erst mit den deutschen Begriffen sicher fühlen, bevor wir die englischen Profi-Begriffe in den Vordergrund stellen. Ab Lektion 4 dann umgekehrt.
+
+### Konsistente Begriffsverwendung
+
+Wenn du einen Begriff einmal eingeführt hast, halte dich daran. Aktuelle Inkonsistenzen, die in der Beginner-Variante alle zu **deutscher Form** wechseln:
+
+| Aktuell (gemischt) | Beginner-Variante (konsistent) |
+|---|---|
+| Revenue / Umsatz | **Umsatz** (engl. Revenue) |
+| COGS / Herstellungskosten | **Herstellungskosten** (engl. COGS) |
+| Gross Margin / Bruttomarge | **Bruttomarge** (engl. Gross Margin) |
+| Net Income / Jahresüberschuss | **Jahresüberschuss** oder **Nettogewinn** |
+
+Englische Akronyme nur dort, wo sie auf Deutsch keinen Standard haben (EBITDA, EBIT).
+
+## 🧪 ACCEPTANCE CRITERIA Phase 3b
+
+Bevor du Phase 3b als fertig betrachtest:
+
+1. Die Lektion umfasst jetzt **11 Slides** (statt 12)
+2. Wasserfall (Slide 3) zeigt **5 Hauptpositionen + 6 Vorschau-Abzüge** mit visueller Differenzierung
+3. Margen (Slide 4) zeigt **nur 2 Margen** mit Firmenbeispielen
+4. Formel-Drill (Slide 5) hat **keinen Distraktor**
+5. Quiz hat **2 Fragen** statt 4
+6. Slide 10 ist die neue **EBITDA-Cliffhanger-Slide**
+7. Marcus-Tonfall ist **durchgehend gentle** in dieser Lektion
+8. Deutsche Begriffe sind primär, englische in Klammern
+9. Total-XP der Lektion ist **25** statt 55
+10. Lektions-Dauer-Schätzung: **6 Min** statt 8
+
+Plus: alle Acceptance Criteria aus Phase 3a sind weiterhin erfüllt (responsive, keine Bugs, Sounds funktionieren).
 
 ## 🚀 IMPLEMENTIERUNGS-REIHENFOLGE
 
-1. **Im Branch bleiben** (siehe Git-Workflow)
-2. **Dependencies** installieren falls nicht vorhanden
-3. **Slide 07** Pro-Tips-Carousel
-4. **Slide 08** Quiz Sort (Drag-and-Drop)
-5. **Slide 09** Quiz Calc
-6. **Slide 10** Quiz Multi-Select
-7. **Slide 11** Quiz Hierarchy
-8. **Slide 12** Retention Hub (vier Sektionen, größter Slide)
-9. **Routing & State:** `page.tsx` + `xp.ts` + `mockData.ts`
-10. **Polishing:** Animationen feinjustieren, Mobile-Layouts checken, Lighthouse-Audit
-11. **Push & PR**
+1. **Branch sicherstellen** (siehe Git-Workflow)
+2. **MarcusNote** um `tone`-Prop erweitern
+3. **Slide 1** Marcus-Quote ersetzen + Outcomes umformulieren
+4. **Slide 2** Marcus-Feedback anpassen
+5. **Slide 3** Wasserfall umbauen auf 5+6-Struktur
+6. **Slide 4** Margen reduzieren + Firmenbeispiele
+7. **Slide 5** Formel-Drill Distraktor entfernen
+8. **Slide 6** Cheat Sheet vereinfachen
+9. **Slide 7** Pro-Tipps neue Inhalte
+10. **Slide 8** Quiz auf MC umstellen (statt Drag-Sort)
+11. **Slide 9** Quiz Hint immer anzeigen
+12. **Slides 10 + 11 entfernen, neue Slide 10** EBITDA-Cliffhanger anlegen
+13. **Retention-Hub** anpassen (XP, Email-Text, Next-Lesson)
+14. **Globale Sprach-Anpassung** Deutsch first
+15. **Manueller Lesefluss-Test:** Geh die Lektion einmal komplett durch, als wärst du Erstsemester
+16. **Push & PR**
 
-Wenn du an einer Stelle einen besseren Vorschlag hast (elegantere Animation, sauberere State-Lösung), schlage ihn aktiv vor – aber halte dich strikt an Farben, Typografie und Tonfall.
+Frag mich nach jedem Slide-Umbau, ob ich Änderungen will.
 
-Frag mich nach jedem implementierten Slide, ob ich Änderungen will, bevor du zum nächsten gehst.
+Wenn du an einer Stelle einen besseren Vorschlag hast (z.B. ein noch passenderes Firmenbeispiel, eine elegantere Erklärung), schlage ihn aktiv vor – aber halte dich strikt an den gentle Marcus-Tonfall und die Konzept-Reduktion.
 
-Los geht's mit Slide 07.
+Los geht's mit Schritt 2 (MarcusNote tone-Prop).
