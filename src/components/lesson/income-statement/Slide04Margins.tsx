@@ -56,8 +56,8 @@ function MarginRow({
   onToggle: () => void;
 }) {
   const fillColor = margin.highlighted ? 'var(--is-accent)' : 'var(--is-text-primary)';
-  const valueColor = margin.highlighted ? 'text-is-accent' : 'text-is-bg-primary';
-
+  // Each row has a label outside the bar (always readable) + a value pill
+  // outside the bar on the right (always readable). Bar is purely visual.
   return (
     <div>
       <button
@@ -65,36 +65,32 @@ function MarginRow({
         onClick={onToggle}
         aria-expanded={isOpen}
         className={[
-          'group relative w-full h-12 rounded-md overflow-hidden bg-is-bg-secondary border border-is-bg-border',
-          'hover:border-is-text-muted transition-colors duration-200',
-          isOpen ? 'border-is-text-muted' : '',
+          'group w-full flex flex-col gap-1.5 rounded-md p-2',
+          'hover:bg-is-bg-tertiary transition-colors duration-200 text-left',
+          isOpen ? 'bg-is-bg-tertiary' : '',
         ].join(' ')}
       >
-        <motion.div
-          className="absolute inset-y-0 left-0 rounded-md"
-          initial={{ width: 0 }}
-          animate={{ width: `${margin.value}%` }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          style={{ background: fillColor }}
-        />
-
-        <div className="absolute inset-0 flex items-center justify-between px-3 pointer-events-none">
-          <span className="font-[family-name:var(--font-is-mono)] text-sm text-is-bg-primary mix-blend-normal relative z-10">
-            <span className={margin.highlighted ? 'text-is-bg-primary' : 'text-is-bg-primary'}>
-              {margin.label}
-            </span>
-          </span>
+        <div className="flex items-center justify-between gap-3">
           <span
             className={[
-              'font-[family-name:var(--font-is-mono)] text-sm tabular-nums relative z-10',
-              valueColor,
+              'font-[family-name:var(--font-is-mono)] text-sm',
+              margin.highlighted ? 'text-is-accent font-semibold' : 'text-is-text-primary',
             ].join(' ')}
-            style={{ color: 'var(--is-text-primary)' }}
           >
-            <span className="px-2 py-0.5 rounded bg-is-bg-primary/70">
-              {margin.value}% · {margin.abs}
-            </span>
+            {margin.label}
           </span>
+          <span className="font-[family-name:var(--font-is-mono)] text-sm tabular-nums text-is-text-primary">
+            {margin.value}% <span className="text-is-text-muted">· {margin.abs}</span>
+          </span>
+        </div>
+        <div className="h-3 w-full rounded-md bg-is-bg-secondary border border-is-bg-border overflow-hidden">
+          <motion.div
+            className="h-full rounded-md"
+            initial={{ width: 0 }}
+            animate={{ width: `${margin.value}%` }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            style={{ background: fillColor }}
+          />
         </div>
       </button>
 
@@ -107,7 +103,7 @@ function MarginRow({
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="overflow-hidden"
           >
-            <div className="bg-is-bg-tertiary border border-is-bg-border rounded-md mt-2 p-3">
+            <div className="bg-is-bg-secondary border border-is-bg-border rounded-md mt-2 p-3">
               <p className="font-[family-name:var(--font-is-sans)] text-sm text-is-text-secondary leading-relaxed">
                 {margin.explanation}
               </p>

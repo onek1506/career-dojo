@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, type ComponentType } from 'react';
+import { useMemo, useState, type ComponentType } from 'react';
 import { useRouter } from 'next/navigation';
 import LessonLayout from '../LessonLayout';
 import Slide01Briefing from './Slide01Briefing';
@@ -18,7 +18,6 @@ import Slide12Retention from './Slide12Retention';
 import { useStore } from '@/lib/store';
 import { calculateAccuracy, calculateTotalXp } from '@/lib/lesson/xp';
 import { playClickSound, playCompleteSound, unlockAudioContext } from '@/lib/sounds';
-// Note: completeLesson(lessonId, xp) handles both lesson tracking and XP via the store.
 import type {
   QuizResult,
   QuizResults,
@@ -69,29 +68,10 @@ export default function IncomeStatementLesson() {
   const Slide = SLIDES[currentStep];
   const isRetention = currentStep === SLIDES.length - 1;
 
-  // Capture elapsed time when entering retention slide; persist completion to global store.
-  useEffect(() => {
-    if (!isRetention) return;
-    if (finalElapsed === null) {
-      setFinalElapsed(Math.floor((Date.now() - startTime) / 1000));
-    }
-    if (!completionFinalized) {
-      try {
-        unlockAudioContext();
-        playCompleteSound();
-      } catch {
-        // ignore audio errors
-      }
-      completeLesson(LESSON_ID, totalXp);
-      setCompletionFinalized(true);
-    }
-  }, [isRetention, finalElapsed, completionFinalized, startTime, totalXp, completeLesson]);
-
-  const elapsedSeconds = finalElapsed ?? Math.floor((Date.now() - startTime) / 1000);
-
-  const retentionResults: RetentionResults | undefined = isRetention
-    ? { quizResults, totalXp, elapsedSeconds, accuracy }
-    : undefined;
+  const retentionResults: RetentionResults | undefined =
+    isRetention && finalElapsed !== null
+      ? { quizResults, totalXp, elapsedSeconds: finalElapsed, accuracy }
+      : undefined;
 
   const handleAnswer = (slideKey: QuizSlideKey, result: QuizResult) => {
     setQuizResults((prev) => ({ ...prev, [slideKey]: result }));
@@ -107,6 +87,18 @@ export default function IncomeStatementLesson() {
       playClickSound();
     } catch {
       // ignore
+    }
+    const enteringRetention = currentStep === SLIDES.length - 2;
+    if (enteringRetention && !completionFinalized) {
+      setFinalElapsed(Math.floor((Date.now() - startTime) / 1000));
+      completeLesson(LESSON_ID, totalXp);
+      setCompletionFinalized(true);
+      try {
+        unlockAudioContext();
+        playCompleteSound();
+      } catch {
+        // ignore audio errors
+      }
     }
     setCanProceed(false);
     setCurrentStep((s) => s + 1);

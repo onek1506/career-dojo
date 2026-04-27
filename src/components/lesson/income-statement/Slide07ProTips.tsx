@@ -17,7 +17,6 @@ export default function Slide07ProTips({ onCanProceed, onNext }: SlideProps) {
 
   useEffect(() => {
     if (!emblaApi) return;
-    onSelect();
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
     return () => {
