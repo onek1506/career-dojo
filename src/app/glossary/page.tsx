@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Search, BookOpen, ChevronDown, ChevronUp, X } from 'lucide-react';
 import AppShell from '@/components/AppShell';
 import { useStore } from '@/lib/store';
@@ -31,19 +31,23 @@ const TRACK_LABEL: Record<GlossaryTrack, { label: string; color: string }> = {
 };
 
 export default function GlossaryPage() {
-  const { progress, t } = useStore();
+  const { progress, t, loaded } = useStore();
   const isDE = progress.language === 'de';
   const character = getCharacterForTrack(progress.selectedTrack || 'ib');
 
   const [query, setQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<FilterTab>(() => {
-    // Default the filter to the user's current track when possible.
+  const [activeTab, setActiveTab] = useState<FilterTab>('all');
+
+  // Sync the initial tab with the user's profile track once localStorage has loaded.
+  // The lazy useState initializer runs before useStore's useEffect populates the data,
+  // so we must wait for `loaded` to be true to read the correct selectedTrack.
+  useEffect(() => {
+    if (!loaded) return;
     const track = progress.selectedTrack;
     if (track === 'ib' || track === 'consulting' || track === 'pe' || track === 'vc') {
-      return track;
+      setActiveTab(track as FilterTab);
     }
-    return 'all';
-  });
+  }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps
   const [openId, setOpenId] = useState<string | null>(null);
 
   const filtered = useMemo<GlossaryTerm[]>(() => {
