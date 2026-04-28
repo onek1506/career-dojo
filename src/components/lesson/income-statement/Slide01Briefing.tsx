@@ -55,7 +55,7 @@ export default function Slide01Briefing({
           }
         />
 
-        <div className="grid grid-cols-3 gap-3 bg-is-bg-secondary border border-is-bg-border rounded-lg p-3">
+        <div className="grid grid-cols-3 gap-3 bg-is-bg-secondary border border-is-bg-border rounded-lg p-3 max-w-md">
           <Stat label="DAUER" value="6 MIN" />
           <Stat label="XP" value="+25" />
           <Stat label="SCHWIERIG." value="★☆☆☆☆" />
