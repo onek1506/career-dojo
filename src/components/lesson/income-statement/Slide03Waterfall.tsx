@@ -103,6 +103,10 @@ function WaterfallRow({
   onClose: () => void;
 }) {
   const isMain = step.type === 'main';
+  // Bars are drawn proportional to revenue (which is always 100). |value|
+  // is therefore directly the percentage. -50 → 50% wide, 18 → 18% wide.
+  const REFERENCE_VALUE = 100;
+  const widthPercent = Math.min(100, (Math.abs(step.value) / REFERENCE_VALUE) * 100);
   const barColor = step.highlighted
     ? 'var(--is-accent)'
     : step.value < 0
@@ -141,19 +145,21 @@ function WaterfallRow({
               ({step.en})
             </span>
           </div>
-          {isMain && step.barWidth !== undefined && (
+          {isMain ? (
             <div className="h-2 bg-is-bg-tertiary rounded-sm overflow-hidden">
               <motion.div
                 className="h-full rounded-sm"
                 initial={{ width: 0 }}
-                animate={{ width: `${step.barWidth}%` }}
+                animate={{ width: `${widthPercent}%` }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
                 style={{ background: barColor }}
               />
             </div>
-          )}
-          {!isMain && (
-            <div className="h-[2px] rounded-sm" style={{ background: barColor, width: `${Math.abs(step.value)}%`, opacity: 0.5 }} />
+          ) : (
+            <div
+              className="h-[2px] rounded-sm"
+              style={{ background: barColor, width: `${widthPercent}%`, opacity: 0.5 }}
+            />
           )}
         </div>
         <span
