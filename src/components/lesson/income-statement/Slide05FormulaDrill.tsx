@@ -17,6 +17,8 @@ const INITIAL_POOL: WordChip[] = [
   { id: 'umsatz-1', label: 'Umsatz' },
   { id: 'cogs-1', label: 'Herstellungskosten' },
   { id: 'umsatz-2', label: 'Umsatz' },
+  { id: 'decoy-vertrieb', label: 'Vertriebskosten' },
+  { id: 'decoy-ebitda', label: 'EBITDA' },
 ];
 
 export default function Slide05FormulaDrill({

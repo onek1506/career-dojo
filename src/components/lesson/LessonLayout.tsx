@@ -83,8 +83,14 @@ export default function LessonLayout({
         </div>
       </header>
 
-      {/* Main + optional side panel */}
+      {/* Main + optional side panel.
+          A phantom spacer mirrors the side panel's width on the left so the
+          centered content sits in the true viewport center, matching the
+          header's progress bar and the footer CTA. */}
       <div className="flex-1 flex overflow-hidden">
+        {sidePanel && (
+          <div className="hidden lg:block w-72 flex-shrink-0" aria-hidden="true" />
+        )}
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8 lg:py-12">
             {children}

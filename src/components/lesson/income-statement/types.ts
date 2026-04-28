@@ -28,7 +28,9 @@ export interface SlideProps {
 }
 
 // Order of quiz keys as they appear in the lesson — used by quiz slides to
-// compute "consecutive correct" streaks based on prior results.
+// compute "consecutive first-try correct" streaks based on prior results.
+// A wrong answer OR a correct answer that needed multiple attempts both
+// reset the streak — only flawless first-try answers extend it.
 export const QUIZ_ORDER: QuizSlideKey[] = ['q1', 'q2'];
 
 export function priorStreakFor(self: QuizSlideKey, results: QuizResults | undefined): number {
@@ -38,7 +40,7 @@ export function priorStreakFor(self: QuizSlideKey, results: QuizResults | undefi
   let run = 0;
   for (let i = 0; i < idx; i++) {
     const r = results[QUIZ_ORDER[i]];
-    if (r?.correct) run += 1;
+    if (r?.correct && r.attempts === 1) run += 1;
     else run = 0;
   }
   return run;

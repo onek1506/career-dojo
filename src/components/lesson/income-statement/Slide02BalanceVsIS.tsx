@@ -77,7 +77,7 @@ export default function Slide02BalanceVsIS({
           <Card
             icon={<Film size={28} className="text-is-text-muted" aria-hidden />}
             title="GuV"
-            subtitle="Zeitraum · Q1–Q4 2024"
+            subtitle="Gewinn- und Verlustrechnung · Q1–Q4 2024"
             onClick={() => onPick('income')}
             state={!showFeedback ? 'idle' : incomeMarkedRight ? 'correct' : 'idle'}
           />

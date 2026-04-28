@@ -91,7 +91,7 @@ export default function IncomeStatementLesson() {
   };
 
   const sidePanel = (
-    <SidePanel currentStep={currentStep + 1} totalSteps={SLIDES.length} sessionXp={totalXp} />
+    <SidePanel currentStep={currentStep + 1} totalSteps={SLIDES.length} />
   );
 
   return (

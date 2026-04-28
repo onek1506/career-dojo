@@ -30,6 +30,7 @@ export default function Slide09QuizCalc({
 }: SlideProps) {
   const [selected, setSelected] = useState<string | null>(null);
   const [state, setState] = useState<State>('idle');
+  const [correctAttempts, setCorrectAttempts] = useState<number | null>(null);
 
   const isCorrect = state === 'submitted-correct';
   const isWrongFirst = state === 'submitted-wrong-1';
@@ -37,6 +38,7 @@ export default function Slide09QuizCalc({
   const isResolved = isCorrect || isWrongFinal;
   const showHint = isResolved || isWrongFirst; // always once submitted
   const priorStreak = priorStreakFor('q2', quizResults);
+  const isFirstTry = isCorrect && correctAttempts === 1;
 
   const handleSubmit = () => {
     if (!selected) return;
@@ -46,6 +48,7 @@ export default function Slide09QuizCalc({
       playCorrectSound();
       window.setTimeout(() => playStreakSound(), 250);
       setState('submitted-correct');
+      setCorrectAttempts(attempts);
       onAnswer?.('q2', { correct: true, attempts });
     } else if (state === 'idle') {
       playWrongSound();
@@ -192,12 +195,14 @@ export default function Slide09QuizCalc({
                       </>
                     }
                   />
-                  <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-bg-border">
-                    <span aria-hidden className="text-is-accent">🔥</span>
-                    <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-secondary">
-                      {priorStreak + 1} in Folge richtig · Quiz abgeschlossen
-                    </span>
-                  </div>
+                  {isFirstTry && (
+                    <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-bg-border">
+                      <span aria-hidden className="text-is-accent">🔥</span>
+                      <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-secondary">
+                        {priorStreak + 1} in Folge richtig · Quiz abgeschlossen
+                      </span>
+                    </div>
+                  )}
                 </>
               )}
 

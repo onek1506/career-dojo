@@ -35,6 +35,7 @@ export default function Slide08QuizSort({
   const [attempts, setAttempts] = useState(0);
 
   const isCorrect = submitted?.correct === true;
+  const isFirstTry = isCorrect && attempts === 1;
   const priorStreak = priorStreakFor('q1', quizResults);
 
   const handleSubmit = () => {
@@ -152,12 +153,14 @@ export default function Slide08QuizSort({
                 tone="gentle"
                 body={<>Genau das. Diese Unterscheidung ist der wichtigste Punkt aus Lektion 1.</>}
               />
-              <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-bg-border">
-                <span aria-hidden className="text-is-accent">🔥</span>
-                <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-secondary">
-                  {priorStreak + 1} in Folge richtig
-                </span>
-              </div>
+              {isFirstTry && (
+                <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-bg-border">
+                  <span aria-hidden className="text-is-accent">🔥</span>
+                  <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-secondary">
+                    {priorStreak + 1} in Folge richtig
+                  </span>
+                </div>
+              )}
             </motion.div>
           )}
           {submitted && !submitted.correct && (
