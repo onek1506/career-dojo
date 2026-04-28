@@ -1,804 +1,298 @@
-# 🎯 Onboarding-Implementation für Career-Dojo
+# 🌿 Neuer Konsolidierungs-Branch: Drei Features in einen Branch zusammenführen
 
-Du arbeitest weiter an der Lern-Webapp für IB-Interview-Vorbereitung. Bisher gibt es eine fertige Lektion ("Income Statement"). Jetzt bauen wir das Onboarding, das vor der ersten Lektion läuft.
+Du arbeitest am Repository `career-dojo`. Es gibt drei aktive Feature-Branches mit unterschiedlichen Features. Diese sollen in einem **einzigen neuen Feature-Branch** kombiniert werden, sodass die App eine vollständige, testbare Version bekommt.
 
-Dieses Onboarding ist eine **psychologische Architektur**, die in 90 Sekunden eine langfristige Beziehung zum User etabliert. Es macht fünf Dinge gleichzeitig: Diagnose, Routing, Commitment-Generierung, Erwartungs-Setting, Identitäts-Verankerung.
+**WICHTIG:** Master bleibt komplett unangetastet. Es wird nicht in master gemerged. Wir erstellen nur einen neuen Branch, in dem alle drei Features zusammenlaufen.
 
-## 🌿 GIT-WORKFLOW
+## 🌿 AUSGANGSLAGE
 
-1. Erstelle einen neuen Feature-Branch vom aktuellen `main`:
+Drei Feature-Branches existieren auf GitHub:
+
+1. **`claude/feat-lesson-income-statement-redesign`**
+   - Komplette erste Lektion "Income Statement" mit 11 Slides
+   - Marcus als Coach, Beginner-Vereinfachung
+   - Side-Panel mit Streak/XP/Lesson-Map
+   - Wasserfall mit visuellen Bugs (Balken-Skalierung)
+   - Streak-Logik zählt auch beim 2. Versuch hoch
+
+2. **`claude/feat-lesson-polish-and-consistency`**
+   - Side-Panel entfernt
+   - Streak-Logik korrigiert (nur First-Try)
+   - Wasserfall-Skalierung gefixt
+   - Lesson-Duration-Tracking
+   - Slide 4 Konsistenz, Tag-Farben, Stat-Card-Anpassung
+   - Sound-Toggle entfernt
+
+3. **`claude/feat-onboarding-flow`**
+   - 9-Slide Marcus-Onboarding auf Route `/onboarding/start`
+   - Cold Open mit "73% scheitern am ersten Technical"
+   - Skill-Profile-Logik (A/B/C)
+   - localStorage-Persistierung
+
+## 🎯 ZIEL
+
+Am Ende dieser Phase existiert ein neuer Branch `claude/feat-full-app-prototype`, der alle drei Features enthält und konsistent funktioniert. Master und die drei ursprünglichen Feature-Branches bleiben unverändert.
+
+Konkret muss der neue Branch:
+- App-Root (`/`) leitet zu `/onboarding/start` weiter, wenn kein User-Profile in localStorage existiert
+- App-Root leitet zu `/lesson/income-statement` weiter, wenn Onboarding bereits abgeschlossen ist
+- Das alte Onboarding (mit Wolfgang dem Wolf, Carl dem Cashflow oder ähnlichen Charakteren) wird vollständig entfernt
+- Die Lektion ist die Polish-Version (Side-Panel weg, korrekte Streak-Logik, korrekte Wasserfall-Skalierung)
+- Eine einzige Vercel-Preview-URL zeigt die komplette App
+
+## 📋 ARBEITSSCHRITTE
+
+### Schritt 1 – Repository inspizieren
+
+Bevor du irgendetwas tust, verschaffe dir einen Überblick:
+
 ```bash
-   git checkout main
-   git pull
-   git checkout -b feature/onboarding-flow
+git fetch --all
+git branch -a
+git log master --oneline -5
+git log claude/feat-lesson-income-statement-redesign --oneline -10
+git log claude/feat-lesson-polish-and-consistency --oneline -10
+git log claude/feat-onboarding-flow --oneline -10
 ```
-2. Committe in logischen Schritten:
-   - `feat(onboarding): add route and state machine`
-   - `feat(onboarding): implement slide 01 cold open`
-   - `feat(onboarding): implement slide 02 problem diagnosis`
-   - `feat(onboarding): implement slide 03 status selection`
-   - `feat(onboarding): implement slide 04 conditional goal slide`
-   - `feat(onboarding): implement slide 05 knowledge check`
-   - `feat(onboarding): implement slide 06 personalized diagnosis`
-   - `feat(onboarding): implement slide 07 identity anchoring`
-   - `feat(onboarding): implement slide 08 streak pre-commitment`
-   - `feat(onboarding): implement slide 09 first lesson hook`
-   - `feat(onboarding): persist user profile to localStorage`
-   - `feat(onboarding): wire up routing to first lesson`
-3. Push nach Abschluss:
+
+Identifiziere:
+- Welche Dateien existieren bereits in `master` (Hinweis auf altes Onboarding)?
+- Welche Dateien wurden in welchem Branch angefasst?
+- Gibt es bereits eine `app/onboarding/page.tsx` (altes Onboarding)?
+- Gibt es bereits eine `app/onboarding/start/page.tsx` (neues Marcus-Onboarding) auf Branch 3?
+
+Dokumentiere deine Erkenntnisse, bevor du weitermachst.
+
+### Schritt 2 – Altes Onboarding identifizieren
+
+Suche im `master`-Branch nach Spuren des alten Onboardings:
+
 ```bash
-   git push origin feature/onboarding-flow
+git checkout master
+grep -r "Wolfgang der Wolf" --include="*.tsx" --include="*.ts" .
+grep -r "Carl der Cashflow" --include="*.tsx" --include="*.ts" .
+grep -r "Cash is King" --include="*.tsx" --include="*.ts" .
 ```
 
-## 🛠️ TECH-STACK
+Notiere alle Dateien, die zum alten Onboarding gehören. Diese werden später entfernt.
 
-- Next.js 14+ (App Router), TypeScript, React 18+
-- Tailwind CSS mit dem bereits etablierten Design-System (Akzent-Orange #FF6B00, Bg-Schwarz #0A0A0B, Off-White-Text #F5F5F0)
-- Framer Motion für Übergänge
-- lucide-react für Icons
-- localStorage für Persistierung (kein Supabase in dieser Phase)
+### Schritt 3 – Neuen Konsolidierungs-Branch erstellen
 
-## 🎨 DESIGN-SYSTEM (verbindlich, identisch zur Lektion)
+Erstelle einen neuen Branch direkt aus `master`. Dieser Branch wird die "Spielwiese" für alle drei Features.
 
-Nutze die exakt gleiche Tailwind-Config wie in der Lektion:
-- Schriften: Inter (sans), JetBrains Mono (mono), Instrument Serif (serif)
-- Farben: bg-primary, bg-secondary, bg-tertiary, bg-border, text-primary, text-secondary, text-muted, accent (DEFAULT, hover, muted), gold, success, error
-- Border-Radius: nur `rounded-lg` und `rounded-xl`
-- Animationen: max. 600ms, `transition-all duration-200 ease-out`
-
-**Marcus-Tonfall:** In diesem Onboarding ist Marcus durchgehend **scharf-direkt** (nicht gentle), weil das Onboarding den USP der App verkaufen muss. Er ist autoritativ, knapp, leicht zynisch – aber nicht abwertend. Vergleichbar mit einem Senior-Mentor, der dir die Wahrheit sagt, weil er Zeit nicht verschwenden will.
-
-## 📂 DATEISTRUKTUR
-
-```
-app/
-  onboarding/
-    page.tsx                    // State Machine, lädt Slides
-components/
-  onboarding/
-    OnboardingLayout.tsx        // Wrapper mit Progress-Bar
-    Slide01ColdOpen.tsx
-    Slide02ProblemDiagnosis.tsx
-    Slide03StatusSelection.tsx
-    Slide04GoalSelection.tsx    // conditional rendering
-    Slide05KnowledgeCheck.tsx
-    Slide06Diagnosis.tsx
-    Slide07IdentityAnchor.tsx
-    Slide08StreakCommit.tsx
-    Slide09FirstLessonHook.tsx
-    types.ts
-lib/
-  onboarding/
-    profile.ts                  // localStorage helpers + routing logic
+```bash
+git checkout master
+git pull origin master
+git checkout -b claude/feat-full-app-prototype
 ```
 
-## 🧬 USER-PROFIL (State Schema)
+Committe in logischen Schritten mit klaren Messages:
+- `chore(prototype): merge income statement lesson redesign`
+- `chore(prototype): merge polish and consistency fixes`
+- `chore(prototype): merge marcus onboarding flow`
+- `chore(prototype): remove legacy onboarding code`
+- `chore(prototype): wire app root to onboarding redirect`
 
-Definiere in `lib/onboarding/profile.ts`:
+### Schritt 4 – Branch 1 in den neuen Branch mergen (Lesson-Redesign)
 
-```ts
-export type UserStatus = 'explorer' | 'starter' | 'applicant' | 'pro'
-export type InterviewGoal = 'spring_week' | 'summer' | 'full_time' | 'off_cycle' | 'unclear'
-export type TimeFrame = '2_weeks' | '1_2_months' | '3_6_months' | 'more_6_months' | 'none'
-export type ExplorerMotivation = 'money' | 'learning' | 'network' | 'unsure'
-export type LearningTime = 'morning' | 'lunch' | 'evening' | 'flexible'
-export type SkillProfile = 'A' | 'B' | 'C'  // A=Beginner, B=BWL-Vorkenntnisse, C=Profi-Drill
-
-export interface UserProfile {
-  status: UserStatus | null
-  interviewGoal?: InterviewGoal
-  timeFrame?: TimeFrame
-  explorerMotivation?: ExplorerMotivation
-  knowledge: {
-    balance: 'correct' | 'wrong' | 'never_heard' | null
-    ebitda: 'correct' | 'wrong' | 'never_heard' | null
-    dcf: 'multiple' | 'once' | 'know_it' | 'never_heard' | null
-  }
-  skillProfile: SkillProfile | null
-  learningTime: LearningTime | null
-  streakStarted: string | null  // ISO date
-  onboardingCompletedAt: string | null
-}
-
-export const STORAGE_KEY = 'career_dojo_profile'
-
-export function getProfile(): UserProfile {
-  if (typeof window === 'undefined') return getEmptyProfile()
-  const raw = localStorage.getItem(STORAGE_KEY)
-  return raw ? JSON.parse(raw) : getEmptyProfile()
-}
-
-export function saveProfile(profile: Partial<UserProfile>): void {
-  const current = getProfile()
-  const updated = { ...current, ...profile }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
-}
-
-export function getEmptyProfile(): UserProfile {
-  return {
-    status: null,
-    knowledge: { balance: null, ebitda: null, dcf: null },
-    skillProfile: null,
-    learningTime: null,
-    streakStarted: null,
-    onboardingCompletedAt: null,
-  }
-}
-
-// Routing-Logik nach Knowledge-Check
-export function calculateSkillProfile(knowledge: UserProfile['knowledge']): SkillProfile {
-  // Profil C: Bereits DCF-Erfahrung
-  if (knowledge.dcf === 'multiple') return 'C'
-  
-  const correctCount = [
-    knowledge.balance === 'correct',
-    knowledge.ebitda === 'correct',
-  ].filter(Boolean).length
-  
-  const neverHeardCount = [
-    knowledge.balance === 'never_heard',
-    knowledge.ebitda === 'never_heard',
-    knowledge.dcf === 'never_heard',
-  ].filter(Boolean).length
-  
-  // Profil A: 2+ "noch nie gehört"
-  if (neverHeardCount >= 2) return 'A'
-  
-  // Profil C: Beide richtig + DCF-Erfahrung
-  if (correctCount === 2 && (knowledge.dcf === 'once' || knowledge.dcf === 'know_it')) return 'C'
-  
-  // Default: Profil B
-  return 'B'
-}
-
-// Diagnostic-Daten für Slide 06
-export function getDiagnosticData(profile: UserProfile) {
-  const profileLabels: Record<SkillProfile, string> = {
-    A: 'Entdecker',
-    B: 'Einsteiger',
-    C: 'Profi-Drill',
-  }
-  
-  const goalLabels: Record<InterviewGoal, string> = {
-    spring_week: 'Spring Week',
-    summer: 'Summer Internship',
-    full_time: 'Full-Time Position',
-    off_cycle: 'Off-Cycle / Praktikum',
-    unclear: 'Noch unklar',
-  }
-  
-  // Lektionen-Anzahl basierend auf Profil
-  const lessonsByProfile: Record<SkillProfile, number> = { A: 78, B: 47, C: 22 }
-  
-  // Empfohlene tägliche Zeit
-  const dailyMinutes: Record<SkillProfile, number> = { A: 30, B: 30, C: 45 }
-  
-  // Wissensstand-Beschreibung
-  const knowledgeDescription: Record<SkillProfile, string> = {
-    A: 'Solider Start ohne Vorkenntnisse',
-    B: 'Grundlagen sitzen, Vertiefung fehlt',
-    C: 'Fortgeschritten, gezielter Drill nötig',
-  }
-  
-  return {
-    profileLabel: profileLabels[profile.skillProfile ?? 'B'],
-    goalLabel: profile.interviewGoal ? goalLabels[profile.interviewGoal] : 'Erkundung',
-    timeFrame: profile.timeFrame,
-    knowledgeDescription: knowledgeDescription[profile.skillProfile ?? 'B'],
-    lessonsCount: lessonsByProfile[profile.skillProfile ?? 'B'],
-    dailyMinutes: dailyMinutes[profile.skillProfile ?? 'B'],
-    weeksToTarget: profile.timeFrame === '2_weeks' ? 2
-                 : profile.timeFrame === '1_2_months' ? 6
-                 : profile.timeFrame === '3_6_months' ? 12
-                 : 20,
-  }
-}
+```bash
+git merge claude/feat-lesson-income-statement-redesign --no-ff -m "chore(prototype): merge income statement lesson redesign"
 ```
 
-## 📐 ONBOARDING-LAYOUT
+Falls Konflikte auftreten:
+- Lies beide Versionen sorgfältig
+- Bei Konflikt zwischen `master`-Code und Lesson-Code: **Lesson-Code gewinnt** (er ist neuer und gewünscht)
+- Bei Konflikt in Routing oder App-Konfiguration: schreibe einen Commit-Kommentar, der die Entscheidung dokumentiert
 
-Erstelle `components/onboarding/OnboardingLayout.tsx`:
+Nach erfolgreichem Merge:
+- Lokale Build-Probe: `npm run build` (oder `pnpm build` / `yarn build`, je nach Setup)
+- Lokaler Dev-Server: `npm run dev` und manuell `/lesson/income-statement` öffnen, um zu prüfen, dass die Lektion lädt
+
+### Schritt 5 – Branch 2 in den neuen Branch mergen (Polish-Fixes)
+
+```bash
+git merge claude/feat-lesson-polish-and-consistency --no-ff -m "chore(prototype): merge polish and consistency fixes"
+```
+
+**Achtung – hier sind Konflikte am wahrscheinlichsten**, weil beide Branches das `LessonLayout.tsx` und einzelne Slides angefasst haben. Erwartete Konfliktstellen:
+
+- `components/lesson/LessonLayout.tsx` – Branch 1 hat Side-Panel, Branch 2 hat es entfernt → **Branch 2 gewinnt** (Side-Panel weg)
+- Quiz-Slides (Slide 8, 9) – Branch 1 hat alte Streak-Logik, Branch 2 hat First-Try-Logik → **Branch 2 gewinnt**
+- Wasserfall-Slide (Slide 3) – Branch 1 hat manuell gesetzte Bar-Widths, Branch 2 hat proportionale Berechnung → **Branch 2 gewinnt**
+- Slide 4 Margen – Branch 1 hat eine Firmen-Tabelle, Branch 2 hat zwei → **Branch 2 gewinnt**
+- Top-Bar – Branch 1 hat Sound-Toggle, Branch 2 hat ihn entfernt → **Branch 2 gewinnt**
+
+**Faustregel:** Bei Konflikten zwischen Branch 1 und Branch 2 gewinnt **immer Branch 2**, weil Branch 2 die Polish-Phase ist und neuere, korrigierte Versionen enthält.
+
+Nach erfolgreichem Merge:
+- Build-Probe
+- Dev-Server: prüfe `/lesson/income-statement` durch alle 11 Slides, achte besonders auf:
+  - Side-Panel sollte NICHT mehr da sein
+  - Wasserfall-Balken sollten proportional sein
+  - Quiz-Slides: bei zweitem Versuch keine Streak-Erhöhung
+  - Slide 11 (Retention) zeigt echte gemessene Zeit
+
+### Schritt 6 – Branch 3 in den neuen Branch mergen (Onboarding)
+
+```bash
+git merge claude/feat-onboarding-flow --no-ff -m "chore(prototype): merge marcus onboarding flow"
+```
+
+Mögliche Konfliktstellen:
+
+- `app/page.tsx` – Falls Branch 3 die Root-Route angepasst hat
+- `app/onboarding/` – Falls bereits altes Onboarding in master existiert, gibt es Konflikt zwischen altem und neuem Onboarding-Code
+
+Bei Konflikten:
+- **Neues Marcus-Onboarding** gewinnt immer
+- Alter Onboarding-Code wird entfernt (siehe Schritt 7)
+
+Nach erfolgreichem Merge:
+- Prüfe, ob `app/onboarding/start/page.tsx` existiert und das Marcus-Onboarding rendert
+- Dev-Server: `/onboarding/start` öffnen, prüfe, ob die Cold-Open-Slide mit "73% der IB-Bewerber scheitern am ersten Technical." erscheint
+
+### Schritt 7 – Altes Onboarding entfernen
+
+Basierend auf deiner Inspektion in Schritt 2: Lösche alle Dateien, die zum alten Onboarding gehören.
+
+Wahrscheinliche Kandidaten:
+- `app/onboarding/page.tsx` (alte Onboarding-Hauptseite)
+- `app/onboarding/_components/` (alte Onboarding-Komponenten)
+- Komponenten mit Wolfgang dem Wolf, Carl dem Cashflow als Mascots
+- Alte Onboarding-Routes wie `/onboarding/track-selection` oder ähnliches
+
+**Wichtig:** Lösche NICHT das neue Marcus-Onboarding unter `app/onboarding/start/`.
+
+```bash
+# Beispiel-Commands (anpassen basierend auf tatsächlich gefundenen Dateien)
+git rm app/onboarding/page.tsx
+git rm -r app/onboarding/_components/  # falls existent
+# weitere Files je nach Inspektion
+```
+
+Commit:
+```bash
+git commit -m "chore(prototype): remove legacy onboarding code"
+```
+
+### Schritt 8 – App-Root-Redirect implementieren
+
+Erstelle oder modifiziere `app/page.tsx` (die Root-Route der App), sodass:
+- Wenn `localStorage` ein Profile mit `onboardingCompletedAt` enthält → Redirect zu `/lesson/income-statement`
+- Sonst → Redirect zu `/onboarding/start`
 
 ```tsx
-interface OnboardingLayoutProps {
-  currentStep: number       // 1-9
-  totalSteps: number        // 9
-  onBack?: () => void       // optional, nicht auf Slide 1
-  footer: React.ReactNode
-  children: React.ReactNode
-  showProgress?: boolean    // default true, false auf Slide 1 (Cold Open ohne UI-Ablenkung)
-}
-```
-
-Layout (verwendet das gleiche `h-screen flex flex-col`-Pattern wie das LessonLayout):
-
-```tsx
-<div className="h-screen flex flex-col bg-bg-primary">
-  {/* Header */}
-  <header className="h-12 flex-shrink-0 flex items-center px-6">
-    {onBack && <button onClick={onBack}><ArrowLeft size={18} /></button>}
-    {showProgress && <ProgressDots currentStep={currentStep} totalSteps={totalSteps} />}
-  </header>
-
-  {/* Main */}
-  <main className="flex-1 overflow-y-auto">
-    <div className="max-w-xl mx-auto px-6 py-8 lg:py-16">
-      {children}
-    </div>
-  </main>
-
-  {/* Footer */}
-  <footer className="flex-shrink-0 px-6 py-4">
-    <div className="max-w-xl mx-auto">
-      {footer}
-    </div>
-  </footer>
-</div>
-```
-
-**ProgressDots:** 9 kleine Kreise (8px), aktiv = `bg-accent`, abgeschlossen = `bg-text-muted`, kommend = `bg-bg-border`. Dezent, mittig im Header.
-
-**Wichtig:** Auf Slide 1 (Cold Open) `showProgress={false}` setzen, damit die Konfrontation pur wirkt.
-
-## 📋 SLIDES
-
-### Slide 01 – Cold Open
-
-Komponente: `Slide01ColdOpen.tsx`
-
-Layout (kein Progress-Bar, kein Back-Button, vertikal mittig):
-
-1. Großer Headline-Block mittig:
-```tsx
-   <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-text-primary leading-tight">
-     73% der IB-Bewerber scheitern am ersten Technical.
-   </h1>
-   <p className="font-serif italic text-xl md:text-2xl text-text-secondary mt-6">
-     Nicht weil sie dumm sind. Weil sie falsch lernen.
-   </p>
-```
-
-2. Footer-Slot enthält nur einen kleinen, dezenten Text-Button (kein großer CTA):
-```tsx
-   <button onClick={onNext} className="text-text-secondary hover:text-text-primary font-mono text-sm transition flex items-center gap-2">
-     Erzähl mir mehr <ArrowRight size={14} />
-   </button>
-```
-
-**Animation:** Headline fade-in mit leichtem y-offset (0 → -20px) bei Mount, 600ms.
-
-**Mobile:** Headline `text-3xl`, Subline `text-lg`. Vertikales Padding angepasst.
-
-### Slide 02 – Problem Diagnosis
-
-Komponente: `Slide02ProblemDiagnosis.tsx`
-
-Layout:
-
-1. Marcus-Header (kompakt, ohne Avatar – nur Text):
-```tsx
-   <div className="font-mono text-xs text-text-muted tracking-wider uppercase">
-     Marcus Hart
-   </div>
-   <div className="font-mono text-xs text-text-secondary italic mt-1">
-     Ex-MD, 11 Jahre Goldman Sachs
-   </div>
-```
-
-2. Quote (in Serif für Gewicht):
-```tsx
-   <blockquote className="font-serif text-2xl md:text-3xl text-text-primary mt-8 leading-snug">
-     "In 11 Jahren habe ich über 2.000 Bewerber interviewt. Die meisten scheitern aus drei Gründen, und keiner davon ist mangelnde Intelligenz."
-   </blockquote>
-```
-
-3. Drei Failure-Reasons als nummerierte Liste mit dünnem Akzent-Strich:
-```tsx
-   <ul className="mt-10 space-y-5">
-     <li className="border-l-2 border-accent pl-4 py-1">
-       <span className="font-mono text-xs text-accent block mb-1">01</span>
-       <span className="text-text-primary">Sie cramen 4 Wochen vor dem Interview, statt täglich zu üben.</span>
-     </li>
-     {/* 02, 03 analog */}
-   </ul>
-```
-
-   Items:
-   - 01: "Sie cramen 4 Wochen vor dem Interview, statt täglich zu üben."
-   - 02: "Sie pauken Antworten auswendig, statt das System zu verstehen."
-   - 03: "Sie üben nie laut – und brechen unter Druck im echten Gespräch."
-
-**Footer-CTA:** `Das passiert mir nicht →` (LessonFooterCTA-Komponente, primary)
-
-### Slide 03 – Status Selection
-
-Komponente: `Slide03StatusSelection.tsx`
-
-Layout:
-
-1. Headline: `**"Wo stehst du gerade?"**` (font-serif text-3xl md:text-4xl)
-2. Sub-line: "Sei ehrlich – das hilft mir, dich richtig einzuschätzen." (text-text-secondary)
-3. **Vier Optionskarten** (untereinander, voll breit):
-
-```tsx
-const options = [
-  {
-    id: 'explorer' as UserStatus,
-    number: '01',
-    label: 'ENTDECKER',
-    description: 'Ich überlege noch, ob IB überhaupt mein Ding ist.',
-  },
-  {
-    id: 'starter' as UserStatus,
-    number: '02',
-    label: 'EINSTEIGER',
-    description: 'Ich weiß, dass ich es will – aber ich habe noch keine Ahnung, wo ich anfangen soll.',
-  },
-  {
-    id: 'applicant' as UserStatus,
-    number: '03',
-    label: 'BEWERBER',
-    description: 'Ich bewerbe mich aktiv – Spring Week, Summer, oder Off-Cycle.',
-  },
-  {
-    id: 'pro' as UserStatus,
-    number: '04',
-    label: 'PROFI',
-    description: 'Ich habe schon Praktikum-Erfahrung und drille gezielt für nächste Interviews.',
-  },
-]
-```
-
-Karten-Stil:
-- Idle: `bg-bg-secondary border border-bg-border rounded-lg p-5 cursor-pointer hover:bg-bg-tertiary hover:border-text-muted transition-all`
-- Selected: `border-accent bg-accent/5`
-- Aufbau: Nummer (mono, accent-Farbe) oben, Label (mono, uppercase, tracking-wider, text-base) und Description (sans, text-sm text-text-secondary) darunter.
-
-State: `useState<UserStatus | null>(null)`
-
-**Footer-CTA:** `Weiter →` (disabled bis Auswahl getroffen). Bei Klick: Status in Profile speichern, dann `onNext()`.
-
-### Slide 04 – Goal Selection (Conditional)
-
-Komponente: `Slide04GoalSelection.tsx`
-
-**Diese Slide hat zwei Varianten** je nach Status aus Slide 03.
-
-**Variante A** (für `starter`, `applicant`, `pro`):
-
-1. Headline: **"Worauf bereitest du dich vor?"**
-2. Fünf Optionen als kompakte Buttons (`grid grid-cols-1 md:grid-cols-2 gap-3`):
-   - Spring Week (Februar–April)
-   - Summer Internship (Juni–August)
-   - Full-Time Position
-   - Off-Cycle / Praktikum
-   - Noch unklar
-3. Sub-Headline darunter: **"Wann ist dein nächstes Interview?"** (font-serif text-2xl, mit `mt-12`)
-4. Fünf Optionen:
-   - In den nächsten 2 Wochen
-   - In 1–2 Monaten
-   - In 3–6 Monaten
-   - Mehr als 6 Monate
-   - Noch keines geplant
-
-**Variante B** (für `explorer`):
-
-1. Headline: **"Was reizt dich am IB?"**
-2. Vier Optionen (gleich gestylt wie Variante A):
-   - Das Geld, ehrlich gesagt
-   - Die Lernkurve und der Prestige
-   - Das Netzwerk und Karriereperspektiven
-   - Bin nicht sicher, will erstmal sehen, was das ist
-3. **Keine zweite Frage** – Entdecker brauchen keinen Interview-Anker.
-
-Button-Stil (für beide Varianten):
-- Idle: `bg-bg-secondary border border-bg-border rounded-md px-4 py-3 text-sm cursor-pointer hover:bg-bg-tertiary transition-all`
-- Selected: `border-accent bg-accent/10`
-
-**Footer-CTA:** `Weiter →` (disabled bis ALLE Fragen der Variante beantwortet sind).
-
-Bei Speichern: `interviewGoal`, `timeFrame` (Variante A) oder `explorerMotivation` (Variante B) in Profile.
-
-### Slide 05 – Knowledge Check
-
-Komponente: `Slide05KnowledgeCheck.tsx`
-
-Layout:
-
-1. Marcus-Pre-Frame oben:
-```tsx
-   <div className="border-l-2 border-accent pl-4 py-2 bg-bg-secondary rounded-r-lg">
-     <div className="font-mono text-xs text-text-muted">MARCUS HART</div>
-     <p className="text-text-primary italic mt-1">"Drei kurze Fragen – damit ich dich nicht mit Sachen langweile, die du schon kannst."</p>
-   </div>
-```
-
-2. Drei Fragen untereinander (mit `mt-8 space-y-10`):
-
-**Frage 1 – Bilanz:**
-- Header: "Was zeigt eine Bilanz?" (font-serif text-xl)
-- Optionen (4 Stück, gleicher Button-Stil wie Slide 04):
-  - "Was eine Firma in einem Zeitraum verdient hat" → wrong
-  - "Was eine Firma zu einem Stichtag besitzt und schuldet" → correct
-  - "Wie viel Cash eine Firma generiert" → wrong
-  - "Habe ich noch nie gehört" → never_heard
-
-**Frage 2 – EBITDA:**
-- Header: "Wofür steht EBITDA?"
-- Optionen:
-  - "Earnings Before Interest, Taxes, Depreciation and Amortization" → correct
-  - "Estimated Business Income Tax Deduction Allowance" → wrong
-  - "European Business Tax Indicator" → wrong
-  - "Habe ich noch nie gehört" → never_heard
-
-**Frage 3 – DCF:**
-- Header: "Hast du schon mal ein DCF-Modell in Excel gebaut?"
-- Optionen:
-  - "Ja, mehrfach" → multiple
-  - "Einmal, war kompliziert" → once
-  - "Nein, aber ich weiß was es ist" → know_it
-  - "Habe ich noch nie gehört" → never_heard
-
-**Wichtig:** Alle drei Fragen sind sichtbar gleichzeitig, der User scrollt durch. Bei Auswahl glüht die Option in Akzent. Keine sofortige Bewertung (richtig/falsch) – das ist eine Diagnose, kein Test.
-
-**Footer-CTA:** `Auswerten →` (disabled bis alle 3 Fragen beantwortet).
-
-Bei Klick: 
-1. Knowledge in Profile speichern
-2. `calculateSkillProfile(knowledge)` aufrufen, Ergebnis in `skillProfile` speichern
-3. `onNext()` triggern
-
-### Slide 06 – Personalized Diagnosis
-
-Komponente: `Slide06Diagnosis.tsx`
-
-**Diese Slide ist der psychologische Höhepunkt des Onboardings** – hier zahlt sich die Investition des Users in die Diagnose aus.
-
-Layout:
-
-1. Headline: **"Hier ist meine Einschätzung."** (font-serif text-3xl)
-
-2. **Diagnostic-Card im Bloomberg-Look** (font-mono):
-```tsx
-   <div className="bg-bg-secondary border border-bg-border rounded-xl p-6 mt-6 font-mono text-sm">
-     <div className="space-y-3">
-       <Row label="PROFIL"           value={data.profileLabel} />
-       <Row label="ZIELINTERVIEW"    value={data.goalLabel} />
-       <Row label="ZEITFENSTER"      value={data.timeFrame || '—'} />
-       <Row label="WISSENSSTAND"     value={data.knowledgeDescription} />
-     </div>
-     
-     <hr className="my-5 border-bg-border" />
-     
-     <div className="text-xs text-text-muted uppercase tracking-wider mb-3">EMPFOHLENER LERNPLAN</div>
-     <div className="space-y-3">
-       <Row label="Tägliche Übungszeit"        value={`${data.dailyMinutes} Min`} accent />
-       <Row label="Lektionen bis Interview-ready" value={`${data.lessonsCount}`} accent />
-       <Row label="Erste Lektion"              value="Income Statement" accent />
-     </div>
-   </div>
-```
-
-   Wo `Row` so aussieht:
-```tsx
-   <div className="flex justify-between items-center">
-     <span className="text-text-secondary">{label}</span>
-     <span className={accent ? 'text-accent' : 'text-text-primary'}>{value}</span>
-   </div>
-```
-
-3. **Marcus-Block darunter** (im gewohnten MarcusNote-Stil):
-   - Subject: dynamisch je nach Profil
-   - Body: dynamisch je nach Profil
-
-   Beispiele für Marcus-Texte:
-
-   **Für Profil A (Entdecker/Beginner):**
-   > "Du fängst bei Null an. Das ist okay – die meisten unterschätzen IB-Interviews und überschätzen ihr Wissen. Du machst es richtig herum. Mit 30 Minuten täglich bist du in 5 Monaten auf einem Niveau, auf dem du im First Round nicht panisch wirst. Es ist machbar. Es ist auch nicht optional – wer kürzer trainiert, fliegt zuverlässig raus."
-
-   **Für Profil B (Einsteiger):**
-   > "Du hast die Basics, aber dir fehlt die IB-spezifische Tiefe. Mit 30 Minuten täglich bist du in 12 Wochen auf einem Niveau, auf dem du im Summer-Interview nicht panisch wirst. Das ist machbar. Es ist auch nicht optional – wer kürzer trainiert, fliegt im First Round."
-
-   **Für Profil C (Profi):**
-   > "Du brauchst keine Erklärung mehr, du brauchst Drill. 45 Minuten täglich, gezielt auf deine Schwachstellen. Wenn du dranbleibst, hast du in 5 Wochen einen Vorteil gegenüber 90% der anderen Bewerber – nicht durch mehr Wissen, sondern durch mehr Reps."
-
-   Implementiere das als Dictionary in `lib/onboarding/profile.ts`:
-```ts
-   export const MARCUS_DIAGNOSIS_TEXTS: Record<SkillProfile, { subject: string; body: string }> = {
-     A: { subject: 'Re: Erste Einschätzung', body: '...' },
-     B: { subject: 'Re: Erste Einschätzung', body: '...' },
-     C: { subject: 'Re: Erste Einschätzung', body: '...' },
-   }
-```
-
-**Footer-CTA:** `Plan annehmen →`
-
-**Wichtig:** Der CTA-Text "Plan annehmen" ist nicht zufällig. Er ist eine Mikro-Verpflichtung. NICHT in "Weiter" ändern.
-
-### Slide 07 – Identity Anchoring
-
-Komponente: `Slide07IdentityAnchor.tsx`
-
-Layout:
-
-1. Headline (klein, leise): **"Eine Sache noch."** (font-serif text-2xl text-text-secondary)
-
-2. Marcus-Quote (in Serif, groß):
-```tsx
-   <blockquote className="font-serif text-2xl text-text-primary mt-6 leading-snug">
-     "Du wirst täglich eine Lektion machen. Nicht zwei, nicht drei. Eine. Manche Tage 5 Minuten, manche 30. Aber jeden Tag. Das ist die einzige Regel."
-   </blockquote>
-   <p className="font-serif italic text-text-secondary mt-4 text-lg">
-     "Wer das durchzieht, schafft 90% der Konkurrenz – allein durch Konsequenz."
-   </p>
-```
-
-3. **Lerntyp-Auswahl** mit Sub-Header:
-```tsx
-   <div className="mt-12">
-     <h3 className="font-serif text-xl text-text-primary">Wann lernst du am besten?</h3>
-     <p className="text-sm text-text-muted mt-1">Damit ich dich genau dann erinnere – nicht öfter.</p>
-   </div>
-```
-
-4. **Vier Optionen** (Buttons, vertikal, gleicher Stil wie Slide 04):
-   - Morgens vor der Uni *(7:00–9:00)*
-   - In der Mittagspause *(12:00–13:00)*
-   - Abends nach dem Tag *(20:00–22:00)*
-   - Anders / wechselt
-
-   Wichtig: Die Zeitangaben in Klammern sind in mono, kleiner.
-
-State: `useState<LearningTime | null>(null)`
-
-**Footer-CTA:** `Weiter →` (disabled bis Auswahl).
-
-Bei Save: `learningTime` in Profile.
-
-### Slide 08 – Streak Pre-Commitment
-
-Komponente: `Slide08StreakCommit.tsx`
-
-Layout:
-
-1. Headline: **"Eine letzte Sache: Streaks."** (font-serif text-2xl)
-
-2. **Animierte 7-Tage-Streak-Vorschau** mittig:
-```tsx
-   <div className="flex items-center justify-center gap-3 mt-12">
-     {[1,2,3,4,5,6,7].map(day => (
-       <div key={day} className={`
-         w-10 h-10 rounded-full border-2 flex items-center justify-center
-         transition-all duration-500
-         ${day === 1 
-           ? 'border-accent bg-accent/20 text-accent' 
-           : 'border-bg-border text-text-muted'
-         }
-         font-mono text-sm
-       `}>
-         {day}
-       </div>
-     ))}
-   </div>
-```
-   
-   Animation: Tag 1 leuchtet bei Mount auf (Framer Motion: scale 0 → 1 + Akzent-Glow), die anderen 6 erscheinen mit Stagger-Delay.
-
-3. **Erklärungs-Text:**
-```tsx
-   <div className="mt-12 space-y-5 text-text-primary">
-     <p>Ab morgen läuft dein Streak. Jeden Tag, an dem du eine Lektion abschließt, wächst er.</p>
-     <p>Wenn du einen Tag aussetzt, beginnt er bei Null. Klingt hart, ist aber psychologisch der einzige Mechanismus, der nachweislich funktioniert.</p>
-     <p className="font-serif italic text-lg text-text-secondary border-l-2 border-accent pl-4 py-2">
-       Dein Ziel der ersten Woche: 7 Tage in Folge. Das ist alles. Keine Lektion-Targets, keine XP. Nur 7 Tage.
-     </p>
-   </div>
-```
-
-**Footer-CTA:** `Bin dabei →`
-
-Bei Klick: `streakStarted` in Profile auf morgen setzen (oder heute, wenn der User direkt die erste Lektion macht – siehe Slide 9).
-
-### Slide 09 – First Lesson Hook
-
-Komponente: `Slide09FirstLessonHook.tsx`
-
-Layout:
-
-1. Headline mittig, groß: **"Bereit?"** (font-serif text-5xl)
-
-2. **Lesson-Preview-Card** (orientiert sich exakt an der Lesson-Stat-Card aus der Lektion):
-```tsx
-   <div className="bg-bg-secondary border border-bg-border rounded-xl p-6 mt-12">
-     <div className="font-mono text-xs text-text-muted tracking-wider uppercase mb-3">
-       Deine erste Lektion
-     </div>
-     <h3 className="font-serif text-3xl text-text-primary">Income Statement</h3>
-     <p className="text-text-secondary mt-1">Gewinn- und Verlustrechnung</p>
-     
-     <div className="grid grid-cols-3 gap-4 mt-6 pt-5 border-t border-bg-border">
-       <div>
-         <div className="font-mono text-xs text-text-muted uppercase">Dauer</div>
-         <div className="font-mono text-2xl text-text-primary mt-1">6 MIN</div>
-       </div>
-       <div>
-         <div className="font-mono text-xs text-text-muted uppercase">Schwierig.</div>
-         <div className="font-mono text-2xl text-text-primary mt-1">★☆☆☆☆</div>
-       </div>
-       <div>
-         <div className="font-mono text-xs text-text-muted uppercase">XP</div>
-         <div className="font-mono text-2xl text-accent mt-1">+25</div>
-       </div>
-     </div>
-   </div>
-```
-
-3. **Marcus-Quote (kurz, knapp):**
-```tsx
-   <blockquote className="font-serif italic text-xl text-text-secondary mt-8 text-center">
-     "Sechs Minuten. Eine Lektion. Dann hast du Tag 1 deines Streaks. Los."
-   </blockquote>
-```
-
-**Footer-CTA:** `Lektion starten →` (groß, accent, mit Pfeil-Icon)
-
-Bei Klick:
-1. `onboardingCompletedAt` auf jetzt setzen
-2. `streakStarted` auf heute setzen (User startet sofort)
-3. Router-Navigation zu `/lesson/income-statement`
-
-## 🧠 STATE MACHINE (page.tsx)
-
-```tsx
+// app/page.tsx
 'use client'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { OnboardingLayout } from '@/components/onboarding/OnboardingLayout'
-import {
-  getProfile,
-  saveProfile,
-  calculateSkillProfile,
-  type UserProfile,
-} from '@/lib/onboarding/profile'
 
-import Slide01ColdOpen from '@/components/onboarding/Slide01ColdOpen'
-import Slide02ProblemDiagnosis from '@/components/onboarding/Slide02ProblemDiagnosis'
-// ... alle 9 Imports
+const STORAGE_KEY = 'career_dojo_profile'
 
-const SLIDES = [
-  Slide01ColdOpen,
-  Slide02ProblemDiagnosis,
-  Slide03StatusSelection,
-  Slide04GoalSelection,
-  Slide05KnowledgeCheck,
-  Slide06Diagnosis,
-  Slide07IdentityAnchor,
-  Slide08StreakCommit,
-  Slide09FirstLessonHook,
-] as const
-
-export default function OnboardingPage() {
+export default function HomePage() {
   const router = useRouter()
-  const [currentStep, setCurrentStep] = useState(0)
-  const [profile, setProfileState] = useState<UserProfile>(getProfile())
 
-  // Skip onboarding if already completed
   useEffect(() => {
-    if (profile.onboardingCompletedAt) {
-      router.push('/lesson/income-statement')
+    if (typeof window === 'undefined') return
+    
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY)
+      const profile = raw ? JSON.parse(raw) : null
+      
+      if (profile?.onboardingCompletedAt) {
+        router.replace('/lesson/income-statement')
+      } else {
+        router.replace('/onboarding/start')
+      }
+    } catch {
+      // Falls localStorage korrupt ist, sicherheitshalber zum Onboarding
+      router.replace('/onboarding/start')
     }
-  }, [profile.onboardingCompletedAt, router])
+  }, [router])
 
-  const updateProfile = (partial: Partial<UserProfile>) => {
-    saveProfile(partial)
-    setProfileState(prev => ({ ...prev, ...partial }))
-  }
-
-  const goNext = () => setCurrentStep(s => Math.min(s + 1, SLIDES.length - 1))
-  const goBack = () => setCurrentStep(s => Math.max(s - 1, 0))
-
-  const Slide = SLIDES[currentStep]
-  const isFirstSlide = currentStep === 0
-
+  // Während Redirect läuft: minimaler Loading-State
   return (
-    <OnboardingLayout
-      currentStep={currentStep + 1}
-      totalSteps={9}
-      onBack={isFirstSlide ? undefined : goBack}
-      showProgress={!isFirstSlide}
-      footer={null}  // wird vom Slide selbst gerendert via Render-Prop oder context
-    >
-      <Slide
-        profile={profile}
-        updateProfile={updateProfile}
-        onNext={goNext}
-      />
-    </OnboardingLayout>
+    <div className="h-screen flex items-center justify-center bg-bg-primary">
+      <div className="font-mono text-text-muted text-sm">Lade...</div>
+    </div>
   )
 }
 ```
 
-**Wichtig zur Footer-Architektur:** Da jeder Slide seinen eigenen Footer-CTA braucht (mit unterschiedlichen Validations und Labels), übergibt das `OnboardingLayout` den Footer als Slot, und jeder Slide rendert sein eigenes `<LessonFooterCTA>` darin. Verwende dafür entweder einen React Context oder Render-Props – am saubersten ist:
-
-```tsx
-// Slide rendert sich selbst inkl. Footer in einem Fragment:
-return (
-  <>
-    {/* Slide-Content kommt in Layout's main */}
-    <SlideContent />
-    
-    {/* Footer wird via Portal in den Footer-Slot teleportiert */}
-    <FooterPortal>
-      <LessonFooterCTA onClick={handleNext} disabled={!isValid} label="Weiter →" />
-    </FooterPortal>
-  </>
-)
+Committe:
+```bash
+git commit -m "chore(prototype): wire app root to onboarding redirect"
 ```
 
-Setze einen Footer-Portal-Mechanismus mit React's `createPortal` auf, der einen Footer-Slot im Layout adressiert.
+### Schritt 9 – Vollständiger Build und Test
 
-## 🎯 PUSH NOTIFICATION (Post-Onboarding, optional)
-
-Nach Abschluss der ersten Lektion (NICHT direkt nach Onboarding) zeigst du Push-Permission. Implementiere das als separaten Hook:
-
-```ts
-// hooks/usePushPermission.ts
-export function usePushPermission() {
-  const requestPermission = async () => {
-    if (!('Notification' in window)) return 'denied'
-    return await Notification.requestPermission()
-  }
-  return { requestPermission }
-}
+```bash
+npm run build  # oder pnpm/yarn equivalent
 ```
 
-Nach Lesson-1-Completion zeige ein Modal mit Marcus-Stimme:
+Falls der Build scheitert: lies die Fehlermeldungen, behebe die Probleme. Häufige Build-Fehler nach Merges:
+- Doppelte Imports
+- Fehlende Komponenten (weil im Merge gelöscht)
+- TypeScript-Fehler durch geänderte Interfaces
 
-> *"Soll ich dich morgen erinnern? Genau zur Zeit, die du gewählt hast – nicht öfter."*
-> 
-> [Erlauben] [Nein danke]
+Nach erfolgreichem Build, lokaler Dev-Test:
 
-**Wichtig:** Das ist NICHT Teil dieses Prompts (Phase Onboarding). Implementiere nur den Hook und einen Marker im Profile (`pushPermissionAsked: boolean`), der beim nächsten Lesson-Complete-Event geprüft wird.
+```bash
+npm run dev
+```
 
-## ✅ ACCEPTANCE CRITERIA
+Test-Szenarien:
+1. **Erster Besuch:** Öffne `localhost:3000` im Inkognito-Fenster → sollte zu `/onboarding/start` redirecten
+2. **Marcus-Onboarding durchklicken:** Alle 9 Slides funktionieren, am Ende Redirect zu `/lesson/income-statement`
+3. **Lektion durchklicken:** Alle 11 Slides funktionieren, Side-Panel ist weg, Wasserfall-Balken sind proportional, Streak-Logik bei 2. Versuch korrekt
+4. **Zweiter Besuch:** Schließe Tab, öffne `localhost:3000` neu (NICHT inkognito) → sollte direkt zu `/lesson/income-statement` redirecten, weil Profile in localStorage
 
-1. User kann das gesamte Onboarding in unter 90 Sekunden durchklicken
-2. Nach Slide 5 wird `skillProfile` korrekt berechnet (A/B/C-Logik)
-3. Slide 4 zeigt zwei verschiedene Varianten je nach `status` aus Slide 3
-4. Slide 6 zeigt personalisierte Marcus-Texte je nach `skillProfile`
-5. Profil wird in localStorage persistiert (`career_dojo_profile`)
-6. Wenn User Onboarding bereits abgeschlossen hat (Profile hat `onboardingCompletedAt`), wird er direkt zu `/lesson/income-statement` weitergeleitet
-7. Bei Klick auf "Lektion starten" in Slide 9 wird der User zur Lektion navigiert
-8. **Mobile (375px):** Alle Slides funktionieren ohne horizontalen Scroll
-9. **Desktop (1440px):** Content ist auf `max-w-xl` zentriert, leere Seiten wirken durch klare Typografie nicht leer
-10. Marcus' Tonfall ist durchgehend scharf-direkt, niemals "weichgespült"
-11. Keine 3D-Emojis, keine Cartoon-Elemente
-12. Animationen niemals länger als 600ms
+### Schritt 10 – Push des neuen Branches
 
-## 🚀 IMPLEMENTIERUNGS-REIHENFOLGE
+```bash
+git push origin claude/feat-full-app-prototype
+```
 
-1. **Branch erstellen** + Profile-Schema in `lib/onboarding/profile.ts` anlegen
-2. **OnboardingLayout** + Footer-Portal-Mechanismus
-3. **Slide 01** Cold Open (psychologisch wichtigster Hook)
-4. **Slide 02** Problem Diagnosis
-5. **Slide 03** Status Selection
-6. **Slide 04** Goal Selection (conditional rendering!)
-7. **Slide 05** Knowledge Check + `calculateSkillProfile`-Logik
-8. **Slide 06** Diagnosis (mit allen drei Marcus-Varianten)
-9. **Slide 07** Identity Anchor
-10. **Slide 08** Streak Pre-Commitment (mit Animation)
-11. **Slide 09** First Lesson Hook
-12. **Routing:** `app/onboarding/page.tsx` als State Machine
-13. **Skip-Logic:** Wenn Profile.onboardingCompletedAt existiert, direkt zur Lektion weiterleiten
-14. **App-Root anpassen:** Initial-Route soll zu `/onboarding` führen, wenn kein Profile vorhanden ist
-15. **Mobile-Testing** auf 375px, 768px, 1440px
-16. **Push & PR**
+Vercel wird automatisch ein Preview-Deployment für diesen neuen Branch bauen. Sobald das Deployment fertig ist (sichtbar im Vercel-Dashboard unter "Deployments"), kannst du die Preview-URL aufrufen.
 
-Frag mich nach jedem implementierten Slide, ob ich Änderungen will, bevor du zum nächsten gehst.
+**KEIN Pull Request gegen master.** Wir mergen nicht in master. Der neue Branch existiert eigenständig zum Testen.
 
-Wenn du einen besseren psychologischen Hook für eine Slide siehst (z.B. eine schärfere Marcus-Quote, eine elegantere Animation), schlage ihn aktiv vor. Aber halte dich strikt an:
-- Den scharfen, direkten Marcus-Tonfall (keine Hype-Sprache)
-- Das etablierte Design-System (keine neuen Farben)
-- Die psychologische Architektur (Diagnose → Routing → Commitment → Identity → Erste Lektion)
+## ⚠️ KRITISCHE HINWEISE
 
-Los geht's mit Schritt 1 (Branch + Profile-Schema).
+1. **Master bleibt unangetastet.** Niemals `git checkout master` und dann irgendetwas committen. Master wird in dieser Phase NICHT verändert.
+
+2. **Die drei ursprünglichen Feature-Branches bleiben unangetastet.** Sie werden nur als Quelle zum Mergen genutzt, nicht selbst geändert.
+
+3. **Bei jedem Konflikt nachfragen, wenn unklar.** Wenn ein Konflikt nicht mit der "Branch 2 gewinnt"-Faustregel auflösbar ist (z.B. weil beide Branches semantisch unterschiedlichen Code haben), STOP und frag den User. Lieber einmal mehr fragen als falsch mergen.
+
+4. **Bei jedem Build-Fehler dokumentieren.** Wenn der Build nach einem Merge fehlschlägt, sammle alle Fehlermeldungen, behebe sie sequentiell, und committe die Fixes mit klaren Messages.
+
+5. **Niemals `git push --force` auf irgendeinen Branch.** Wenn etwas schiefgeht: lieber den Konsolidierungs-Branch lokal löschen und neu starten.
+
+6. **Vercel deployed automatisch.** Sobald du den neuen Branch pushst, baut Vercel ein Preview-Deployment. Dieses ist die URL, die der User testen wird.
+
+## ✅ AKZEPTANZKRITERIEN
+
+Du bist fertig, wenn:
+
+1. Neuer Branch `claude/feat-full-app-prototype` existiert lokal und auf GitHub
+2. Vercel-Preview-Deployment dieses Branches funktioniert (sichtbar im Vercel-Dashboard)
+3. Auf der Preview-URL führt der Klick auf die Domain (ohne URL-Suffix) zum Marcus-Onboarding
+4. Nach Marcus-Onboarding landet man in der Lektion
+5. Die Lektion ist die Polish-Version (kein Side-Panel, korrekte Streak-Logik, korrekter Wasserfall)
+6. Du hast den User informiert, welche Preview-URL er testen muss
+7. Master und die drei ursprünglichen Feature-Branches sind unverändert
+
+## 🚀 ARBEITSWEISE
+
+Frag mich nach jedem größeren Schritt, ob ich Änderungen will:
+
+- Nach Schritt 1 (Inspektion): zeig mir, was du im Repo gefunden hast
+- Nach Schritt 4 (erstem Merge): zeig mir, ob es Konflikte gab
+- Nach Schritt 6 (drittem Merge): bestätige, dass alle Features integriert sind
+- Nach Schritt 9 (Build & Test): zeig mir Screenshots oder logs der Test-Szenarien
+- Nach Schritt 10 (Push): gib mir die Preview-URL des neuen Branches
+
+Wenn du beim Mergen auf eine Situation stößt, die nicht klar ist, **STOP und frag**. Falsche Merges kosten Stunden zur Korrektur.
+
+Los geht's mit Schritt 1 (Repository inspizieren).
