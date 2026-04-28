@@ -1,4 +1,9 @@
-export type QuizResult = { correct: boolean; attempts: number };
+export type QuizResult = {
+  correct: boolean;
+  attempts: number; // 1 = first try, 2 = second try
+  xpEarned: number;
+  countsForStreak: boolean; // true only when correct AND attempts === 1
+};
 
 // Beginner variant has 2 quiz questions instead of 4 — q3/q4 were dropped
 // in favor of an EBITDA cliffhanger preview slide.
@@ -37,7 +42,9 @@ export function priorStreakFor(self: QuizSlideKey, results: QuizResults | undefi
   let run = 0;
   for (let i = 0; i < idx; i++) {
     const r = results[QUIZ_ORDER[i]];
-    if (r?.correct) run += 1;
+    // Only first-try successes count toward the streak — second-try wins
+    // and wrongs reset it. This matches the visual UI on each quiz slide.
+    if (r?.countsForStreak) run += 1;
     else run = 0;
   }
   return run;

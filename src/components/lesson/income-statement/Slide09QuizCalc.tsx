@@ -6,7 +6,10 @@ import { ArrowRight, RotateCcw } from 'lucide-react';
 import LessonLayout from '../LessonLayout';
 import MarcusNote from '../MarcusNote';
 import { playClickSound, playCorrectSound, playWrongSound, playStreakSound } from '@/lib/sounds';
+import { calculateQuizXp } from '@/lib/lesson/xp';
 import { priorStreakFor, type SlideProps } from './types';
+
+const BASE_XP = 10;
 
 const OPTIONS = [
   { letter: 'A', value: '60%' },
@@ -29,6 +32,7 @@ export default function Slide09QuizCalc({
 }: SlideProps) {
   const [selected, setSelected] = useState<string | null>(null);
   const [state, setState] = useState<State>('idle');
+  const [solvedOnAttempt, setSolvedOnAttempt] = useState<1 | 2 | null>(null);
 
   const isCorrect = state === 'submitted-correct';
   const isWrongFirst = state === 'submitted-wrong-1';
@@ -41,18 +45,21 @@ export default function Slide09QuizCalc({
     if (!selected) return;
     const correct = selected === CORRECT_LETTER;
     if (correct) {
-      const attempts = state === 'submitted-wrong-1' ? 2 : 1;
+      const attempts: 1 | 2 = state === 'submitted-wrong-1' ? 2 : 1;
+      const xpInfo = calculateQuizXp(true, attempts, BASE_XP);
       playCorrectSound();
-      window.setTimeout(() => playStreakSound(), 250);
+      if (xpInfo.countsForStreak) window.setTimeout(() => playStreakSound(), 250);
+      setSolvedOnAttempt(attempts);
       setState('submitted-correct');
-      onAnswer?.('q2', { correct: true, attempts });
+      onAnswer?.('q2', { correct: true, attempts, ...xpInfo });
     } else if (state === 'idle') {
       playWrongSound();
       setState('submitted-wrong-1');
     } else {
+      const xpInfo = calculateQuizXp(false, 2, BASE_XP);
       playWrongSound();
       setState('submitted-wrong-2');
-      onAnswer?.('q2', { correct: false, attempts: 2 });
+      onAnswer?.('q2', { correct: false, attempts: 2, ...xpInfo });
     }
   };
 
@@ -191,12 +198,18 @@ export default function Slide09QuizCalc({
                       </>
                     }
                   />
-                  <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-bg-border">
-                    <span aria-hidden className="text-is-accent">🔥</span>
-                    <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-secondary">
-                      {priorStreak + 1} in Folge richtig · Quiz abgeschlossen
+                  {solvedOnAttempt === 1 ? (
+                    <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-bg-border">
+                      <span aria-hidden className="text-is-accent">🔥</span>
+                      <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-secondary">
+                        {priorStreak + 1} in Folge richtig · Quiz abgeschlossen
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted">
+                      Beim zweiten Versuch geschafft · +5 XP
                     </span>
-                  </div>
+                  )}
                 </>
               )}
 
@@ -213,10 +226,18 @@ export default function Slide09QuizCalc({
               )}
 
               {isWrongFinal && (
-                <MarcusNote
-                  tone="gentle"
-                  body={<>Kein Problem, das verstehst du jetzt für nächstes Mal. Weiter geht&apos;s.</>}
-                />
+                <>
+                  <MarcusNote
+                    tone="gentle"
+                    body={<>Kein Problem, das verstehst du jetzt für nächstes Mal. Weiter geht&apos;s.</>}
+                  />
+                  <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-error">
+                    <span aria-hidden className="text-is-error">🔥</span>
+                    <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-error">
+                      0 · Streak unterbrochen
+                    </span>
+                  </div>
+                </>
               )}
             </motion.div>
           )}
