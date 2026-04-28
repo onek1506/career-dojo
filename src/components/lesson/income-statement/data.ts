@@ -123,12 +123,16 @@ export const margins: MarginItem[] = [
   },
 ];
 
-export type CompanyMargin = { name: string; netMargin: string };
+export type CompanyMargin = {
+  name: string;
+  grossMargin: string;
+  netMargin: string;
+};
 
 export const companyExamples: CompanyMargin[] = [
-  { name: 'APPLE', netMargin: '~25%' },
-  { name: 'NETFLIX', netMargin: '~15%' },
-  { name: 'WALMART', netMargin: '~3%' },
+  { name: 'APPLE', grossMargin: '~40%', netMargin: '~25%' },
+  { name: 'NETFLIX', grossMargin: '~40%', netMargin: '~15%' },
+  { name: 'WALMART', grossMargin: '~25%', netMargin: '~3%' },
 ];
 
 export type ProTip = {
