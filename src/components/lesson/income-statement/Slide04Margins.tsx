@@ -15,7 +15,6 @@ export default function Slide04Margins({
   totalSteps,
   onBack,
   onNext,
-  sidePanel,
 }: SlideProps) {
   const [openKey, setOpenKey] = useState<MarginItem['key'] | null>(null);
 
@@ -37,7 +36,7 @@ export default function Slide04Margins({
       currentStep={currentStep}
       totalSteps={totalSteps}
       onBack={onBack}
-      sidePanel={sidePanel}
+     
       footer={<LessonFooterCTA onClick={handleNext} icon={<ArrowRight size={16} />} />}
     >
       <div className="flex flex-col gap-5 sm:gap-6">

@@ -15,7 +15,6 @@ export default function Slide03Waterfall({
   totalSteps,
   onBack,
   onNext,
-  sidePanel,
 }: SlideProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -37,7 +36,7 @@ export default function Slide03Waterfall({
       currentStep={currentStep}
       totalSteps={totalSteps}
       onBack={onBack}
-      sidePanel={sidePanel}
+     
       footer={<LessonFooterCTA onClick={handleNext} label="Verstanden" icon={<ArrowRight size={16} />} />}
     >
       <div className="flex flex-col gap-5">

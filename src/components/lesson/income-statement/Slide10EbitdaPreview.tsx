@@ -11,7 +11,6 @@ export default function Slide10EbitdaPreview({
   totalSteps,
   onBack,
   onNext,
-  sidePanel,
 }: SlideProps) {
   const handleNext = () => {
     playClickSound();
@@ -23,7 +22,7 @@ export default function Slide10EbitdaPreview({
       currentStep={currentStep}
       totalSteps={totalSteps}
       onBack={onBack}
-      sidePanel={sidePanel}
+     
       footer={<LessonFooterCTA onClick={handleNext} label="Lektion abschließen" icon={<ArrowRight size={16} />} />}
     >
       <div className="flex flex-col gap-5 sm:gap-6">

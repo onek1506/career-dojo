@@ -21,7 +21,6 @@ export interface SlideProps {
   totalSteps: number;
   onBack: () => void;
   onNext: () => void;
-  sidePanel?: import('react').ReactNode;
   onAnswer?: (slideKey: QuizSlideKey, result: QuizResult) => void;
   quizResults?: QuizResults;
   results?: RetentionResults;

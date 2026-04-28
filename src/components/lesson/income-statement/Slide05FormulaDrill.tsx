@@ -24,7 +24,6 @@ export default function Slide05FormulaDrill({
   totalSteps,
   onBack,
   onNext,
-  sidePanel,
 }: SlideProps) {
   const [slots, setSlots] = useState<(WordChip | null)[]>([null, null, null]);
   const [errorSlot, setErrorSlot] = useState<number | null>(null);
@@ -94,7 +93,7 @@ export default function Slide05FormulaDrill({
       currentStep={currentStep}
       totalSteps={totalSteps}
       onBack={onBack}
-      sidePanel={sidePanel}
+     
       footer={footer}
     >
       <div className="flex flex-col gap-5 sm:gap-6">

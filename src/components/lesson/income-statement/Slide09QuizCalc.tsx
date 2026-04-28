@@ -26,7 +26,6 @@ export default function Slide09QuizCalc({
   onNext,
   onAnswer,
   quizResults,
-  sidePanel,
 }: SlideProps) {
   const [selected, setSelected] = useState<string | null>(null);
   const [state, setState] = useState<State>('idle');
@@ -109,7 +108,7 @@ export default function Slide09QuizCalc({
   );
 
   return (
-    <LessonLayout currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} sidePanel={sidePanel} footer={footer}>
+    <LessonLayout currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} footer={footer}>
       <div className="flex flex-col gap-5">
         <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted tracking-wider uppercase">
           Frage 2 / 2 · +{state === 'submitted-wrong-1' || state === 'submitted-wrong-2' ? 5 : 10} XP

@@ -19,7 +19,6 @@ export default function Slide07ProTips({
   totalSteps,
   onBack,
   onNext,
-  sidePanel,
 }: SlideProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'start', loop: false });
   const [activeIndex, setActiveIndex] = useState(0);
@@ -67,7 +66,7 @@ export default function Slide07ProTips({
       currentStep={currentStep}
       totalSteps={totalSteps}
       onBack={onBack}
-      sidePanel={sidePanel}
+     
       footer={footer}
     >
       <div className="flex flex-col gap-5 sm:gap-6">

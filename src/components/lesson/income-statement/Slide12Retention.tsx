@@ -15,7 +15,6 @@ export default function Slide12Retention({
   onBack,
   onNext,
   results,
-  sidePanel,
 }: SlideProps) {
   const accuracy = results?.accuracy ?? 0;
   const elapsed = formatTime(results?.elapsedSeconds ?? 0);
@@ -47,7 +46,7 @@ export default function Slide12Retention({
       currentStep={currentStep}
       totalSteps={totalSteps}
       onBack={onBack}
-      sidePanel={sidePanel}
+     
       footer={null}
     >
       <div className="flex flex-col gap-6 sm:gap-8">

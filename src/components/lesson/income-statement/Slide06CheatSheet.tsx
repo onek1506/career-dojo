@@ -26,7 +26,6 @@ export default function Slide06CheatSheet({
   totalSteps,
   onBack,
   onNext,
-  sidePanel,
 }: SlideProps) {
   const desktopRef = useRef<HTMLDivElement | null>(null);
   const mobileRef = useRef<HTMLDivElement | null>(null);
@@ -90,7 +89,7 @@ export default function Slide06CheatSheet({
       currentStep={currentStep}
       totalSteps={totalSteps}
       onBack={onBack}
-      sidePanel={sidePanel}
+     
       footer={footer}
     >
       <div className="flex flex-col gap-5 sm:gap-6">

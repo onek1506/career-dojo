@@ -18,7 +18,6 @@ export default function Slide01Briefing({
   totalSteps,
   onBack,
   onNext,
-  sidePanel,
 }: SlideProps) {
   const handleNext = () => {
     playClickSound();
@@ -30,7 +29,7 @@ export default function Slide01Briefing({
       currentStep={currentStep}
       totalSteps={totalSteps}
       onBack={onBack}
-      sidePanel={sidePanel}
+     
       footer={<LessonFooterCTA onClick={handleNext} label="Briefing starten" icon={<ArrowRight size={16} />} />}
     >
       <div className="flex flex-col gap-5 sm:gap-6">

@@ -28,7 +28,6 @@ export default function Slide08QuizSort({
   onNext,
   onAnswer,
   quizResults,
-  sidePanel,
 }: SlideProps) {
   const [selected, setSelected] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState<{ letter: string; correct: boolean } | null>(null);
@@ -86,7 +85,7 @@ export default function Slide08QuizSort({
   );
 
   return (
-    <LessonLayout currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} sidePanel={sidePanel} footer={footer}>
+    <LessonLayout currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} footer={footer}>
       <div className="flex flex-col gap-5">
         <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted tracking-wider uppercase">
           Frage 1 / 2 · +10 XP
