@@ -6,6 +6,7 @@ import { ArrowRight, Download, Trophy } from 'lucide-react';
 import LessonLayout from '../LessonLayout';
 import MarcusNote from '../MarcusNote';
 import { playClickSound, playCompleteSound } from '@/lib/sounds';
+import { formatDuration } from '@/lib/lesson/format';
 import { mockRetentionData } from './mockData';
 import type { SlideProps } from './types';
 
@@ -17,7 +18,7 @@ export default function Slide12Retention({
   results,
 }: SlideProps) {
   const accuracy = results?.accuracy ?? 0;
-  const elapsed = formatTime(results?.elapsedSeconds ?? 0);
+  const elapsed = formatDuration(results?.elapsedSeconds ?? 0);
   const xp = results?.totalXp ?? 0;
   const correctCount = results
     ? Object.values(results.quizResults).filter((r) => r?.correct).length
@@ -278,8 +279,3 @@ function ActionCard({
   );
 }
 
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-}
