@@ -1,476 +1,804 @@
-# 🛠️ Phase 3c: Polish & Konsistenz-Fixes für Income-Statement-Lektion
+# 🎯 Onboarding-Implementation für Career-Dojo
 
-Du arbeitest weiter an der Lern-Webapp für IB-Interview-Vorbereitung. Die erste Lektion ("Income Statement") läuft als Prototyp in einem Feature-Branch. User-Tests haben mehrere konkrete Probleme aufgezeigt, die jetzt behoben werden müssen.
+Du arbeitest weiter an der Lern-Webapp für IB-Interview-Vorbereitung. Bisher gibt es eine fertige Lektion ("Income Statement"). Jetzt bauen wir das Onboarding, das vor der ersten Lektion läuft.
 
-## 🌿 GIT-WORKFLOW (verbindlich)
+Dieses Onboarding ist eine **psychologische Architektur**, die in 90 Sekunden eine langfristige Beziehung zum User etabliert. Es macht fünf Dinge gleichzeitig: Diagnose, Routing, Commitment-Generierung, Erwartungs-Setting, Identitäts-Verankerung.
 
-**Wichtig:** Erstelle den neuen Branch direkt vom `master` (oder `main`), NICHT vom bestehenden Feature-Branch. Diese Fixes werden später separat in `master` gemerged, unabhängig vom Feature-Branch des Prototyps.
+## 🌿 GIT-WORKFLOW
 
+1. Erstelle einen neuen Feature-Branch vom aktuellen `main`:
 ```bash
-# Sicherstellen, dass du auf master/main bist
-git checkout master  # oder: git checkout main
-git pull origin master  # oder: git pull origin main
-
-# Neuen Branch direkt von master erstellen
-git checkout -b feature/lesson-polish-and-consistency
+   git checkout main
+   git pull
+   git checkout -b feature/onboarding-flow
+```
+2. Committe in logischen Schritten:
+   - `feat(onboarding): add route and state machine`
+   - `feat(onboarding): implement slide 01 cold open`
+   - `feat(onboarding): implement slide 02 problem diagnosis`
+   - `feat(onboarding): implement slide 03 status selection`
+   - `feat(onboarding): implement slide 04 conditional goal slide`
+   - `feat(onboarding): implement slide 05 knowledge check`
+   - `feat(onboarding): implement slide 06 personalized diagnosis`
+   - `feat(onboarding): implement slide 07 identity anchoring`
+   - `feat(onboarding): implement slide 08 streak pre-commitment`
+   - `feat(onboarding): implement slide 09 first lesson hook`
+   - `feat(onboarding): persist user profile to localStorage`
+   - `feat(onboarding): wire up routing to first lesson`
+3. Push nach Abschluss:
+```bash
+   git push origin feature/onboarding-flow
 ```
 
-Committe in logischen Schritten:
-- `refactor(layout): remove side panel from active lesson view`
-- `refactor(layout): center content with max-w-2xl`
-- `fix(quiz): only count first-try success in streak`
-- `fix(quiz): track correct attempt count for xp calculation`
-- `fix(waterfall): proportional bar widths based on actual values`
-- `feat(lesson): track lesson duration and display in retention hub`
-- `fix(margins): align marcus quote with displayed company examples`
-- `fix(protips): differentiate tag colors by semantic meaning`
-- `refactor(briefing): adjust stat card sizing and alignment`
-- `chore(audio): remove sound toggle until sound files are ready`
-
-Push nach Abschluss:
-```bash
-git push origin feature/lesson-polish-and-consistency
-```
-
-Pull Request öffnen mit Titel: `fix(lesson): polish, consistency, and timing for income statement lesson`
-
-## 🛠️ TECH-STACK (unverändert)
+## 🛠️ TECH-STACK
 
 - Next.js 14+ (App Router), TypeScript, React 18+
-- Tailwind CSS mit etabliertem Design-System
-- Framer Motion für Animationen
+- Tailwind CSS mit dem bereits etablierten Design-System (Akzent-Orange #FF6B00, Bg-Schwarz #0A0A0B, Off-White-Text #F5F5F0)
+- Framer Motion für Übergänge
 - lucide-react für Icons
-- localStorage für Persistierung (kein Supabase)
+- localStorage für Persistierung (kein Supabase in dieser Phase)
 
-## 🎨 DESIGN-SYSTEM (verbindlich, unverändert)
+## 🎨 DESIGN-SYSTEM (verbindlich, identisch zur Lektion)
 
-Nutze die etablierten Tokens:
+Nutze die exakt gleiche Tailwind-Config wie in der Lektion:
 - Schriften: Inter (sans), JetBrains Mono (mono), Instrument Serif (serif)
 - Farben: bg-primary, bg-secondary, bg-tertiary, bg-border, text-primary, text-secondary, text-muted, accent (DEFAULT, hover, muted), gold, success, error
 - Border-Radius: nur `rounded-lg` und `rounded-xl`
+- Animationen: max. 600ms, `transition-all duration-200 ease-out`
 
-## 🔧 FIX 1 – Side-Panel während Lektion entfernen (HÖCHSTE PRIORITÄT)
+**Marcus-Tonfall:** In diesem Onboarding ist Marcus durchgehend **scharf-direkt** (nicht gentle), weil das Onboarding den USP der App verkaufen muss. Er ist autoritativ, knapp, leicht zynisch – aber nicht abwertend. Vergleichbar mit einem Senior-Mentor, der dir die Wahrheit sagt, weil er Zeit nicht verschwenden will.
 
-**Problem:** Das Side-Panel mit Streak, XP, Lesson-Map lenkt während der Lektion vom Lerninhalt ab. Content ist nicht mehr zentriert. User-Tests haben das als Hauptkritikpunkt identifiziert.
+## 📂 DATEISTRUKTUR
 
-**Lösung:** Side-Panel komplett aus der `LessonLayout`-Komponente entfernen. Content wird wieder vollständig zentriert.
+```
+app/
+  onboarding/
+    page.tsx                    // State Machine, lädt Slides
+components/
+  onboarding/
+    OnboardingLayout.tsx        // Wrapper mit Progress-Bar
+    Slide01ColdOpen.tsx
+    Slide02ProblemDiagnosis.tsx
+    Slide03StatusSelection.tsx
+    Slide04GoalSelection.tsx    // conditional rendering
+    Slide05KnowledgeCheck.tsx
+    Slide06Diagnosis.tsx
+    Slide07IdentityAnchor.tsx
+    Slide08StreakCommit.tsx
+    Slide09FirstLessonHook.tsx
+    types.ts
+lib/
+  onboarding/
+    profile.ts                  // localStorage helpers + routing logic
+```
 
-### Änderungen in `LessonLayout.tsx`:
+## 🧬 USER-PROFIL (State Schema)
+
+Definiere in `lib/onboarding/profile.ts`:
+
+```ts
+export type UserStatus = 'explorer' | 'starter' | 'applicant' | 'pro'
+export type InterviewGoal = 'spring_week' | 'summer' | 'full_time' | 'off_cycle' | 'unclear'
+export type TimeFrame = '2_weeks' | '1_2_months' | '3_6_months' | 'more_6_months' | 'none'
+export type ExplorerMotivation = 'money' | 'learning' | 'network' | 'unsure'
+export type LearningTime = 'morning' | 'lunch' | 'evening' | 'flexible'
+export type SkillProfile = 'A' | 'B' | 'C'  // A=Beginner, B=BWL-Vorkenntnisse, C=Profi-Drill
+
+export interface UserProfile {
+  status: UserStatus | null
+  interviewGoal?: InterviewGoal
+  timeFrame?: TimeFrame
+  explorerMotivation?: ExplorerMotivation
+  knowledge: {
+    balance: 'correct' | 'wrong' | 'never_heard' | null
+    ebitda: 'correct' | 'wrong' | 'never_heard' | null
+    dcf: 'multiple' | 'once' | 'know_it' | 'never_heard' | null
+  }
+  skillProfile: SkillProfile | null
+  learningTime: LearningTime | null
+  streakStarted: string | null  // ISO date
+  onboardingCompletedAt: string | null
+}
+
+export const STORAGE_KEY = 'career_dojo_profile'
+
+export function getProfile(): UserProfile {
+  if (typeof window === 'undefined') return getEmptyProfile()
+  const raw = localStorage.getItem(STORAGE_KEY)
+  return raw ? JSON.parse(raw) : getEmptyProfile()
+}
+
+export function saveProfile(profile: Partial<UserProfile>): void {
+  const current = getProfile()
+  const updated = { ...current, ...profile }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+}
+
+export function getEmptyProfile(): UserProfile {
+  return {
+    status: null,
+    knowledge: { balance: null, ebitda: null, dcf: null },
+    skillProfile: null,
+    learningTime: null,
+    streakStarted: null,
+    onboardingCompletedAt: null,
+  }
+}
+
+// Routing-Logik nach Knowledge-Check
+export function calculateSkillProfile(knowledge: UserProfile['knowledge']): SkillProfile {
+  // Profil C: Bereits DCF-Erfahrung
+  if (knowledge.dcf === 'multiple') return 'C'
+  
+  const correctCount = [
+    knowledge.balance === 'correct',
+    knowledge.ebitda === 'correct',
+  ].filter(Boolean).length
+  
+  const neverHeardCount = [
+    knowledge.balance === 'never_heard',
+    knowledge.ebitda === 'never_heard',
+    knowledge.dcf === 'never_heard',
+  ].filter(Boolean).length
+  
+  // Profil A: 2+ "noch nie gehört"
+  if (neverHeardCount >= 2) return 'A'
+  
+  // Profil C: Beide richtig + DCF-Erfahrung
+  if (correctCount === 2 && (knowledge.dcf === 'once' || knowledge.dcf === 'know_it')) return 'C'
+  
+  // Default: Profil B
+  return 'B'
+}
+
+// Diagnostic-Daten für Slide 06
+export function getDiagnosticData(profile: UserProfile) {
+  const profileLabels: Record<SkillProfile, string> = {
+    A: 'Entdecker',
+    B: 'Einsteiger',
+    C: 'Profi-Drill',
+  }
+  
+  const goalLabels: Record<InterviewGoal, string> = {
+    spring_week: 'Spring Week',
+    summer: 'Summer Internship',
+    full_time: 'Full-Time Position',
+    off_cycle: 'Off-Cycle / Praktikum',
+    unclear: 'Noch unklar',
+  }
+  
+  // Lektionen-Anzahl basierend auf Profil
+  const lessonsByProfile: Record<SkillProfile, number> = { A: 78, B: 47, C: 22 }
+  
+  // Empfohlene tägliche Zeit
+  const dailyMinutes: Record<SkillProfile, number> = { A: 30, B: 30, C: 45 }
+  
+  // Wissensstand-Beschreibung
+  const knowledgeDescription: Record<SkillProfile, string> = {
+    A: 'Solider Start ohne Vorkenntnisse',
+    B: 'Grundlagen sitzen, Vertiefung fehlt',
+    C: 'Fortgeschritten, gezielter Drill nötig',
+  }
+  
+  return {
+    profileLabel: profileLabels[profile.skillProfile ?? 'B'],
+    goalLabel: profile.interviewGoal ? goalLabels[profile.interviewGoal] : 'Erkundung',
+    timeFrame: profile.timeFrame,
+    knowledgeDescription: knowledgeDescription[profile.skillProfile ?? 'B'],
+    lessonsCount: lessonsByProfile[profile.skillProfile ?? 'B'],
+    dailyMinutes: dailyMinutes[profile.skillProfile ?? 'B'],
+    weeksToTarget: profile.timeFrame === '2_weeks' ? 2
+                 : profile.timeFrame === '1_2_months' ? 6
+                 : profile.timeFrame === '3_6_months' ? 12
+                 : 20,
+  }
+}
+```
+
+## 📐 ONBOARDING-LAYOUT
+
+Erstelle `components/onboarding/OnboardingLayout.tsx`:
 
 ```tsx
-// VORHER (mit Side-Panel):
-<div className="h-screen flex flex-col bg-bg-primary">
-  <header>...</header>
-  <div className="flex-1 flex overflow-hidden">
-    <main className="flex-1 overflow-y-auto">
-      <div className="max-w-2xl mx-auto px-6 py-12">{children}</div>
-    </main>
-    <aside className="hidden lg:flex w-72 flex-shrink-0 border-l border-bg-border flex-col">
-      <SidePanel ... />
-    </aside>
-  </div>
-  <footer>...</footer>
-</div>
+interface OnboardingLayoutProps {
+  currentStep: number       // 1-9
+  totalSteps: number        // 9
+  onBack?: () => void       // optional, nicht auf Slide 1
+  footer: React.ReactNode
+  children: React.ReactNode
+  showProgress?: boolean    // default true, false auf Slide 1 (Cold Open ohne UI-Ablenkung)
+}
+```
 
-// NACHHER (zentriert, kein Side-Panel):
+Layout (verwendet das gleiche `h-screen flex flex-col`-Pattern wie das LessonLayout):
+
+```tsx
 <div className="h-screen flex flex-col bg-bg-primary">
-  <header>...</header>
+  {/* Header */}
+  <header className="h-12 flex-shrink-0 flex items-center px-6">
+    {onBack && <button onClick={onBack}><ArrowLeft size={18} /></button>}
+    {showProgress && <ProgressDots currentStep={currentStep} totalSteps={totalSteps} />}
+  </header>
+
+  {/* Main */}
   <main className="flex-1 overflow-y-auto">
-    <div className="max-w-2xl mx-auto px-6 py-8 lg:py-12">{children}</div>
+    <div className="max-w-xl mx-auto px-6 py-8 lg:py-16">
+      {children}
+    </div>
   </main>
-  <footer>...</footer>
+
+  {/* Footer */}
+  <footer className="flex-shrink-0 px-6 py-4">
+    <div className="max-w-xl mx-auto">
+      {footer}
+    </div>
+  </footer>
 </div>
 ```
 
-### Was passiert mit den Side-Panel-Inhalten?
+**ProgressDots:** 9 kleine Kreise (8px), aktiv = `bg-accent`, abgeschlossen = `bg-text-muted`, kommend = `bg-bg-border`. Dezent, mittig im Header.
 
-- **Streak-Anzeige:** Wird in der Briefing-Slide (Slide 1) und Retention-Slide (Slide 11) angezeigt. Während der Lektion: nicht sichtbar.
-- **XP-Anzeige:** Gleiches Prinzip – nur in Briefing und Retention.
-- **Lesson-Map:** Wird komplett aus der aktiven Lektion entfernt. Der Progress-Bar oben + der Step-Counter ("07 / 11") reichen als Orientierung. Die Lesson-Map wandert in einen späteren Dashboard-Screen (nicht in dieser Phase implementieren – nur die Komponente nicht mehr im Lesson-Layout rendern).
+**Wichtig:** Auf Slide 1 (Cold Open) `showProgress={false}` setzen, damit die Konfrontation pur wirkt.
 
-### Komponente `SidePanel.tsx` und `LessonMap.tsx`:
+## 📋 SLIDES
 
-Nicht löschen – nur aus dem `LessonLayout` entfernen. Wir brauchen sie später für ein Dashboard. Verschiebe sie in einen `_archived/`-Unterordner oder belasse sie ungenutzt im `components/lesson/`-Verzeichnis. Hauptsache: Sie werden nicht mehr im aktiven Layout gerendert.
+### Slide 01 – Cold Open
 
-### Akzeptanzkriterium:
+Komponente: `Slide01ColdOpen.tsx`
 
-Auf allen Bildschirmgrößen (Mobile, Tablet, Desktop, Wide Desktop) ist der Lektions-Content zentriert auf `max-w-2xl`. Rechts und links ist leerer Bg-Bereich. Kein Side-Panel mehr sichtbar während der aktiven Lektion.
+Layout (kein Progress-Bar, kein Back-Button, vertikal mittig):
 
-## 🔧 FIX 2 – Streak-Logik korrigieren
-
-**Problem:** Aktuell wird die "Frage in Folge richtig"-Streak auch dann erhöht, wenn der User die Frage erst beim zweiten Versuch richtig hat. Das ist ein Trust-Killer für die Streak-Mechanik.
-
-**Lösung:** Streak nur bei First-Try-Erfolg erhöhen. XP entsprechend differenzieren.
-
-### Datenmodell anpassen:
-
-In der State-Definition für Quiz-Antworten:
-
+1. Großer Headline-Block mittig:
 ```tsx
-type QuizResult = {
-  correct: boolean
-  attempts: number  // 1 = first try, 2 = second try, etc.
-  xpEarned: number
-  countsForStreak: boolean  // true nur wenn correct UND attempts === 1
-}
+   <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-text-primary leading-tight">
+     73% der IB-Bewerber scheitern am ersten Technical.
+   </h1>
+   <p className="font-serif italic text-xl md:text-2xl text-text-secondary mt-6">
+     Nicht weil sie dumm sind. Weil sie falsch lernen.
+   </p>
 ```
 
-### XP-Logik:
-
+2. Footer-Slot enthält nur einen kleinen, dezenten Text-Button (kein großer CTA):
 ```tsx
-function calculateQuizXp(correct: boolean, attempts: number, baseXp: number): {
-  xpEarned: number
-  countsForStreak: boolean
-} {
-  if (!correct) {
-    return { xpEarned: 1, countsForStreak: false }  // Trostpunkt
-  }
-  if (attempts === 1) {
-    return { xpEarned: baseXp, countsForStreak: true }  // First-try: voll
-  }
-  // Korrekt, aber zweiter Versuch oder später
-  return { xpEarned: Math.floor(baseXp / 2), countsForStreak: false }
-}
+   <button onClick={onNext} className="text-text-secondary hover:text-text-primary font-mono text-sm transition flex items-center gap-2">
+     Erzähl mir mehr <ArrowRight size={14} />
+   </button>
 ```
 
-### Visuelles Feedback:
+**Animation:** Headline fade-in mit leichtem y-offset (0 → -20px) bei Mount, 600ms.
 
-- **First-Try richtig:** Grüne Streak-Pille mit `🔥 X in Folge richtig` und voller XP-Anzeige.
-- **Second-Try richtig:** **KEINE Streak-Pille**, stattdessen ein dezenter Hinweis: `Beim zweiten Versuch geschafft · +5 XP`. In `text-text-muted`, nicht in Akzent-Farbe.
-- **Falsch (auch nach 2. Versuch):** Streak-Pille **bricht** sichtbar ab: `🔥 0 · Streak unterbrochen` in `text-error`. Das ist hart, aber fair – und psychologisch wichtig für die Glaubwürdigkeit der Mechanik.
+**Mobile:** Headline `text-3xl`, Subline `text-lg`. Vertikales Padding angepasst.
 
-### Akzeptanzkriterium:
+### Slide 02 – Problem Diagnosis
 
-In den Quiz-Slides (Slide 8 und Slide 9 in der aktuellen Lesson-Struktur):
-- Wenn User Antwort beim ersten Versuch richtig hat → Streak +1, volle XP, grüne Pille
-- Wenn User erst beim zweiten Versuch richtig hat → Streak unverändert, halbe XP, dezenter Hinweis
-- Wenn User nach 2. Versuch immer noch falsch → Streak gebrochen, Trostpunkt
+Komponente: `Slide02ProblemDiagnosis.tsx`
 
-## 🔧 FIX 3 – Wasserfall-Balken-Skalierung mathematisch korrekt
+Layout:
 
-**Problem:** In Slide 3 (Wasserfall) sind die Balken-Breiten nicht proportional zu den dargestellten Werten. Z.B. ist der COGS-Balken bei -€50M deutlich kürzer als 50% des Umsatz-Balkens (€100M), obwohl er das visuell sein müsste.
+1. Marcus-Header (kompakt, ohne Avatar – nur Text):
+```tsx
+   <div className="font-mono text-xs text-text-muted tracking-wider uppercase">
+     Marcus Hart
+   </div>
+   <div className="font-mono text-xs text-text-secondary italic mt-1">
+     Ex-MD, 11 Jahre Goldman Sachs
+   </div>
+```
 
-**Lösung:** Balken-Breiten konsequent als prozentualer Anteil des Umsatz-Werts berechnen.
+2. Quote (in Serif für Gewicht):
+```tsx
+   <blockquote className="font-serif text-2xl md:text-3xl text-text-primary mt-8 leading-snug">
+     "In 11 Jahren habe ich über 2.000 Bewerber interviewt. Die meisten scheitern aus drei Gründen, und keiner davon ist mangelnde Intelligenz."
+   </blockquote>
+```
 
-### Datenstruktur in `data.ts`:
+3. Drei Failure-Reasons als nummerierte Liste mit dünnem Akzent-Strich:
+```tsx
+   <ul className="mt-10 space-y-5">
+     <li className="border-l-2 border-accent pl-4 py-1">
+       <span className="font-mono text-xs text-accent block mb-1">01</span>
+       <span className="text-text-primary">Sie cramen 4 Wochen vor dem Interview, statt täglich zu üben.</span>
+     </li>
+     {/* 02, 03 analog */}
+   </ul>
+```
+
+   Items:
+   - 01: "Sie cramen 4 Wochen vor dem Interview, statt täglich zu üben."
+   - 02: "Sie pauken Antworten auswendig, statt das System zu verstehen."
+   - 03: "Sie üben nie laut – und brechen unter Druck im echten Gespräch."
+
+**Footer-CTA:** `Das passiert mir nicht →` (LessonFooterCTA-Komponente, primary)
+
+### Slide 03 – Status Selection
+
+Komponente: `Slide03StatusSelection.tsx`
+
+Layout:
+
+1. Headline: `**"Wo stehst du gerade?"**` (font-serif text-3xl md:text-4xl)
+2. Sub-line: "Sei ehrlich – das hilft mir, dich richtig einzuschätzen." (text-text-secondary)
+3. **Vier Optionskarten** (untereinander, voll breit):
 
 ```tsx
-// In data.ts - waterfallSteps muss Werte und KEINE manuell gesetzten barWidths haben
-export const waterfallSteps = [
-  { type: 'main',    label: 'Umsatz',           en: 'Revenue',           value: 100, en_label: 'Revenue' },
-  { type: 'preview', label: 'Aufwendungen',     en: 'COGS, SG&A, etc.',  value: -50 },
-  { type: 'main',    label: 'EBITDA',           en: 'Op. Erg. vor D&A',  value: 40 },
-  { type: 'preview', label: 'Abschreibungen',   en: 'D&A',               value: -10 },
-  { type: 'main',    label: 'EBIT',             en: 'Operatives Ergebnis', value: 30 },
-  { type: 'preview', label: 'Zinsen + Steuern', en: 'Interest + Taxes',  value: -12 },
-  { type: 'main',    label: 'Jahresüberschuss', en: 'Net Income',        value: 18, highlighted: true },
+const options = [
+  {
+    id: 'explorer' as UserStatus,
+    number: '01',
+    label: 'ENTDECKER',
+    description: 'Ich überlege noch, ob IB überhaupt mein Ding ist.',
+  },
+  {
+    id: 'starter' as UserStatus,
+    number: '02',
+    label: 'EINSTEIGER',
+    description: 'Ich weiß, dass ich es will – aber ich habe noch keine Ahnung, wo ich anfangen soll.',
+  },
+  {
+    id: 'applicant' as UserStatus,
+    number: '03',
+    label: 'BEWERBER',
+    description: 'Ich bewerbe mich aktiv – Spring Week, Summer, oder Off-Cycle.',
+  },
+  {
+    id: 'pro' as UserStatus,
+    number: '04',
+    label: 'PROFI',
+    description: 'Ich habe schon Praktikum-Erfahrung und drille gezielt für nächste Interviews.',
+  },
 ]
 ```
 
-### Berechnungslogik im Slide-3-Component:
+Karten-Stil:
+- Idle: `bg-bg-secondary border border-bg-border rounded-lg p-5 cursor-pointer hover:bg-bg-tertiary hover:border-text-muted transition-all`
+- Selected: `border-accent bg-accent/5`
+- Aufbau: Nummer (mono, accent-Farbe) oben, Label (mono, uppercase, tracking-wider, text-base) und Description (sans, text-sm text-text-secondary) darunter.
 
+State: `useState<UserStatus | null>(null)`
+
+**Footer-CTA:** `Weiter →` (disabled bis Auswahl getroffen). Bei Klick: Status in Profile speichern, dann `onNext()`.
+
+### Slide 04 – Goal Selection (Conditional)
+
+Komponente: `Slide04GoalSelection.tsx`
+
+**Diese Slide hat zwei Varianten** je nach Status aus Slide 03.
+
+**Variante A** (für `starter`, `applicant`, `pro`):
+
+1. Headline: **"Worauf bereitest du dich vor?"**
+2. Fünf Optionen als kompakte Buttons (`grid grid-cols-1 md:grid-cols-2 gap-3`):
+   - Spring Week (Februar–April)
+   - Summer Internship (Juni–August)
+   - Full-Time Position
+   - Off-Cycle / Praktikum
+   - Noch unklar
+3. Sub-Headline darunter: **"Wann ist dein nächstes Interview?"** (font-serif text-2xl, mit `mt-12`)
+4. Fünf Optionen:
+   - In den nächsten 2 Wochen
+   - In 1–2 Monaten
+   - In 3–6 Monaten
+   - Mehr als 6 Monate
+   - Noch keines geplant
+
+**Variante B** (für `explorer`):
+
+1. Headline: **"Was reizt dich am IB?"**
+2. Vier Optionen (gleich gestylt wie Variante A):
+   - Das Geld, ehrlich gesagt
+   - Die Lernkurve und der Prestige
+   - Das Netzwerk und Karriereperspektiven
+   - Bin nicht sicher, will erstmal sehen, was das ist
+3. **Keine zweite Frage** – Entdecker brauchen keinen Interview-Anker.
+
+Button-Stil (für beide Varianten):
+- Idle: `bg-bg-secondary border border-bg-border rounded-md px-4 py-3 text-sm cursor-pointer hover:bg-bg-tertiary transition-all`
+- Selected: `border-accent bg-accent/10`
+
+**Footer-CTA:** `Weiter →` (disabled bis ALLE Fragen der Variante beantwortet sind).
+
+Bei Speichern: `interviewGoal`, `timeFrame` (Variante A) oder `explorerMotivation` (Variante B) in Profile.
+
+### Slide 05 – Knowledge Check
+
+Komponente: `Slide05KnowledgeCheck.tsx`
+
+Layout:
+
+1. Marcus-Pre-Frame oben:
 ```tsx
-const REFERENCE_VALUE = 100  // Umsatz = 100% Breite
-
-function calculateBarWidth(value: number): number {
-  // Absoluter Wert in % des Referenzwerts
-  return Math.abs(value) / REFERENCE_VALUE * 100
-}
-
-// Im JSX:
-{waterfallSteps.map(step => {
-  const widthPercent = calculateBarWidth(step.value)
-  return (
-    <div key={step.label} className="...">
-      <div 
-        style={{ width: `${widthPercent}%` }}
-        className={`h-${step.type === 'main' ? '12' : '6'} ${
-          step.value < 0 ? 'bg-error/40' : 
-          step.highlighted ? 'bg-accent' : 
-          'bg-text-primary'
-        } rounded-md transition-all duration-500`}
-      />
-      <span className="font-mono text-sm">€{Math.abs(step.value)}M</span>
-    </div>
-  )
-})}
+   <div className="border-l-2 border-accent pl-4 py-2 bg-bg-secondary rounded-r-lg">
+     <div className="font-mono text-xs text-text-muted">MARCUS HART</div>
+     <p className="text-text-primary italic mt-1">"Drei kurze Fragen – damit ich dich nicht mit Sachen langweile, die du schon kannst."</p>
+   </div>
 ```
 
-### Visuelle Hierarchie bleibt:
+2. Drei Fragen untereinander (mit `mt-8 space-y-10`):
 
-- `type: 'main'` → Volle Höhe (`h-12`), Off-White oder Akzent-Farbe
-- `type: 'preview'` → Halbe Höhe (`h-6`), `bg-error/40` für Abzüge
+**Frage 1 – Bilanz:**
+- Header: "Was zeigt eine Bilanz?" (font-serif text-xl)
+- Optionen (4 Stück, gleicher Button-Stil wie Slide 04):
+  - "Was eine Firma in einem Zeitraum verdient hat" → wrong
+  - "Was eine Firma zu einem Stichtag besitzt und schuldet" → correct
+  - "Wie viel Cash eine Firma generiert" → wrong
+  - "Habe ich noch nie gehört" → never_heard
 
-### Akzeptanzkriterium:
+**Frage 2 – EBITDA:**
+- Header: "Wofür steht EBITDA?"
+- Optionen:
+  - "Earnings Before Interest, Taxes, Depreciation and Amortization" → correct
+  - "Estimated Business Income Tax Deduction Allowance" → wrong
+  - "European Business Tax Indicator" → wrong
+  - "Habe ich noch nie gehört" → never_heard
 
-In Slide 3 müssen die Balken visuell den dargestellten Werten entsprechen:
-- Umsatz €100M → 100% Breite
-- Aufwendungen -€50M → 50% Breite
-- EBITDA €40M → 40% Breite
-- EBIT €30M → 30% Breite
-- Jahresüberschuss €18M → 18% Breite
+**Frage 3 – DCF:**
+- Header: "Hast du schon mal ein DCF-Modell in Excel gebaut?"
+- Optionen:
+  - "Ja, mehrfach" → multiple
+  - "Einmal, war kompliziert" → once
+  - "Nein, aber ich weiß was es ist" → know_it
+  - "Habe ich noch nie gehört" → never_heard
 
-Die Balken müssen mathematisch korrekt sein, sonst untergräbt das Diagramm das Lernziel.
+**Wichtig:** Alle drei Fragen sind sichtbar gleichzeitig, der User scrollt durch. Bei Auswahl glüht die Option in Akzent. Keine sofortige Bewertung (richtig/falsch) – das ist eine Diagnose, kein Test.
 
-## 🔧 FIX 4 – Lesson-Duration-Tracking (NEUES FEATURE)
+**Footer-CTA:** `Auswerten →` (disabled bis alle 3 Fragen beantwortet).
 
-**Problem:** In der Retention-Slide (Slide 11) wird aktuell eine fixe Zeit angezeigt (z.B. "12:40"). Das muss tatsächlich gemessen werden.
+Bei Klick: 
+1. Knowledge in Profile speichern
+2. `calculateSkillProfile(knowledge)` aufrufen, Ergebnis in `skillProfile` speichern
+3. `onNext()` triggern
 
-**Lösung:** Beim Start der Lektion einen Timer starten, beim Erreichen der Retention-Slide den Wert berechnen und anzeigen.
+### Slide 06 – Personalized Diagnosis
 
-### Implementation:
+Komponente: `Slide06Diagnosis.tsx`
 
-In der `app/lesson/income-statement/page.tsx` (Lesson-State-Machine):
+**Diese Slide ist der psychologische Höhepunkt des Onboardings** – hier zahlt sich die Investition des Users in die Diagnose aus.
+
+Layout:
+
+1. Headline: **"Hier ist meine Einschätzung."** (font-serif text-3xl)
+
+2. **Diagnostic-Card im Bloomberg-Look** (font-mono):
+```tsx
+   <div className="bg-bg-secondary border border-bg-border rounded-xl p-6 mt-6 font-mono text-sm">
+     <div className="space-y-3">
+       <Row label="PROFIL"           value={data.profileLabel} />
+       <Row label="ZIELINTERVIEW"    value={data.goalLabel} />
+       <Row label="ZEITFENSTER"      value={data.timeFrame || '—'} />
+       <Row label="WISSENSSTAND"     value={data.knowledgeDescription} />
+     </div>
+     
+     <hr className="my-5 border-bg-border" />
+     
+     <div className="text-xs text-text-muted uppercase tracking-wider mb-3">EMPFOHLENER LERNPLAN</div>
+     <div className="space-y-3">
+       <Row label="Tägliche Übungszeit"        value={`${data.dailyMinutes} Min`} accent />
+       <Row label="Lektionen bis Interview-ready" value={`${data.lessonsCount}`} accent />
+       <Row label="Erste Lektion"              value="Income Statement" accent />
+     </div>
+   </div>
+```
+
+   Wo `Row` so aussieht:
+```tsx
+   <div className="flex justify-between items-center">
+     <span className="text-text-secondary">{label}</span>
+     <span className={accent ? 'text-accent' : 'text-text-primary'}>{value}</span>
+   </div>
+```
+
+3. **Marcus-Block darunter** (im gewohnten MarcusNote-Stil):
+   - Subject: dynamisch je nach Profil
+   - Body: dynamisch je nach Profil
+
+   Beispiele für Marcus-Texte:
+
+   **Für Profil A (Entdecker/Beginner):**
+   > "Du fängst bei Null an. Das ist okay – die meisten unterschätzen IB-Interviews und überschätzen ihr Wissen. Du machst es richtig herum. Mit 30 Minuten täglich bist du in 5 Monaten auf einem Niveau, auf dem du im First Round nicht panisch wirst. Es ist machbar. Es ist auch nicht optional – wer kürzer trainiert, fliegt zuverlässig raus."
+
+   **Für Profil B (Einsteiger):**
+   > "Du hast die Basics, aber dir fehlt die IB-spezifische Tiefe. Mit 30 Minuten täglich bist du in 12 Wochen auf einem Niveau, auf dem du im Summer-Interview nicht panisch wirst. Das ist machbar. Es ist auch nicht optional – wer kürzer trainiert, fliegt im First Round."
+
+   **Für Profil C (Profi):**
+   > "Du brauchst keine Erklärung mehr, du brauchst Drill. 45 Minuten täglich, gezielt auf deine Schwachstellen. Wenn du dranbleibst, hast du in 5 Wochen einen Vorteil gegenüber 90% der anderen Bewerber – nicht durch mehr Wissen, sondern durch mehr Reps."
+
+   Implementiere das als Dictionary in `lib/onboarding/profile.ts`:
+```ts
+   export const MARCUS_DIAGNOSIS_TEXTS: Record<SkillProfile, { subject: string; body: string }> = {
+     A: { subject: 'Re: Erste Einschätzung', body: '...' },
+     B: { subject: 'Re: Erste Einschätzung', body: '...' },
+     C: { subject: 'Re: Erste Einschätzung', body: '...' },
+   }
+```
+
+**Footer-CTA:** `Plan annehmen →`
+
+**Wichtig:** Der CTA-Text "Plan annehmen" ist nicht zufällig. Er ist eine Mikro-Verpflichtung. NICHT in "Weiter" ändern.
+
+### Slide 07 – Identity Anchoring
+
+Komponente: `Slide07IdentityAnchor.tsx`
+
+Layout:
+
+1. Headline (klein, leise): **"Eine Sache noch."** (font-serif text-2xl text-text-secondary)
+
+2. Marcus-Quote (in Serif, groß):
+```tsx
+   <blockquote className="font-serif text-2xl text-text-primary mt-6 leading-snug">
+     "Du wirst täglich eine Lektion machen. Nicht zwei, nicht drei. Eine. Manche Tage 5 Minuten, manche 30. Aber jeden Tag. Das ist die einzige Regel."
+   </blockquote>
+   <p className="font-serif italic text-text-secondary mt-4 text-lg">
+     "Wer das durchzieht, schafft 90% der Konkurrenz – allein durch Konsequenz."
+   </p>
+```
+
+3. **Lerntyp-Auswahl** mit Sub-Header:
+```tsx
+   <div className="mt-12">
+     <h3 className="font-serif text-xl text-text-primary">Wann lernst du am besten?</h3>
+     <p className="text-sm text-text-muted mt-1">Damit ich dich genau dann erinnere – nicht öfter.</p>
+   </div>
+```
+
+4. **Vier Optionen** (Buttons, vertikal, gleicher Stil wie Slide 04):
+   - Morgens vor der Uni *(7:00–9:00)*
+   - In der Mittagspause *(12:00–13:00)*
+   - Abends nach dem Tag *(20:00–22:00)*
+   - Anders / wechselt
+
+   Wichtig: Die Zeitangaben in Klammern sind in mono, kleiner.
+
+State: `useState<LearningTime | null>(null)`
+
+**Footer-CTA:** `Weiter →` (disabled bis Auswahl).
+
+Bei Save: `learningTime` in Profile.
+
+### Slide 08 – Streak Pre-Commitment
+
+Komponente: `Slide08StreakCommit.tsx`
+
+Layout:
+
+1. Headline: **"Eine letzte Sache: Streaks."** (font-serif text-2xl)
+
+2. **Animierte 7-Tage-Streak-Vorschau** mittig:
+```tsx
+   <div className="flex items-center justify-center gap-3 mt-12">
+     {[1,2,3,4,5,6,7].map(day => (
+       <div key={day} className={`
+         w-10 h-10 rounded-full border-2 flex items-center justify-center
+         transition-all duration-500
+         ${day === 1 
+           ? 'border-accent bg-accent/20 text-accent' 
+           : 'border-bg-border text-text-muted'
+         }
+         font-mono text-sm
+       `}>
+         {day}
+       </div>
+     ))}
+   </div>
+```
+   
+   Animation: Tag 1 leuchtet bei Mount auf (Framer Motion: scale 0 → 1 + Akzent-Glow), die anderen 6 erscheinen mit Stagger-Delay.
+
+3. **Erklärungs-Text:**
+```tsx
+   <div className="mt-12 space-y-5 text-text-primary">
+     <p>Ab morgen läuft dein Streak. Jeden Tag, an dem du eine Lektion abschließt, wächst er.</p>
+     <p>Wenn du einen Tag aussetzt, beginnt er bei Null. Klingt hart, ist aber psychologisch der einzige Mechanismus, der nachweislich funktioniert.</p>
+     <p className="font-serif italic text-lg text-text-secondary border-l-2 border-accent pl-4 py-2">
+       Dein Ziel der ersten Woche: 7 Tage in Folge. Das ist alles. Keine Lektion-Targets, keine XP. Nur 7 Tage.
+     </p>
+   </div>
+```
+
+**Footer-CTA:** `Bin dabei →`
+
+Bei Klick: `streakStarted` in Profile auf morgen setzen (oder heute, wenn der User direkt die erste Lektion macht – siehe Slide 9).
+
+### Slide 09 – First Lesson Hook
+
+Komponente: `Slide09FirstLessonHook.tsx`
+
+Layout:
+
+1. Headline mittig, groß: **"Bereit?"** (font-serif text-5xl)
+
+2. **Lesson-Preview-Card** (orientiert sich exakt an der Lesson-Stat-Card aus der Lektion):
+```tsx
+   <div className="bg-bg-secondary border border-bg-border rounded-xl p-6 mt-12">
+     <div className="font-mono text-xs text-text-muted tracking-wider uppercase mb-3">
+       Deine erste Lektion
+     </div>
+     <h3 className="font-serif text-3xl text-text-primary">Income Statement</h3>
+     <p className="text-text-secondary mt-1">Gewinn- und Verlustrechnung</p>
+     
+     <div className="grid grid-cols-3 gap-4 mt-6 pt-5 border-t border-bg-border">
+       <div>
+         <div className="font-mono text-xs text-text-muted uppercase">Dauer</div>
+         <div className="font-mono text-2xl text-text-primary mt-1">6 MIN</div>
+       </div>
+       <div>
+         <div className="font-mono text-xs text-text-muted uppercase">Schwierig.</div>
+         <div className="font-mono text-2xl text-text-primary mt-1">★☆☆☆☆</div>
+       </div>
+       <div>
+         <div className="font-mono text-xs text-text-muted uppercase">XP</div>
+         <div className="font-mono text-2xl text-accent mt-1">+25</div>
+       </div>
+     </div>
+   </div>
+```
+
+3. **Marcus-Quote (kurz, knapp):**
+```tsx
+   <blockquote className="font-serif italic text-xl text-text-secondary mt-8 text-center">
+     "Sechs Minuten. Eine Lektion. Dann hast du Tag 1 deines Streaks. Los."
+   </blockquote>
+```
+
+**Footer-CTA:** `Lektion starten →` (groß, accent, mit Pfeil-Icon)
+
+Bei Klick:
+1. `onboardingCompletedAt` auf jetzt setzen
+2. `streakStarted` auf heute setzen (User startet sofort)
+3. Router-Navigation zu `/lesson/income-statement`
+
+## 🧠 STATE MACHINE (page.tsx)
 
 ```tsx
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { OnboardingLayout } from '@/components/onboarding/OnboardingLayout'
+import {
+  getProfile,
+  saveProfile,
+  calculateSkillProfile,
+  type UserProfile,
+} from '@/lib/onboarding/profile'
 
-export default function IncomeStatementLessonPage() {
-  // ... bestehender State
-  
-  // Timer: Beim Mount der Page starten
-  const lessonStartTime = useRef<number>(Date.now())
-  const [elapsedSeconds, setElapsedSeconds] = useState(0)
-  
-  // Live-Update jede Sekunde (optional, nur falls du den Timer irgendwo zeigen willst)
-  // Wenn nicht gebraucht, kann der Effect entfallen
+import Slide01ColdOpen from '@/components/onboarding/Slide01ColdOpen'
+import Slide02ProblemDiagnosis from '@/components/onboarding/Slide02ProblemDiagnosis'
+// ... alle 9 Imports
+
+const SLIDES = [
+  Slide01ColdOpen,
+  Slide02ProblemDiagnosis,
+  Slide03StatusSelection,
+  Slide04GoalSelection,
+  Slide05KnowledgeCheck,
+  Slide06Diagnosis,
+  Slide07IdentityAnchor,
+  Slide08StreakCommit,
+  Slide09FirstLessonHook,
+] as const
+
+export default function OnboardingPage() {
+  const router = useRouter()
+  const [currentStep, setCurrentStep] = useState(0)
+  const [profile, setProfileState] = useState<UserProfile>(getProfile())
+
+  // Skip onboarding if already completed
   useEffect(() => {
-    const interval = setInterval(() => {
-      setElapsedSeconds(Math.floor((Date.now() - lessonStartTime.current) / 1000))
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [])
-  
-  // Beim Erreichen der Retention-Slide: finalen Wert berechnen
-  const finalElapsedSeconds = Math.floor((Date.now() - lessonStartTime.current) / 1000)
-  
-  // An Slide 11 als Prop übergeben
+    if (profile.onboardingCompletedAt) {
+      router.push('/lesson/income-statement')
+    }
+  }, [profile.onboardingCompletedAt, router])
+
+  const updateProfile = (partial: Partial<UserProfile>) => {
+    saveProfile(partial)
+    setProfileState(prev => ({ ...prev, ...partial }))
+  }
+
+  const goNext = () => setCurrentStep(s => Math.min(s + 1, SLIDES.length - 1))
+  const goBack = () => setCurrentStep(s => Math.max(s - 1, 0))
+
+  const Slide = SLIDES[currentStep]
+  const isFirstSlide = currentStep === 0
+
   return (
-    <LessonLayout ...>
-      <Slide 
-        elapsedSeconds={currentStep === 10 ? finalElapsedSeconds : elapsedSeconds}
-        ...
+    <OnboardingLayout
+      currentStep={currentStep + 1}
+      totalSteps={9}
+      onBack={isFirstSlide ? undefined : goBack}
+      showProgress={!isFirstSlide}
+      footer={null}  // wird vom Slide selbst gerendert via Render-Prop oder context
+    >
+      <Slide
+        profile={profile}
+        updateProfile={updateProfile}
+        onNext={goNext}
       />
-    </LessonLayout>
+    </OnboardingLayout>
   )
 }
 ```
 
-### Format-Helper:
+**Wichtig zur Footer-Architektur:** Da jeder Slide seinen eigenen Footer-CTA braucht (mit unterschiedlichen Validations und Labels), übergibt das `OnboardingLayout` den Footer als Slot, und jeder Slide rendert sein eigenes `<LessonFooterCTA>` darin. Verwende dafür entweder einen React Context oder Render-Props – am saubersten ist:
 
 ```tsx
-// lib/lesson/format.ts
-export function formatDuration(seconds: number): string {
-  const mins = Math.floor(seconds / 60)
-  const secs = seconds % 60
-  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+// Slide rendert sich selbst inkl. Footer in einem Fragment:
+return (
+  <>
+    {/* Slide-Content kommt in Layout's main */}
+    <SlideContent />
+    
+    {/* Footer wird via Portal in den Footer-Slot teleportiert */}
+    <FooterPortal>
+      <LessonFooterCTA onClick={handleNext} disabled={!isValid} label="Weiter →" />
+    </FooterPortal>
+  </>
+)
+```
+
+Setze einen Footer-Portal-Mechanismus mit React's `createPortal` auf, der einen Footer-Slot im Layout adressiert.
+
+## 🎯 PUSH NOTIFICATION (Post-Onboarding, optional)
+
+Nach Abschluss der ersten Lektion (NICHT direkt nach Onboarding) zeigst du Push-Permission. Implementiere das als separaten Hook:
+
+```ts
+// hooks/usePushPermission.ts
+export function usePushPermission() {
+  const requestPermission = async () => {
+    if (!('Notification' in window)) return 'denied'
+    return await Notification.requestPermission()
+  }
+  return { requestPermission }
 }
 ```
 
-### In Slide 11 (Retention) verwenden:
+Nach Lesson-1-Completion zeige ein Modal mit Marcus-Stimme:
 
-```tsx
-import { formatDuration } from '@/lib/lesson/format'
+> *"Soll ich dich morgen erinnern? Genau zur Zeit, die du gewählt hast – nicht öfter."*
+> 
+> [Erlauben] [Nein danke]
 
-// Im Render:
-<div>
-  <div className="font-mono text-xs text-text-muted uppercase">Time</div>
-  <div className="font-mono text-3xl text-text-primary mt-1">
-    {formatDuration(elapsedSeconds)}
-  </div>
-</div>
-```
+**Wichtig:** Das ist NICHT Teil dieses Prompts (Phase Onboarding). Implementiere nur den Hook und einen Marker im Profile (`pushPermissionAsked: boolean`), der beim nächsten Lesson-Complete-Event geprüft wird.
 
-### Edge-Cases:
+## ✅ ACCEPTANCE CRITERIA
 
-- **User pausiert Browser-Tab:** `Date.now()` läuft weiter, also wird Pausierungs-Zeit mitgezählt. Das ist akzeptabel für v1 – wer pausiert, hat halt Pause gemacht.
-- **User refreshed Seite:** Timer startet neu. Auch okay für v1 – Edge-Case.
-- **User geht zurück und vor:** Timer läuft weiter, weil `useRef` über Re-Renders persistent ist. Wir messen Zeit von Lektion-Start bis Lektion-Ende, nicht "Zeit pro Slide".
-
-### Akzeptanzkriterium:
-
-In Slide 11 zeigt das "TIME"-Feld die tatsächlich gemessene Zeit zwischen Slide 1 und Slide 11 im Format `MM:SS`. Bei einer 6-Minuten-Lektion sollte dort ungefähr `06:XX` stehen.
-
-## 🔧 FIX 5 – Slide 4 (Margen) Konsistenz
-
-**Problem:** Im Marcus-Quote auf Slide 4 wird "Bruttomarge" als Beispiel genannt ("Apple hat hohe Bruttomargen ~40%, Walmart niedrige ~25%"). Aber die Firmen-Tabelle darunter zeigt "ECHTE FIRMEN, NETTOMARGE" mit Apple ~25%, Netflix ~15%, Walmart ~3%. Das ist inkonsistent: Marcus spricht von Brutto, Tabelle zeigt Netto.
-
-**Lösung:** Beide Margen mit Firmenbeispielen separat ausweisen.
-
-### Neue Layout-Struktur in Slide 4:
-
-Statt einer einzigen Firmen-Tabelle, zwei kompakte Tabellen nebeneinander:
-
-```tsx
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-  <div className="bg-bg-secondary border border-bg-border rounded-lg p-4">
-    <div className="font-mono text-xs text-text-muted uppercase tracking-wider mb-3">
-      Echte Firmen · Bruttomarge
-    </div>
-    <div className="space-y-2 font-mono text-sm">
-      <div className="flex justify-between">
-        <span>APPLE</span><span className="text-text-secondary">~40%</span>
-      </div>
-      <div className="flex justify-between">
-        <span>NETFLIX</span><span className="text-text-secondary">~40%</span>
-      </div>
-      <div className="flex justify-between">
-        <span>WALMART</span><span className="text-text-secondary">~25%</span>
-      </div>
-    </div>
-  </div>
-  
-  <div className="bg-bg-secondary border border-bg-border rounded-lg p-4">
-    <div className="font-mono text-xs text-text-muted uppercase tracking-wider mb-3">
-      Echte Firmen · Nettomarge
-    </div>
-    <div className="space-y-2 font-mono text-sm">
-      <div className="flex justify-between">
-        <span>APPLE</span><span className="text-text-secondary">~25%</span>
-      </div>
-      <div className="flex justify-between">
-        <span>NETFLIX</span><span className="text-text-secondary">~15%</span>
-      </div>
-      <div className="flex justify-between">
-        <span>WALMART</span><span className="text-text-secondary">~3%</span>
-      </div>
-    </div>
-  </div>
-</div>
-```
-
-### Marcus-Quote anpassen:
-
-```tsx
-"Diese zwei Margen reichen für den Anfang. Brutto = wie viel bleibt nach den Produktionskosten. Netto = wie viel bleibt am Ende. Apple ist top in beiden, Walmart kämpft mit dünnen Margen. Das ist der Unterschied zwischen Tech und Retail."
-```
-
-Damit ist Marcus konsistent mit beiden Tabellen.
-
-### Akzeptanzkriterium:
-
-Slide 4 zeigt zwei Firmen-Tabellen (Brutto und Netto). Marcus-Quote spricht beide Margen an, ohne Widerspruch zu den angezeigten Zahlen.
-
-## 🔧 FIX 6 – Pro-Tipp-Tags farblich differenzieren
-
-**Problem:** In Slide 7 (Pro-Tipps) sind die Tags `LERNTIPP`, `MERKE` und `NÄCHSTER SCHRITT` aktuell teils orange, teils grün. Inkonsistent.
-
-**Lösung:** Tags semantisch differenzieren:
-
-```tsx
-const tagStyles: Record<string, string> = {
-  LERNTIPP: 'text-accent',         // Orange (Akzent) – aktive Hilfe
-  MERKE: 'text-gold',              // Gold – wichtige Erkenntnis
-  'NÄCHSTER SCHRITT': 'text-success',  // Grün – Vorausblick/Action
-}
-```
-
-Tag-Komponente:
-
-```tsx
-<div className={`flex items-center gap-2 font-mono text-xs uppercase tracking-wider ${tagStyles[tag]}`}>
-  <span className="w-1.5 h-1.5 rounded-full bg-current" />
-  {tag}
-</div>
-```
-
-### Akzeptanzkriterium:
-
-Die drei Pro-Tipp-Cards haben jeweils einen unterschiedlich gefärbten Tag (orange, gold, grün), die semantisch differenzieren.
-
-## 🔧 FIX 7 – Slide 1 (Briefing) Stat-Card-Anpassung
-
-**Problem:** Die Stat-Card auf Slide 1 ist sehr breit und wirkt out of place neben der schmaleren Marcus-Note darüber. Der visuelle Rhythmus bricht.
-
-**Lösung:** Stat-Card auf gleiche Maximalbreite wie die Marcus-Note bringen, und Werte etwas kleiner.
-
-```tsx
-// Statt voller Container-Breite:
-<div className="bg-bg-secondary border border-bg-border rounded-lg p-4 mt-6 max-w-md">
-  <div className="grid grid-cols-3 gap-4">
-    <div>
-      <div className="font-mono text-[10px] text-text-muted uppercase tracking-widest">Dauer</div>
-      <div className="font-mono text-xl text-text-primary mt-1">6 MIN</div>
-    </div>
-    <div>
-      <div className="font-mono text-[10px] text-text-muted uppercase tracking-widest">XP</div>
-      <div className="font-mono text-xl text-text-primary mt-1">+25</div>
-    </div>
-    <div>
-      <div className="font-mono text-[10px] text-text-muted uppercase tracking-widest">Schwierig.</div>
-      <div className="font-mono text-xl text-text-primary mt-1">★☆☆☆☆</div>
-    </div>
-  </div>
-</div>
-```
-
-### Akzeptanzkriterium:
-
-Stat-Card wirkt visuell konsistent zur Marcus-Note (gleiche oder etwas geringere Breite, harmonische Werte-Größe).
-
-## 🔧 FIX 8 – Sound-Toggle vorerst entfernen
-
-**Problem:** In der Top-Bar ist ein Sound-Toggle, aber es gibt keine echten Sound-Files. Das verwirrt User (klicken, nichts passiert).
-
-**Lösung:** Sound-Toggle aus der Top-Bar **temporär entfernen**, bis echte Sounds vorhanden sind.
-
-### In `LessonLayout.tsx` Header:
-
-```tsx
-// VORHER:
-<header>
-  <BackButton />
-  <ProgressBar />
-  <SoundToggle />  // ENTFERNEN
-  <StepCounter />
-</header>
-
-// NACHHER:
-<header>
-  <BackButton />
-  <ProgressBar />
-  <StepCounter />
-</header>
-```
-
-Den `useSounds`-Hook und das Sound-System NICHT löschen. Es bleibt im Codebase für später. Nur die UI-Komponente nicht mehr rendern.
-
-### Akzeptanzkriterium:
-
-Sound-Toggle ist nicht mehr in der Top-Bar sichtbar. Sound-Hook bleibt im Code für spätere Reaktivierung.
-
-## ✅ GESAMT-AKZEPTANZKRITERIEN
-
-Bevor du Phase 3c als fertig betrachtest, teste:
-
-1. **Side-Panel weg:** Auf Desktop (1440px) ist während der Lektion kein Side-Panel sichtbar. Content ist auf `max-w-2xl` zentriert.
-2. **Streak ehrlich:** Beim Test eines Quiz mit absichtlich falscher erster Antwort → Streak wird NICHT erhöht.
-3. **Wasserfall korrekt:** Visuelle Balken-Längen entsprechen mathematisch den Werten.
-4. **Timer funktioniert:** Slide 11 zeigt eine plausible Zeit (z.B. `04:32` nach echter Lesson-Durchführung).
-5. **Slide 4 konsistent:** Zwei Firmen-Tabellen, Marcus-Quote stimmt mit beiden überein.
-6. **Tags farbig:** Pro-Tipps haben drei verschiedene Tag-Farben.
-7. **Stat-Card auf Slide 1** wirkt visuell harmonisch.
-8. **Sound-Toggle entfernt** aus der Top-Bar.
-9. **Mobile (375px)** und **Tablet (768px):** Alle Änderungen funktionieren auch auf kleineren Viewports.
-10. **Saubere Commit-History** mit den oben genannten Commit-Messages.
+1. User kann das gesamte Onboarding in unter 90 Sekunden durchklicken
+2. Nach Slide 5 wird `skillProfile` korrekt berechnet (A/B/C-Logik)
+3. Slide 4 zeigt zwei verschiedene Varianten je nach `status` aus Slide 3
+4. Slide 6 zeigt personalisierte Marcus-Texte je nach `skillProfile`
+5. Profil wird in localStorage persistiert (`career_dojo_profile`)
+6. Wenn User Onboarding bereits abgeschlossen hat (Profile hat `onboardingCompletedAt`), wird er direkt zu `/lesson/income-statement` weitergeleitet
+7. Bei Klick auf "Lektion starten" in Slide 9 wird der User zur Lektion navigiert
+8. **Mobile (375px):** Alle Slides funktionieren ohne horizontalen Scroll
+9. **Desktop (1440px):** Content ist auf `max-w-xl` zentriert, leere Seiten wirken durch klare Typografie nicht leer
+10. Marcus' Tonfall ist durchgehend scharf-direkt, niemals "weichgespült"
+11. Keine 3D-Emojis, keine Cartoon-Elemente
+12. Animationen niemals länger als 600ms
 
 ## 🚀 IMPLEMENTIERUNGS-REIHENFOLGE
 
-1. **Branch erstellen** vom `master` (siehe Git-Workflow)
-2. **FIX 1:** Side-Panel aus LessonLayout entfernen
-3. **FIX 4:** Timer-System einbauen (vor Quiz-Fixes, weil die Quiz-Logik darauf aufbaut)
-4. **FIX 2:** Streak-Logik korrigieren in Slides 8 und 9
-5. **FIX 3:** Wasserfall-Skalierung in Slide 3
-6. **FIX 5:** Slide 4 Konsistenz
-7. **FIX 6:** Pro-Tipp-Tag-Farben in Slide 7
-8. **FIX 7:** Stat-Card auf Slide 1 anpassen
-9. **FIX 8:** Sound-Toggle entfernen
-10. **Manuelles Testen** auf 3 Viewport-Größen (375, 768, 1440)
-11. **Push & PR** öffnen mit Beschreibung der Änderungen
+1. **Branch erstellen** + Profile-Schema in `lib/onboarding/profile.ts` anlegen
+2. **OnboardingLayout** + Footer-Portal-Mechanismus
+3. **Slide 01** Cold Open (psychologisch wichtigster Hook)
+4. **Slide 02** Problem Diagnosis
+5. **Slide 03** Status Selection
+6. **Slide 04** Goal Selection (conditional rendering!)
+7. **Slide 05** Knowledge Check + `calculateSkillProfile`-Logik
+8. **Slide 06** Diagnosis (mit allen drei Marcus-Varianten)
+9. **Slide 07** Identity Anchor
+10. **Slide 08** Streak Pre-Commitment (mit Animation)
+11. **Slide 09** First Lesson Hook
+12. **Routing:** `app/onboarding/page.tsx` als State Machine
+13. **Skip-Logic:** Wenn Profile.onboardingCompletedAt existiert, direkt zur Lektion weiterleiten
+14. **App-Root anpassen:** Initial-Route soll zu `/onboarding` führen, wenn kein Profile vorhanden ist
+15. **Mobile-Testing** auf 375px, 768px, 1440px
+16. **Push & PR**
 
-Frag mich nach jedem implementierten Fix, ob ich Änderungen will, bevor du zum nächsten gehst.
+Frag mich nach jedem implementierten Slide, ob ich Änderungen will, bevor du zum nächsten gehst.
 
-Wenn du beim Implementieren auf Inkonsistenzen oder Probleme stößt, die im Prompt nicht abgedeckt sind, weise mich aktiv darauf hin – nicht selbstständig "fixen", sondern fragen.
+Wenn du einen besseren psychologischen Hook für eine Slide siehst (z.B. eine schärfere Marcus-Quote, eine elegantere Animation), schlage ihn aktiv vor. Aber halte dich strikt an:
+- Den scharfen, direkten Marcus-Tonfall (keine Hype-Sprache)
+- Das etablierte Design-System (keine neuen Farben)
+- Die psychologische Architektur (Diagnose → Routing → Commitment → Identity → Erste Lektion)
 
-Los geht's mit Schritt 1 (Branch von master erstellen + Side-Panel-Entfernung).
+Los geht's mit Schritt 1 (Branch + Profile-Schema).

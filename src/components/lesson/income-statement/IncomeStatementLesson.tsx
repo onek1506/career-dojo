@@ -13,7 +13,6 @@ import Slide08QuizSort from './Slide08QuizSort';
 import Slide09QuizCalc from './Slide09QuizCalc';
 import Slide10EbitdaPreview from './Slide10EbitdaPreview';
 import Slide12Retention from './Slide12Retention';
-import SidePanel from './SidePanel';
 import { useStore } from '@/lib/store';
 import { calculateAccuracy, calculateTotalXp } from '@/lib/lesson/xp';
 import type {
@@ -90,10 +89,6 @@ export default function IncomeStatementLesson() {
     setCurrentStep((s) => s - 1);
   };
 
-  const sidePanel = (
-    <SidePanel currentStep={currentStep + 1} totalSteps={SLIDES.length} sessionXp={totalXp} />
-  );
-
   return (
     <Slide
       key={currentStep}
@@ -101,7 +96,6 @@ export default function IncomeStatementLesson() {
       totalSteps={SLIDES.length}
       onBack={goBack}
       onNext={goNext}
-      sidePanel={sidePanel}
       onAnswer={handleAnswer}
       quizResults={quizResults}
       results={retentionResults}

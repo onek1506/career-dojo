@@ -1,15 +1,13 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
-import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
-import { getSoundEnabled, setSoundEnabled } from '@/lib/sounds';
+import type { ReactNode } from 'react';
+import { ArrowLeft } from 'lucide-react';
 
 export interface LessonLayoutProps {
   currentStep: number;
   totalSteps: number;
   onBack: () => void;
   footer: ReactNode;
-  sidePanel?: ReactNode;
   children: ReactNode;
 }
 
@@ -18,21 +16,8 @@ export default function LessonLayout({
   totalSteps,
   onBack,
   footer,
-  sidePanel,
   children,
 }: LessonLayoutProps) {
-  const [soundOn, setSoundOn] = useState(true);
-
-  useEffect(() => {
-    setSoundOn(getSoundEnabled());
-  }, []);
-
-  const toggleSound = () => {
-    const next = !soundOn;
-    setSoundOn(next);
-    setSoundEnabled(next);
-  };
-
   const progress = Math.min(100, Math.max(0, (currentStep / totalSteps) * 100));
   const stepCounter = `${String(currentStep).padStart(2, '0')} / ${String(totalSteps).padStart(2, '0')}`;
 
@@ -68,38 +53,19 @@ export default function LessonLayout({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          <button
-            type="button"
-            onClick={toggleSound}
-            aria-label={soundOn ? 'Sound aus' : 'Sound an'}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center text-is-text-muted hover:text-is-text-primary transition-colors duration-200"
-          >
-            {soundOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
-          </button>
-          <span className="font-[family-name:var(--font-is-mono)] text-[11px] sm:text-xs text-is-text-muted tabular-nums">
-            {stepCounter}
-          </span>
-        </div>
+        <span className="font-[family-name:var(--font-is-mono)] text-[11px] sm:text-xs text-is-text-muted tabular-nums min-w-[44px] text-right">
+          {stepCounter}
+        </span>
       </header>
 
-      {/* Main + optional side panel */}
-      <div className="flex-1 flex overflow-hidden">
-        <main className="flex-1 overflow-y-auto">
-          <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8 lg:py-12">
-            {children}
-          </div>
-        </main>
-
-        {sidePanel && (
-          <aside
-            className="hidden lg:flex w-72 flex-shrink-0 border-l border-is-bg-border flex-col overflow-y-auto"
-            style={{ background: 'var(--is-bg-primary)' }}
-          >
-            {sidePanel}
-          </aside>
-        )}
-      </div>
+      {/* Main — content centers on every viewport now that the side panel
+          is gone. Content area is always max-w-2xl, with empty bg gutters
+          on wide screens. */}
+      <main className="flex-1 overflow-y-auto">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8 lg:py-12">
+          {children}
+        </div>
+      </main>
 
       {/* Footer (omitted when no CTA — e.g. Retention Hub) */}
       {footer && (

@@ -16,7 +16,6 @@ export default function Slide02BalanceVsIS({
   totalSteps,
   onBack,
   onNext,
-  sidePanel,
 }: SlideProps) {
   const [state, setState] = useState<State>('idle');
 
@@ -53,7 +52,7 @@ export default function Slide02BalanceVsIS({
   );
 
   return (
-    <LessonLayout currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} sidePanel={sidePanel} footer={footer}>
+    <LessonLayout currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} footer={footer}>
       <div className="flex flex-col gap-5 sm:gap-6">
         <div className="flex flex-col gap-2">
           <h2 className="font-[family-name:var(--font-is-serif)] text-3xl sm:text-4xl font-medium text-is-text-primary leading-tight">

@@ -6,8 +6,7 @@ export type WaterfallStep = {
   type: 'main' | 'preview';
   label: string; // German-first per Phase 3b
   en: string; // English term shown smaller
-  value: number; // signed millions
-  barWidth?: number; // 0-100, only for main rows
+  value: number; // signed millions; bar width is computed from |value|
   highlighted?: boolean;
   tooltip: string;
   lessonHint?: string; // shown for preview rows ("Lektion X")
@@ -19,7 +18,6 @@ export const waterfallSteps: WaterfallStep[] = [
     label: 'Umsatz',
     en: 'Revenue',
     value: 100,
-    barWidth: 100,
     tooltip: 'Alles, was die Firma verkauft hat. Der Top-Line-Wert — bevor irgendwelche Kosten abgezogen werden.',
   },
   {
@@ -35,7 +33,6 @@ export const waterfallSteps: WaterfallStep[] = [
     label: 'Bruttoergebnis',
     en: 'Gross Profit',
     value: 50,
-    barWidth: 50,
     tooltip: 'Was nach den direkten Produktionskosten übrig bleibt — Indikator für Pricing Power.',
   },
   {
@@ -51,7 +48,6 @@ export const waterfallSteps: WaterfallStep[] = [
     label: 'EBITDA',
     en: 'Op. Erg. vor Abschr.',
     value: 40,
-    barWidth: 40,
     tooltip: 'Operative Profitabilität ohne Kapitalstruktur und Abschreibungen. Lieblings-Kennzahl in der Praxis.',
   },
   {
@@ -67,7 +63,6 @@ export const waterfallSteps: WaterfallStep[] = [
     label: 'EBIT',
     en: 'Operatives Ergebnis',
     value: 30,
-    barWidth: 30,
     tooltip: 'EBITDA minus Abschreibungen. Realistisches Bild der operativen Profitabilität.',
   },
   {
@@ -91,7 +86,6 @@ export const waterfallSteps: WaterfallStep[] = [
     label: 'Jahresüberschuss',
     en: 'Net Income',
     value: 18,
-    barWidth: 18,
     highlighted: true,
     tooltip: 'Was am Ende für die Aktionäre übrig bleibt. Die "Bottom Line".',
   },
@@ -129,12 +123,16 @@ export const margins: MarginItem[] = [
   },
 ];
 
-export type CompanyMargin = { name: string; netMargin: string };
+export type CompanyMargin = {
+  name: string;
+  grossMargin: string;
+  netMargin: string;
+};
 
 export const companyExamples: CompanyMargin[] = [
-  { name: 'APPLE', netMargin: '~25%' },
-  { name: 'NETFLIX', netMargin: '~15%' },
-  { name: 'WALMART', netMargin: '~3%' },
+  { name: 'APPLE', grossMargin: '~40%', netMargin: '~25%' },
+  { name: 'NETFLIX', grossMargin: '~40%', netMargin: '~15%' },
+  { name: 'WALMART', grossMargin: '~25%', netMargin: '~3%' },
 ];
 
 export type ProTip = {

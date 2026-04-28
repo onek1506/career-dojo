@@ -15,7 +15,6 @@ export default function Slide04Margins({
   totalSteps,
   onBack,
   onNext,
-  sidePanel,
 }: SlideProps) {
   const [openKey, setOpenKey] = useState<MarginItem['key'] | null>(null);
 
@@ -37,7 +36,7 @@ export default function Slide04Margins({
       currentStep={currentStep}
       totalSteps={totalSteps}
       onBack={onBack}
-      sidePanel={sidePanel}
+     
       footer={<LessonFooterCTA onClick={handleNext} icon={<ArrowRight size={16} />} />}
     >
       <div className="flex flex-col gap-5 sm:gap-6">
@@ -56,33 +55,42 @@ export default function Slide04Margins({
           ))}
         </div>
 
-        <div className="bg-is-bg-secondary border border-is-bg-border rounded-lg p-4">
-          <span className="font-[family-name:var(--font-is-mono)] text-[10px] text-is-text-muted uppercase tracking-wider mb-3 block">
-            Echte Firmen, Nettomarge
-          </span>
-          <ul className="flex flex-col gap-2">
-            {companyExamples.map((c) => (
-              <li
-                key={c.name}
-                className="grid grid-cols-[1fr_auto] items-center gap-2 font-[family-name:var(--font-is-mono)] text-sm text-is-text-secondary tabular-nums"
-              >
-                <span className="text-is-text-primary">{c.name}</span>
-                <span>{c.netMargin}</span>
-              </li>
-            ))}
-          </ul>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <CompanyTable label="Echte Firmen · Bruttomarge" rows={companyExamples.map((c) => ({ name: c.name, value: c.grossMargin }))} />
+          <CompanyTable label="Echte Firmen · Nettomarge" rows={companyExamples.map((c) => ({ name: c.name, value: c.netMargin }))} />
         </div>
 
         <MarcusNote
           tone="gentle"
           body={
             <>
-              Diese zwei Margen reichen für den Anfang. Brutto = wie viel bleibt nach den Produktionskosten. Netto = wie viel bleibt am Ende. Apple hat hohe Margen, Supermärkte niedrige. Mehr braucht es heute nicht.
+              Diese zwei Margen reichen für den Anfang. Brutto = wie viel bleibt nach den Produktionskosten. Netto = wie viel bleibt am Ende. Apple ist top in beiden, Walmart kämpft mit dünnen Margen. Das ist der Unterschied zwischen Tech und Retail.
             </>
           }
         />
       </div>
     </LessonLayout>
+  );
+}
+
+function CompanyTable({ label, rows }: { label: string; rows: { name: string; value: string }[] }) {
+  return (
+    <div className="bg-is-bg-secondary border border-is-bg-border rounded-lg p-4">
+      <span className="font-[family-name:var(--font-is-mono)] text-[10px] text-is-text-muted uppercase tracking-wider mb-3 block">
+        {label}
+      </span>
+      <ul className="flex flex-col gap-2">
+        {rows.map((r) => (
+          <li
+            key={r.name}
+            className="grid grid-cols-[1fr_auto] items-center gap-2 font-[family-name:var(--font-is-mono)] text-sm text-is-text-secondary tabular-nums"
+          >
+            <span className="text-is-text-primary">{r.name}</span>
+            <span>{r.value}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
