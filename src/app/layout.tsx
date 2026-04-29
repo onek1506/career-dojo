@@ -71,6 +71,17 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        {/* Synchronously apply the saved theme before the first paint to
+            avoid a dark→light flash for light-mode users. The script is
+            inlined in the server-rendered HTML and runs during HTML parse,
+            so it executes before React hydrates. Keep this body small. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var s=localStorage.getItem('career-dojo-progress');if(!s)return;var d=JSON.parse(s);if(d&&d.theme==='light'){document.documentElement.setAttribute('data-theme','light');}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body
         className="min-h-full flex flex-col bg-[var(--bg)] text-[var(--text-primary)]"
         suppressHydrationWarning
