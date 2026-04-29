@@ -19,7 +19,7 @@ export const lessonMeta = {
   difficulty: 2,
   prerequisite: 'acc-3-cash-flow-statement',
   trackConfig: {
-    A: { slidesToShow: [1, 2, 3, 4, 5, 7, 8, 9, 11], duration: 8 },
+    A: { slidesToShow: [1, 2, 3, 4, 5, 7, 8, 9, 10, 11], duration: 8 },
     B: { slidesToShow: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], duration: 10 },
     C: { slidesToShow: [1, 3, 4, 5, 6, 7, 8, 9, 10, 11], duration: 8 },
   } satisfies Record<SkillProfile, TrackConfig>,
