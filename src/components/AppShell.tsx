@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useStore } from '@/lib/store';
+import { isOnboardingComplete } from '@/lib/onboarding/profile';
 import TopBar from './TopBar';
 import BottomNav from './BottomNav';
 import StreakReminder from './StreakReminder';
@@ -30,9 +31,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }, [loaded, progress.theme]);
 
   useEffect(() => {
-    if (loaded && !progress.onboardingComplete) {
-      router.push('/onboarding');
-    }
+    // Two onboarding stores live in this app: the legacy `useStore.progress`
+    // flag and the newer Marcus-onboarding profile in localStorage. Either
+    // one being "done" should let the user out of the redirect loop.
+    if (!loaded) return;
+    if (progress.onboardingComplete) return;
+    if (isOnboardingComplete()) return;
+    router.push('/onboarding/start');
   }, [loaded, progress.onboardingComplete, router]);
 
   // Show notification banner once daily if not enabled
@@ -81,7 +86,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!progress.onboardingComplete) {
+  // Hide chrome (TopBar + BottomNav) only when onboarding is genuinely
+  // incomplete in BOTH stores. The new Marcus profile store is the source
+  // of truth for the redesigned flow; the legacy progress flag still
+  // covers older sessions. Either one being done means show the chrome.
+  if (!progress.onboardingComplete && !isOnboardingComplete()) {
     return <>{children}</>;
   }
 
