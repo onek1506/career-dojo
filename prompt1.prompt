@@ -1,298 +1,527 @@
-# 🌿 Neuer Konsolidierungs-Branch: Drei Features in einen Branch zusammenführen
+# 📚 Lektion 02: Balance Sheet (Bilanz)
 
-Du arbeitest am Repository `career-dojo`. Es gibt drei aktive Feature-Branches mit unterschiedlichen Features. Diese sollen in einem **einzigen neuen Feature-Branch** kombiniert werden, sodass die App eine vollständige, testbare Version bekommt.
+Du baust die zweite Lektion der Career-Dojo Lern-Webapp für IB-Interview-Vorbereitung. Die Architektur, das Design-System, alle Komponenten und Templates existieren bereits aus Lektion 01 (Income Statement). Du wiederverwendest sie konsequent – keine neue Infrastruktur, nur neue Inhalte.
 
-**WICHTIG:** Master bleibt komplett unangetastet. Es wird nicht in master gemerged. Wir erstellen nur einen neuen Branch, in dem alle drei Features zusammenlaufen.
-
-## 🌿 AUSGANGSLAGE
-
-Drei Feature-Branches existieren auf GitHub:
-
-1. **`claude/feat-lesson-income-statement-redesign`**
-   - Komplette erste Lektion "Income Statement" mit 11 Slides
-   - Marcus als Coach, Beginner-Vereinfachung
-   - Side-Panel mit Streak/XP/Lesson-Map
-   - Wasserfall mit visuellen Bugs (Balken-Skalierung)
-   - Streak-Logik zählt auch beim 2. Versuch hoch
-
-2. **`claude/feat-lesson-polish-and-consistency`**
-   - Side-Panel entfernt
-   - Streak-Logik korrigiert (nur First-Try)
-   - Wasserfall-Skalierung gefixt
-   - Lesson-Duration-Tracking
-   - Slide 4 Konsistenz, Tag-Farben, Stat-Card-Anpassung
-   - Sound-Toggle entfernt
-
-3. **`claude/feat-onboarding-flow`**
-   - 9-Slide Marcus-Onboarding auf Route `/onboarding/start`
-   - Cold Open mit "73% scheitern am ersten Technical"
-   - Skill-Profile-Logik (A/B/C)
-   - localStorage-Persistierung
-
-## 🎯 ZIEL
-
-Am Ende dieser Phase existiert ein neuer Branch `claude/feat-full-app-prototype`, der alle drei Features enthält und konsistent funktioniert. Master und die drei ursprünglichen Feature-Branches bleiben unverändert.
-
-Konkret muss der neue Branch:
-- App-Root (`/`) leitet zu `/onboarding/start` weiter, wenn kein User-Profile in localStorage existiert
-- App-Root leitet zu `/lesson/income-statement` weiter, wenn Onboarding bereits abgeschlossen ist
-- Das alte Onboarding (mit Wolfgang dem Wolf, Carl dem Cashflow oder ähnlichen Charakteren) wird vollständig entfernt
-- Die Lektion ist die Polish-Version (Side-Panel weg, korrekte Streak-Logik, korrekte Wasserfall-Skalierung)
-- Eine einzige Vercel-Preview-URL zeigt die komplette App
-
-## 📋 ARBEITSSCHRITTE
-
-### Schritt 1 – Repository inspizieren
-
-Bevor du irgendetwas tust, verschaffe dir einen Überblick:
-
-```bash
-git fetch --all
-git branch -a
-git log master --oneline -5
-git log claude/feat-lesson-income-statement-redesign --oneline -10
-git log claude/feat-lesson-polish-and-consistency --oneline -10
-git log claude/feat-onboarding-flow --oneline -10
-```
-
-Identifiziere:
-- Welche Dateien existieren bereits in `master` (Hinweis auf altes Onboarding)?
-- Welche Dateien wurden in welchem Branch angefasst?
-- Gibt es bereits eine `app/onboarding/page.tsx` (altes Onboarding)?
-- Gibt es bereits eine `app/onboarding/start/page.tsx` (neues Marcus-Onboarding) auf Branch 3?
-
-Dokumentiere deine Erkenntnisse, bevor du weitermachst.
-
-### Schritt 2 – Altes Onboarding identifizieren
-
-Suche im `master`-Branch nach Spuren des alten Onboardings:
-
-```bash
-git checkout master
-grep -r "Wolfgang der Wolf" --include="*.tsx" --include="*.ts" .
-grep -r "Carl der Cashflow" --include="*.tsx" --include="*.ts" .
-grep -r "Cash is King" --include="*.tsx" --include="*.ts" .
-```
-
-Notiere alle Dateien, die zum alten Onboarding gehören. Diese werden später entfernt.
-
-### Schritt 3 – Neuen Konsolidierungs-Branch erstellen
-
-Erstelle einen neuen Branch direkt aus `master`. Dieser Branch wird die "Spielwiese" für alle drei Features.
+## 🌿 GIT-WORKFLOW
 
 ```bash
 git checkout master
 git pull origin master
-git checkout -b claude/feat-full-app-prototype
+git checkout -b feature/lesson-02-balance-sheet
 ```
 
-Committe in logischen Schritten mit klaren Messages:
-- `chore(prototype): merge income statement lesson redesign`
-- `chore(prototype): merge polish and consistency fixes`
-- `chore(prototype): merge marcus onboarding flow`
-- `chore(prototype): remove legacy onboarding code`
-- `chore(prototype): wire app root to onboarding redirect`
+Commit-Messages:
+- `feat(lesson-02): add balance sheet lesson data and slide content`
+- `feat(lesson-02): implement two-column asset/liability interactive slide`
+- `feat(lesson-02): wire up track-based slide visibility`
+- `feat(lesson-02): add lesson route and register in lesson registry`
 
-### Schritt 4 – Branch 1 in den neuen Branch mergen (Lesson-Redesign)
-
+Push nach Abschluss:
 ```bash
-git merge claude/feat-lesson-income-statement-redesign --no-ff -m "chore(prototype): merge income statement lesson redesign"
+git push origin feature/lesson-02-balance-sheet
 ```
 
-Falls Konflikte auftreten:
-- Lies beide Versionen sorgfältig
-- Bei Konflikt zwischen `master`-Code und Lesson-Code: **Lesson-Code gewinnt** (er ist neuer und gewünscht)
-- Bei Konflikt in Routing oder App-Konfiguration: schreibe einen Commit-Kommentar, der die Entscheidung dokumentiert
+## 📁 DATEIEN, DIE DU ANLEGST
 
-Nach erfolgreichem Merge:
-- Lokale Build-Probe: `npm run build` (oder `pnpm build` / `yarn build`, je nach Setup)
-- Lokaler Dev-Server: `npm run dev` und manuell `/lesson/income-statement` öffnen, um zu prüfen, dass die Lektion lädt
-
-### Schritt 5 – Branch 2 in den neuen Branch mergen (Polish-Fixes)
-
-```bash
-git merge claude/feat-lesson-polish-and-consistency --no-ff -m "chore(prototype): merge polish and consistency fixes"
+```
+app/
+  lesson/
+    balance-sheet/
+      page.tsx
+components/
+  lesson/
+    balance-sheet/
+      Slide01Briefing.tsx
+      Slide02RecapTapReveal.tsx
+      Slide03ThreeSections.tsx
+      Slide04Positions.tsx
+      Slide05EquilibriumExample.tsx
+      Slide06ShareholdersEquity.tsx      // Track B+C only
+      Slide07NegativeEquity.tsx          // Track B+C only
+      Slide08WorkingCapital.tsx
+      Slide09ProTips.tsx
+      Slide10QuizAssets.tsx
+      Slide11QuizCalculation.tsx
+      Slide12Cliffhanger.tsx
+      Slide13Retention.tsx
+      data.ts
 ```
 
-**Achtung – hier sind Konflikte am wahrscheinlichsten**, weil beide Branches das `LessonLayout.tsx` und einzelne Slides angefasst haben. Erwartete Konfliktstellen:
+## 🎨 DESIGN-SYSTEM
 
-- `components/lesson/LessonLayout.tsx` – Branch 1 hat Side-Panel, Branch 2 hat es entfernt → **Branch 2 gewinnt** (Side-Panel weg)
-- Quiz-Slides (Slide 8, 9) – Branch 1 hat alte Streak-Logik, Branch 2 hat First-Try-Logik → **Branch 2 gewinnt**
-- Wasserfall-Slide (Slide 3) – Branch 1 hat manuell gesetzte Bar-Widths, Branch 2 hat proportionale Berechnung → **Branch 2 gewinnt**
-- Slide 4 Margen – Branch 1 hat eine Firmen-Tabelle, Branch 2 hat zwei → **Branch 2 gewinnt**
-- Top-Bar – Branch 1 hat Sound-Toggle, Branch 2 hat ihn entfernt → **Branch 2 gewinnt**
+Identisch zu Lektion 01. Nutze exakt dieselben Tailwind-Tokens:
+- Farben: bg-primary (#0A0A0B), bg-secondary (#141416), accent (#FF6B00), text-primary (#F5F5F0), text-secondary, text-muted, success, error, gold
+- Fonts: font-serif (Headlines), font-mono (Zahlen/Labels), font-sans (Fließtext)
+- Animationen: max. 600ms, ease-out
 
-**Faustregel:** Bei Konflikten zwischen Branch 1 und Branch 2 gewinnt **immer Branch 2**, weil Branch 2 die Polish-Phase ist und neuere, korrigierte Versionen enthält.
+Marcus-Tonfall in dieser Lektion:
+- **Track A + B:** gentle (ermutigend, erklärend)
+- **Track C:** sharp (knapp, direkt, kein Padding)
 
-Nach erfolgreichem Merge:
-- Build-Probe
-- Dev-Server: prüfe `/lesson/income-statement` durch alle 11 Slides, achte besonders auf:
-  - Side-Panel sollte NICHT mehr da sein
-  - Wasserfall-Balken sollten proportional sein
-  - Quiz-Slides: bei zweitem Versuch keine Streak-Erhöhung
-  - Slide 11 (Retention) zeigt echte gemessene Zeit
+## 📊 LEKTIONS-META
 
-### Schritt 6 – Branch 3 in den neuen Branch mergen (Onboarding)
-
-```bash
-git merge claude/feat-onboarding-flow --no-ff -m "chore(prototype): merge marcus onboarding flow"
-```
-
-Mögliche Konfliktstellen:
-
-- `app/page.tsx` – Falls Branch 3 die Root-Route angepasst hat
-- `app/onboarding/` – Falls bereits altes Onboarding in master existiert, gibt es Konflikt zwischen altem und neuem Onboarding-Code
-
-Bei Konflikten:
-- **Neues Marcus-Onboarding** gewinnt immer
-- Alter Onboarding-Code wird entfernt (siehe Schritt 7)
-
-Nach erfolgreichem Merge:
-- Prüfe, ob `app/onboarding/start/page.tsx` existiert und das Marcus-Onboarding rendert
-- Dev-Server: `/onboarding/start` öffnen, prüfe, ob die Cold-Open-Slide mit "73% der IB-Bewerber scheitern am ersten Technical." erscheint
-
-### Schritt 7 – Altes Onboarding entfernen
-
-Basierend auf deiner Inspektion in Schritt 2: Lösche alle Dateien, die zum alten Onboarding gehören.
-
-Wahrscheinliche Kandidaten:
-- `app/onboarding/page.tsx` (alte Onboarding-Hauptseite)
-- `app/onboarding/_components/` (alte Onboarding-Komponenten)
-- Komponenten mit Wolfgang dem Wolf, Carl dem Cashflow als Mascots
-- Alte Onboarding-Routes wie `/onboarding/track-selection` oder ähnliches
-
-**Wichtig:** Lösche NICHT das neue Marcus-Onboarding unter `app/onboarding/start/`.
-
-```bash
-# Beispiel-Commands (anpassen basierend auf tatsächlich gefundenen Dateien)
-git rm app/onboarding/page.tsx
-git rm -r app/onboarding/_components/  # falls existent
-# weitere Files je nach Inspektion
-```
-
-Commit:
-```bash
-git commit -m "chore(prototype): remove legacy onboarding code"
-```
-
-### Schritt 8 – App-Root-Redirect implementieren
-
-Erstelle oder modifiziere `app/page.tsx` (die Root-Route der App), sodass:
-- Wenn `localStorage` ein Profile mit `onboardingCompletedAt` enthält → Redirect zu `/lesson/income-statement`
-- Sonst → Redirect zu `/onboarding/start`
-
-```tsx
-// app/page.tsx
-'use client'
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-
-const STORAGE_KEY = 'career_dojo_profile'
-
-export default function HomePage() {
-  const router = useRouter()
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      const profile = raw ? JSON.parse(raw) : null
-      
-      if (profile?.onboardingCompletedAt) {
-        router.replace('/lesson/income-statement')
-      } else {
-        router.replace('/onboarding/start')
-      }
-    } catch {
-      // Falls localStorage korrupt ist, sicherheitshalber zum Onboarding
-      router.replace('/onboarding/start')
-    }
-  }, [router])
-
-  // Während Redirect läuft: minimaler Loading-State
-  return (
-    <div className="h-screen flex items-center justify-center bg-bg-primary">
-      <div className="font-mono text-text-muted text-sm">Lade...</div>
-    </div>
-  )
+```ts
+// data.ts
+export const lessonMeta = {
+  id: 'acc-2-balance-sheet',
+  title: 'Balance Sheet',
+  titleDe: 'Bilanz',
+  module: 'MODUL 01 · ACCOUNTING',
+  duration: 8,
+  xp: 30,
+  difficulty: 1,
+  prerequisite: 'acc-1-income-statement',
+  trackConfig: {
+    A: { slidesToShow: [1,2,3,4,5,8,9,10,11,12,13], duration: 6 },
+    B: { slidesToShow: [1,2,3,4,5,6,7,8,9,10,11,13], duration: 8 },
+    C: { slidesToShow: [1,3,4,5,6,7,8,9,10,11,13], duration: 6 },
+  }
 }
 ```
 
-Committe:
-```bash
-git commit -m "chore(prototype): wire app root to onboarding redirect"
+## 📋 SLIDE-INHALTE
+
+### Slide 01 – Briefing
+
+Identische Struktur wie Lektion 01 Slide 01. Nutze die bestehende `Slide01Briefing`-Komponente als Vorlage.
+
+Marcus-Note Body:
+```ts
+const marcusBody = {
+  gentle: 'Die Bilanz zeigt, was eine Firma zu einem bestimmten Moment besitzt und was sie schuldet. Sie ist das Gegenstück zur GuV: keine Geschichte über Zeit – ein Foto an einem Stichtag. Heute lernst du lesen, was drauf ist.',
+  sharp: 'Bilanz. Drei Sektionen, eine Gleichung: Assets = Liabilities + Equity. Wenn die nicht aufgeht, ist entweder das Modell falsch oder du hast einen Fehler. Diese Lektion in 6 Minuten durch.',
+}
 ```
 
-### Schritt 9 – Vollständiger Build und Test
+Stat-Card: `DAUER 8 MIN · XP +30 · SCHWIERIG. ★☆☆☆☆`
 
-```bash
-npm run build  # oder pnpm/yarn equivalent
+Learning Outcomes:
+- `→ Verstehen, was die Bilanz zeigt (und was nicht)`
+- `→ Die drei Sektionen und wichtigsten Positionen kennen`
+- `→ Warum Assets = Liabilities + Equity immer gilt`
+
+CTA: `Briefing starten →`
+
+### Slide 02 – Recap Tap-to-reveal (Track A + B)
+
+**Wiederverwendet exakt die Tap-to-reveal-Mechanik aus Lektion 01 Slide 02.** Neue Karten:
+
+Aufgabe: `'Tippe den Bericht an, der einen Stichtag zeigt.'`
+
+```ts
+const cards = [
+  {
+    id: 'guv',
+    icon: 'Film',
+    title: 'GuV',
+    subtitle: 'Zeitraum · Q1–Q4 2024',
+    isCorrect: false,
+  },
+  {
+    id: 'bilanz',
+    icon: 'Camera',
+    title: 'Bilanz',
+    subtitle: 'Stichtag · 31.12.2024',
+    isCorrect: true,
+  },
+]
 ```
 
-Falls der Build scheitert: lies die Fehlermeldungen, behebe die Probleme. Häufige Build-Fehler nach Merges:
-- Doppelte Imports
-- Fehlende Komponenten (weil im Merge gelöscht)
-- TypeScript-Fehler durch geänderte Interfaces
+Marcus korrekt: `'Korrekt. Die Bilanz ist immer auf einen Stichtag bezogen. Du wirst in Interviews oft gefragt, ob du den Unterschied kennst – und jetzt weißt du ihn.'`
 
-Nach erfolgreichem Build, lokaler Dev-Test:
+Marcus falsch: `'Nochmal: Die GuV ist der Film. Die Bilanz ist das Foto. Das Foto wird zu einem festen Datum aufgenommen – dem Stichtag.'`
 
-```bash
-npm run dev
+### Slide 03 – Die drei Sektionen
+
+Visueller Stack aus drei farblich differenzierten Blöcken:
+
+```ts
+export const threeSections = [
+  {
+    id: 'assets',
+    label: 'ASSETS',
+    labelDe: 'Vermögenswerte',
+    tag: 'Was die Firma hat',
+    examples: ['Cash', 'Accounts Receivable', 'Inventory', 'PP&E', 'Goodwill'],
+    color: 'text-text-primary',
+    borderColor: 'border-accent',
+  },
+  {
+    id: 'liabilities',
+    label: 'LIABILITIES',
+    labelDe: 'Verbindlichkeiten',
+    tag: 'Was die Firma schuldet',
+    examples: ['Accounts Payable', 'Accrued Expenses', 'Debt'],
+    color: 'text-error',
+    borderColor: 'border-error',
+  },
+  {
+    id: 'equity',
+    label: "SHAREHOLDERS' EQUITY",
+    labelDe: 'Eigenkapital',
+    tag: 'Was den Aktionären gehört',
+    examples: ['Common Stock', 'Retained Earnings', 'APIC'],
+    color: 'text-success',
+    borderColor: 'border-success',
+  },
+]
 ```
 
-Test-Szenarien:
-1. **Erster Besuch:** Öffne `localhost:3000` im Inkognito-Fenster → sollte zu `/onboarding/start` redirecten
-2. **Marcus-Onboarding durchklicken:** Alle 9 Slides funktionieren, am Ende Redirect zu `/lesson/income-statement`
-3. **Lektion durchklicken:** Alle 11 Slides funktionieren, Side-Panel ist weg, Wasserfall-Balken sind proportional, Streak-Logik bei 2. Versuch korrekt
-4. **Zweiter Besuch:** Schließe Tab, öffne `localhost:3000` neu (NICHT inkognito) → sollte direkt zu `/lesson/income-statement` redirecten, weil Profile in localStorage
+Darunter die Gleichung prominent in monospace:
+```
+ASSETS  =  LIABILITIES  +  SHAREHOLDERS' EQUITY
+```
+Das `=`-Zeichen in `text-accent`.
 
-### Schritt 10 – Push des neuen Branches
+Marcus-Note: `'Diese Gleichung ist unverletzlich. Immer. Wenn du ein Modell baust und sie nicht aufgeht, hast du einen Fehler. Diese einfache Wahrheit prüft jeder Banker täglich.'`
 
-```bash
-git push origin claude/feat-full-app-prototype
+### Slide 04 – Wichtige Positionen (NEUER SLIDE-TYP: Zwei-Spalten-Klickliste)
+
+**Das ist die einzige wirklich neue Interaktions-Mechanik in dieser Lektion.** Baue sie sorgfältig als wiederverwendbares Template.
+
+Layout: Zwei Spalten nebeneinander (`grid grid-cols-1 md:grid-cols-2 gap-6`). Jede Position ist ein klickbarer Button. Bei Klick öffnet sich ein Akkordeon-Panel darunter mit Tooltip-Text.
+
+```ts
+export const balanceSheetPositions = {
+  assets: [
+    {
+      group: 'CURRENT ASSETS',
+      items: [
+        {
+          label: 'Cash',
+          tooltip: 'Bargeld und sofort verfügbare Mittel. Der wichtigste Single-Posten – zeigt die sofortige Liquidität.',
+        },
+        {
+          label: 'Accounts Receivable',
+          tooltip: 'Was Kunden noch schulden. Ware geliefert, Geld noch nicht erhalten. Zu hohes AR kann auf schwache Zahlungsmoral hinweisen.',
+        },
+        {
+          label: 'Inventory',
+          tooltip: 'Vorräte: Rohstoffe, halbfertige und fertige Produkte. Relevant für Produktionsfirmen, irrelevant für Software.',
+        },
+      ],
+    },
+    {
+      group: 'NON-CURRENT ASSETS',
+      items: [
+        {
+          label: 'PP&E',
+          tooltip: 'Plants, Property & Equipment – Maschinen, Gebäude, Fahrzeuge. Wird abgeschrieben (Depreciation), deshalb sinkt PP&E jedes Jahr.',
+        },
+        {
+          label: 'Goodwill',
+          tooltip: 'Entsteht nur bei Übernahmen. Premium, den Käufer über den Buchwert zahlt. Nicht amortisierbar, kann aber impaired werden.',
+        },
+        {
+          label: 'Intangibles',
+          tooltip: 'Marken, Patente, Kundenbeziehungen. Werden amortisiert – ähnlich wie PP&E abgeschrieben, nur für immaterielle Werte.',
+        },
+      ],
+    },
+  ],
+  liabilitiesAndEquity: [
+    {
+      group: 'CURRENT LIABILITIES',
+      items: [
+        {
+          label: 'Accounts Payable',
+          tooltip: 'Was die Firma noch an Lieferanten schuldet. Spiegel von Accounts Receivable – hier ist die Firma der Schuldner.',
+        },
+        {
+          label: 'Accrued Expenses',
+          tooltip: 'Aufgelaufene Kosten – Gehälter, Zinsen, Steuern, die noch nicht bezahlt wurden, aber schon angefallen sind.',
+        },
+        {
+          label: 'Short-Term Debt',
+          tooltip: 'Schulden, die in weniger als 12 Monaten fällig sind. Viel davon ohne ausreichend Cash: kritisches Warnsignal.',
+        },
+      ],
+    },
+    {
+      group: 'LONG-TERM LIABILITIES',
+      items: [
+        {
+          label: 'Long-Term Debt',
+          tooltip: 'Anleihen, Bankdarlehen mit Laufzeit über 1 Jahr. Die größte Verbindlichkeit bei den meisten Unternehmen.',
+        },
+      ],
+    },
+    {
+      group: "SHAREHOLDERS' EQUITY",
+      items: [
+        {
+          label: 'Common Stock',
+          tooltip: 'Nennwert der ausgegebenen Aktien. In der Praxis meist eine sehr kleine Zahl.',
+        },
+        {
+          label: 'Retained Earnings',
+          tooltip: 'Kumulierte einbehaltene Gewinne seit Gründung minus alle Dividenden. Wächst jedes Jahr, wenn die Firma profitabel ist.',
+        },
+        {
+          label: 'Additional Paid-in Capital',
+          tooltip: 'Betrag den Aktionäre über den Nennwert zahlten. Enthält auch Stock-Based Compensation.',
+        },
+      ],
+    },
+  ],
+}
 ```
 
-Vercel wird automatisch ein Preview-Deployment für diesen neuen Branch bauen. Sobald das Deployment fertig ist (sichtbar im Vercel-Dashboard unter "Deployments"), kannst du die Preview-URL aufrufen.
+Jede Gruppe hat einen Header in `font-mono text-xs text-text-muted uppercase tracking-wider`. Jede Position: `bg-bg-secondary border border-bg-border rounded-lg px-4 py-3 hover:bg-bg-tertiary cursor-pointer font-mono text-sm`. Geklickte Position: `border-accent`.
 
-**KEIN Pull Request gegen master.** Wir mergen nicht in master. Der neue Branch existiert eigenständig zum Testen.
+Marcus-Note (erscheint nach erstem Klick auf irgendeine Position): `'Du musst das nicht alles auswendig kennen. Aber Cash, AR, Inventory, PP&E auf der Asset-Seite und Debt, AP, Retained Earnings auf der anderen – die musst du reflexartig benennen können.'`
 
-## ⚠️ KRITISCHE HINWEISE
+### Slide 05 – Gleichgewichts-Logik mit TechCo-Beispiel
 
-1. **Master bleibt unangetastet.** Niemals `git checkout master` und dann irgendetwas committen. Master wird in dieser Phase NICHT verändert.
+Erklärungs-Text:
+> Die Gleichung Assets = Liabilities + Equity ist buchhalterische Logik. Jeder Euro, den eine Firma besitzt, kommt von irgendwoher: entweder von Gläubigern (Liabilities) oder von Aktionären (Equity). Es gibt keine dritte Quelle.
 
-2. **Die drei ursprünglichen Feature-Branches bleiben unangetastet.** Sie werden nur als Quelle zum Mergen genutzt, nicht selbst geändert.
+Danach eine TechCo-Bilanz-Card im Bloomberg-Stil mit `font-mono`:
 
-3. **Bei jedem Konflikt nachfragen, wenn unklar.** Wenn ein Konflikt nicht mit der "Branch 2 gewinnt"-Faustregel auflösbar ist (z.B. weil beide Branches semantisch unterschiedlichen Code haben), STOP und frag den User. Lieber einmal mehr fragen als falsch mergen.
+```ts
+export const techcoBilanz = {
+  assets: [
+    { label: 'Cash',              value: 30 },
+    { label: 'Accounts Rec.',     value: 20 },
+    { label: 'Inventory',         value: 10 },
+    { label: 'PP&E',              value: 60 },
+    { label: 'Goodwill',          value: 30 },
+  ],
+  totalAssets: 150,
+  liabilities: [
+    { label: 'Accounts Payable',  value: 20 },
+    { label: 'Long-Term Debt',    value: 50 },
+  ],
+  totalLiabilities: 70,
+  equity: [
+    { label: 'Common Stock',      value: 10 },
+    { label: 'Retained Earnings', value: 70 },
+  ],
+  totalEquity: 80,
+  totalLE: 150,
+}
+```
 
-4. **Bei jedem Build-Fehler dokumentieren.** Wenn der Build nach einem Merge fehlschlägt, sammle alle Fehlermeldungen, behebe sie sequentiell, und committe die Fixes mit klaren Messages.
+Layout: Zwei Spalten. Beide enden auf `€150M` – diese Zahl in `text-accent` mit einem `✓` daneben.
 
-5. **Niemals `git push --force` auf irgendeinen Branch.** Wenn etwas schiefgeht: lieber den Konsolidierungs-Branch lokal löschen und neu starten.
+Darunter Tap-to-check-Frage:
+- Frage: `'Was sind Retained Earnings?'`
+- Option A: `'Der Gewinn dieses Jahres'` → Falsch. Marcus: `'Nein. Retained Earnings ist kumulativ – alles, was die Firma über die Jahre verdient und NICHT ausgeschüttet hat. Der Gewinn dieses Jahres ist Net Income auf der GuV.'`
+- Option B: `'Kumulierte einbehaltene Gewinne über alle Jahre'` → Richtig. Marcus: `'Genau. Retained Earnings = alle Jahresüberschüsse seit Gründung, minus alle Dividenden. Es wächst jedes Jahr, wenn die Firma profitabel ist.'`
 
-6. **Vercel deployed automatisch.** Sobald du den neuen Branch pushst, baut Vercel ein Preview-Deployment. Dieses ist die URL, die der User testen wird.
+### Slide 06 – Shareholders' Equity im Detail (Track B + C only)
+
+```ts
+export const equityComponents = [
+  {
+    label: 'Common Stock',
+    formula: null,
+    description: 'Nennwert aller ausgegebenen Aktien. In der Praxis oft winzig (z.B. $0,01 per Aktie).',
+  },
+  {
+    label: 'Retained Earnings',
+    formula: 'RE = Vorjahr-RE + Net Income − Dividenden',
+    description: 'Direkte Verbindung zur GuV: Jeder Jahresüberschuss fließt hinein. Jede Dividende fließt heraus.',
+    highlight: true,
+  },
+  {
+    label: 'Additional Paid-In Capital (APIC)',
+    formula: 'APIC = Alter APIC + Stock-Based Comp + Wert neuer Options',
+    description: 'Bei Technologiefirmen oft sehr groß wegen hoher Stock-Based Compensation.',
+  },
+  {
+    label: 'Treasury Stock',
+    formula: null,
+    description: 'Aktien, die die Firma zurückgekauft hat. Reduziert das Eigenkapital.',
+  },
+]
+```
+
+Formeln werden in `font-mono bg-bg-secondary rounded-md px-3 py-2` dargestellt.
+
+Marcus-Note: `'Im Interview reicht es fast immer: Retained Earnings ist der wichtigste Posten im Equity. Er verlinkt Bilanz und GuV. Wenn du das verstehst, verstehst du 80% aller Bilanzfragen.'`
+
+### Slide 07 – Negatives Eigenkapital (Track B + C only)
+
+Frage-Antwort-Format:
+
+**Frage (als Header):** "Kann Shareholders' Equity negativ sein?"
+
+**Antwort:** Ja – in zwei Szenarien:
+
+```ts
+export const negativeEquityScenarios = [
+  {
+    number: '01',
+    title: 'LBO + Dividend Recap',
+    body: 'PE-Fonds hat nach dem Kauf so viel Cash als Dividende herausgezogen, dass das Eigenkapital negativ wurde. Normal im LBO-Kontext.',
+  },
+  {
+    number: '02',
+    title: 'Anhaltende Verluste',
+    body: 'Wenn Retained Earnings durch jahrelange negative Net Incomes immer negativer wird. Kann auf finanzielle Schieflage hinweisen.',
+  },
+]
+```
+
+Marcus-Note (sharp): `'Im Interview: Siehst du negatives Shareholders' Equity, frage zuerst: War da ein LBO? Dann ist es normal. Wenn nicht – dann ist das ein Warnsignal, das du erklären können musst.'`
+
+### Slide 08 – Working Capital
+
+```ts
+export const workingCapital = {
+  formula1: 'Working Capital = Current Assets − Current Liabilities',
+  formula2: 'Operating Working Capital = (Current Assets − Cash) − (Current Liabilities − Debt)',
+  scenarios: [
+    {
+      title: 'Subscriptions / Deferred Revenue',
+      companies: 'Amazon, Netflix',
+      description: 'Sammeln Cash im Voraus, bevor Leistung erbracht wird. Negatives WC = Stärke.',
+      sentiment: 'positive',
+    },
+    {
+      title: 'Retail-Modell',
+      companies: 'Walmart, McDonald\'s',
+      description: 'Kunden zahlen sofort, Lieferanten werden später bezahlt. Zeichen von Verhandlungsmacht.',
+      sentiment: 'positive',
+    },
+    {
+      title: 'Finanzielle Notlage',
+      companies: 'Krisenunternehmen',
+      description: 'Hohe kurzfristige Schulden, kein Cash. Echtes Warnsignal.',
+      sentiment: 'negative',
+    },
+  ],
+}
+```
+
+Scenarios als aufklappbare Mini-Cards. `sentiment: 'positive'` → `border-success/40`, `sentiment: 'negative'` → `border-error/40`.
+
+Marcus-Note: `'Negatives Working Capital ist eine der häufigsten Trick-Fragen. Standardantwort: "Kommt drauf an." Dann die drei Szenarien nennen. Wer einfach sagt "ist schlecht", fliegt raus.'`
+
+### Slide 09 – Pro-Tipps
+
+Identische Carousel-Mechanik wie Lektion 01 Slide 07. Drei Cards:
+
+```ts
+export const proTips = [
+  {
+    tag: 'STRATEGIE',
+    tagColor: 'text-accent',
+    body: 'Wenn ein MD die Bilanz zeigt und fragt "Was fällt dir auf?", geh immer in dieser Reihenfolge: Cash und Debt zuerst (Liquidität), dann Working Capital (Kurzzeit-Gesundheit), dann Retained Earnings (historische Profitabilität).',
+  },
+  {
+    tag: 'WARNUNG',
+    tagColor: 'text-gold',
+    body: 'Verwechsle nie Shareholders\' Equity mit Equity Value. Shareholders\' Equity ist der Buchwert aus der Bilanz. Equity Value ist der Marktwert. Bei gesunden Firmen ist Equity Value fast immer deutlich höher.',
+  },
+  {
+    tag: 'REGEL',
+    tagColor: 'text-success',
+    body: 'Die Bilanz balanciert immer. Wenn dein Modell nicht balanciert, hast du einen Fehler – keine Ausnahme, kein "fast richtig". Das ist die eine absolute Regel in Accounting.',
+  },
+]
+```
+
+### Slide 10 – Quiz Frage 1
+
+```ts
+export const quiz1 = {
+  header: 'Frage 1 / 2 · +10 XP',
+  question: 'Was gehört zu den Current Assets (Umlaufvermögen)?',
+  options: [
+    { id: 'A', label: 'Long-Term Debt', correct: false },
+    { id: 'B', label: 'Accounts Receivable', correct: true },
+    { id: 'C', label: 'Goodwill', correct: false },
+    { id: 'D', label: 'PP&E', correct: false },
+  ],
+  feedback: {
+    correct: {
+      gentle: 'Richtig. Accounts Receivable ist ein Current Asset – wird innerhalb von 12 Monaten zu Cash. Long-Term Debt ist eine Liability, Goodwill und PP&E sind Non-Current Assets.',
+      sharp: 'Korrekt. AR = Current Asset. Goodwill und PP&E = Non-Current. Diese Klassifikation musst du blind abrufen können.',
+    },
+    wrong: 'Nicht ganz. Long-Term Debt ist eine Liability. Goodwill und PP&E sind Assets, aber Non-Current. Accounts Receivable ist das einzige Current Asset hier.',
+    hint: 'Current = innerhalb von 12 Monaten zu Cash konvertierbar oder fällig.',
+  },
+}
+```
+
+### Slide 11 – Quiz Frage 2
+
+```ts
+export const quiz2 = {
+  header: 'Frage 2 / 2 · +10 XP',
+  question: 'TechCo hat Total Assets von €150M und Total Liabilities von €70M. Wie hoch ist das Shareholders\' Equity?',
+  options: [
+    { id: 'A', label: '€220M', correct: false },
+    { id: 'B', label: '€70M', correct: false },
+    { id: 'C', label: '€80M', correct: true },
+    { id: 'D', label: '€150M', correct: false },
+  ],
+  workingOut: 'Assets = Liabilities + Equity → €150M = €70M + Equity → Equity = €80M',
+  feedback: {
+    correct: 'Genau. Assets = Liabilities + Equity, umgeformt: Equity = Assets − Liabilities = €150M − €70M = €80M.',
+    wrong: 'Denk an die Gleichung: Assets = Liabilities + Equity → Equity = Assets − Liabilities = €150M − €70M = €80M.',
+  },
+}
+```
+
+### Slide 12 – Cliffhanger (Track A only, andere Tracks überspringen)
+
+Titel: `'Da war noch etwas: PP&E und Depreciation.'`
+Subline: `'Den hast du in der Bilanz gesehen. Hier ein Vorgeschmack.'`
+
+Erklärungs-Card:
+> PP&E sinkt jedes Jahr durch Abschreibungen (Depreciation). Das erscheint nicht nur in der Bilanz, sondern auch in der GuV als Aufwand und im Cash Flow Statement als non-cash Add-back. Das ist der erste direkte Link zwischen den drei Berichten.
+
+Marcus: `'PP&E und Depreciation sind der Dreh- und Angelpunkt zwischen Bilanz, GuV und Cash Flow. Wenn du das einmal wirklich verstehst, macht alles andere Sinn. Lektion 3 und 4 widmen sich genau diesem Link.'`
+
+### Slide 13 – Retention Hub
+
+Identische Struktur wie Lektion 01. Quiz-Ergebnis: 2/2.
+
+Marcus-Email Body:
+```ts
+const marcusEmail = {
+  subject: 'Re: Lektion 2 abgeschlossen',
+  gentle: 'Gut gemacht. Du verstehst jetzt den Aufbau der Bilanz – Assets, Liabilities, Equity – und weißt, warum sie immer balancieren muss. In Lektion 3 schauen wir uns das Cash Flow Statement an – den einzigen Bericht, den du auf einer einsamen Insel bräuchtest.',
+  sharp: 'Bilanz sitzt. In Lektion 3 kommt das Cash Flow Statement – das ehrlichste der drei Statements. Die Desert-Island-Frage dazu lernst du dann.',
+}
+```
+
+Next Lesson: `{ title: 'Cash Flow Statement', duration: 8, xp: 30 }`
 
 ## ✅ AKZEPTANZKRITERIEN
 
-Du bist fertig, wenn:
+1. Route `/lesson/balance-sheet` lädt korrekt
+2. Track-Routing funktioniert: Track A sieht 9 Slides, B sieht 12, C sieht 11
+3. Slide 04 (Zwei-Spalten-Klickliste) öffnet Tooltips korrekt per Tap/Click
+4. Quiz 1 + 2 funktionieren mit Streak-Logik (nur First-Try)
+5. TechCo-Bilanz auf Slide 05 balanciert visuell (beide Seiten zeigen €150M)
+6. Lesson-Duration-Tracking läuft von Slide 1 bis Retention-Hub
+7. Alle Farben und Fonts aus dem Design-System, keine neuen Töne eingeführt
+8. Mobile (375px): alle Slides ohne horizontalen Scroll nutzbar
+9. Slide 04 auf Mobile: Zwei-Spalten-Grid wird zu einer Spalte (`grid-cols-1`)
 
-1. Neuer Branch `claude/feat-full-app-prototype` existiert lokal und auf GitHub
-2. Vercel-Preview-Deployment dieses Branches funktioniert (sichtbar im Vercel-Dashboard)
-3. Auf der Preview-URL führt der Klick auf die Domain (ohne URL-Suffix) zum Marcus-Onboarding
-4. Nach Marcus-Onboarding landet man in der Lektion
-5. Die Lektion ist die Polish-Version (kein Side-Panel, korrekte Streak-Logik, korrekter Wasserfall)
-6. Du hast den User informiert, welche Preview-URL er testen muss
-7. Master und die drei ursprünglichen Feature-Branches sind unverändert
+## 🚀 REIHENFOLGE
 
-## 🚀 ARBEITSWEISE
+1. Branch erstellen
+2. `data.ts` mit allen obigen Daten anlegen
+3. `Slide01Briefing.tsx` (Copy von Lektion 01, neue Daten)
+4. `Slide02RecapTapReveal.tsx` (Copy von Lektion 01 Slide02, neue Karten)
+5. `Slide03ThreeSections.tsx`
+6. `Slide04Positions.tsx` (neuer Typ – hier Zeit lassen)
+7. `Slide05EquilibriumExample.tsx`
+8. `Slide06ShareholdersEquity.tsx`
+9. `Slide07NegativeEquity.tsx`
+10. `Slide08WorkingCapital.tsx`
+11. `Slide09ProTips.tsx` (Copy von Lektion 01 Slide07, neue Daten)
+12. `Slide10QuizAssets.tsx` + `Slide11QuizCalculation.tsx`
+13. `Slide12Cliffhanger.tsx`
+14. `Slide13Retention.tsx`
+15. `page.tsx` mit Track-Routing verdrahten
+16. Mobile testen, pushen
 
-Frag mich nach jedem größeren Schritt, ob ich Änderungen will:
+Frag mich nach jedem Slide, ob ich Änderungen will.
 
-- Nach Schritt 1 (Inspektion): zeig mir, was du im Repo gefunden hast
-- Nach Schritt 4 (erstem Merge): zeig mir, ob es Konflikte gab
-- Nach Schritt 6 (drittem Merge): bestätige, dass alle Features integriert sind
-- Nach Schritt 9 (Build & Test): zeig mir Screenshots oder logs der Test-Szenarien
-- Nach Schritt 10 (Push): gib mir die Preview-URL des neuen Branches
-
-Wenn du beim Mergen auf eine Situation stößt, die nicht klar ist, **STOP und frag**. Falsche Merges kosten Stunden zur Korrektur.
-
-Los geht's mit Schritt 1 (Repository inspizieren).
+Los geht's mit Schritt 1.

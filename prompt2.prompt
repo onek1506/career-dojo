@@ -1,442 +1,359 @@
-# 🎓 Phase 3b: Inhaltliche Vereinfachung für echtes Beginner-Niveau
+# 📚 Lektion 03: Cash Flow Statement
 
-Phase 3a (Plattform-Stabilisierung) ist abgeschlossen. Du arbeitest weiter im selben Branch `feature/lesson-platform-stability`.
-
-## 🎯 ZIEL DIESER PHASE
-
-Die aktuelle Lektion "Income Statement" ist zu schwer für einen echten Beginner (Profil A: BWL-Erstsemester oder fachfremder Student, hat noch nie EBITDA, COGS, Margin gehört). Sie wirft 11 Konzepte auf einen Slide, mischt Englisch/Deutsch, und Marcus' zynischer Tonfall schreckt Anfänger ab.
-
-Wir bauen die Lektion um auf das echte Beginner-Niveau, **OHNE die Premium-Optik zu verlieren**. Die App bleibt visuell identisch – nur Content, Konzept-Dichte und Marcus-Tonfall werden angepasst.
+Du baust die dritte Lektion der Career-Dojo Webapp. Alle Architektur, Design-System und Slide-Templates existieren. Du wiederverwendest konsequent.
 
 ## 🌿 GIT-WORKFLOW
 
-1. Du bleibst im Branch `feature/lesson-platform-stability` (oder erstelle einen neuen Branch `feature/lesson-beginner-content` aus diesem)
-2. Committe in logischen Schritten:
-   - `refactor(lesson): simplify waterfall to 5 core positions`
-   - `refactor(lesson): reduce margins to gross and net for beginner`
-   - `feat(lesson): add gentle marcus persona for first lessons`
-   - `refactor(quiz): reduce to 2 quiz questions for first lesson`
-   - `feat(lesson): add ebitda cliffhanger preview at end`
-   - `refactor(content): simplify wording and add german-first labels`
-3. Push nach Abschluss + PR
+```bash
+git checkout master
+git pull origin master
+git checkout -b feature/lesson-03-cash-flow-statement
+```
 
-## 📚 KONZEPTIONELLE ÄNDERUNGEN
+Commit-Messages:
+- `feat(lesson-03): add cash flow statement lesson data`
+- `feat(lesson-03): implement three-section CFS interactive slide`
+- `feat(lesson-03): implement desert island scenario slide`
+- `feat(lesson-03): add lesson route and register`
 
-### Marcus' Persona-Wechsel: "Onboarding Marcus"
+Push: `git push origin feature/lesson-03-cash-flow-statement`
 
-Marcus bleibt als Coach, aber sein Tonfall ist in den ersten 3 Lektionen **freundlicher und einladender**, weniger zynisch. Das ist nicht "weichgespült" – das ist einfach didaktisch korrekt: Du brauchst Vertrauen, bevor du Druck ausübst.
+## 📁 DATEIEN
 
-**Regel:** In den ersten 3 Lektionen verwendet Marcus:
-- Begrüßung statt Drohung ("Schön, dass du da bist." statt "Mach das ordentlich, sonst...")
-- Konkretes, ermutigendes Lob ("Genau das wollte ich hören." statt "Sauber. Diese Reihenfolge musst du im Schlaf können.")
-- Hilfsangebote bei Fehlern ("Kein Stress – das ist genau die Stelle, an der die meisten stolpern. Hier ist der Trick:...")
+```
+app/
+  lesson/
+    cash-flow-statement/
+      page.tsx
+components/
+  lesson/
+    cash-flow-statement/
+      Slide01Briefing.tsx
+      Slide02WhatIsCFS.tsx
+      Slide03ThreeSections.tsx
+      Slide04DepreciationPuzzle.tsx
+      Slide05DesertIsland.tsx
+      Slide06NonCashItems.tsx            // Track B+C only
+      Slide07ProTips.tsx
+      Slide08QuizSection.tsx
+      Slide09QuizDepreciation.tsx
+      Slide10Cliffhanger.tsx
+      Slide11Retention.tsx
+      data.ts
+```
 
-**Ab Lektion 4** (Bilanz-Vertiefung) wird Marcus dann der zynische MD, den wir kennen. Das gibt eine echte Charakterentwicklung und einen Anreiz, weiterzumachen.
+## 📊 LEKTIONS-META
 
-Erstelle einen `tone`-Parameter für Marcus:
-
-```tsx
-// components/lesson/MarcusNote.tsx erweitern:
-interface MarcusNoteProps {
-  subject?: string
-  body: string | React.ReactNode
-  tone?: 'gentle' | 'sharp'  // gentle = Lektion 1-3, sharp = ab Lektion 4
+```ts
+export const lessonMeta = {
+  id: 'acc-3-cash-flow-statement',
+  title: 'Cash Flow Statement',
+  titleDe: 'Kapitalflussrechnung',
+  module: 'MODUL 01 · ACCOUNTING',
+  duration: 8,
+  xp: 30,
+  difficulty: 2,
+  prerequisite: 'acc-2-balance-sheet',
+  trackConfig: {
+    A: { slidesToShow: [1,2,3,4,5,7,8,9,10,11], duration: 6 },
+    B: { slidesToShow: [1,2,3,4,5,6,7,8,9,11], duration: 8 },
+    C: { slidesToShow: [1,3,4,5,6,7,8,9,11], duration: 6 },
+  }
 }
 ```
 
-Visuell ändert sich nichts – nur der Inhalt der Quotes folgt dem Tone.
+## 📋 SLIDE-INHALTE
 
-### Konzept-Dichte: Aus 11 wird 5
+### Slide 01 – Briefing
 
-Die Wasserfall-Slide wird radikal reduziert. Statt 11 Positionen (Revenue, COGS, Gross Profit, SG&A, EBITDA, D&A, EBIT, Interest, EBT, Taxes, Net Income) zeigen wir nur 5:
+Marcus-Note Body:
+```ts
+const marcusBody = {
+  gentle: 'Das Cash Flow Statement ist der ehrlichste der drei Berichte. Die GuV kann durch Accounting-Tricks geschönt werden. Das CFS nicht – hier siehst du, was wirklich an Cash rein und raus geflossen ist. Heute lernst du, warum profitable Firmen trotzdem pleite gehen können.',
+  sharp: 'CFS: drei Sektionen, eine Wahrheit. Operations, Investing, Financing. Fang oben mit Net Income an, arbeitest dich durch. Die Desert-Island-Frage dazu kommt in Lektion 3.',
+}
+```
 
-1. **Revenue** (Umsatz)
-2. **Gross Profit** (Bruttoergebnis)
-3. **EBITDA**
-4. **EBIT**
-5. **Net Income** (Jahresüberschuss)
+Stat-Card: `DAUER 8 MIN · XP +30 · SCHWIERIG. ★★☆☆☆`
 
-Die Abzüge (COGS, SG&A, D&A, Interest, Taxes) werden als kleine `+`-Symbole zwischen den 5 Hauptpositionen angedeutet, mit Tooltip-Text wie:
+Learning Outcomes:
+- `→ Warum das CFS der ehrlichste Bericht ist`
+- `→ Die drei Sektionen und was sie zeigen`
+- `→ Warum Net Income ≠ Cash ist`
 
-> *"Hier werden die Herstellungskosten (COGS) abgezogen. Mehr dazu in Lektion 2."*
+### Slide 02 – Was ist das CFS?
 
-Das schafft eine klare Hierarchie: 5 muss-wissen-Konzepte, 6 hier-ist-eine-Vorschau-Konzepte.
+Erklärungs-Text:
+> Die GuV sagt dir, was eine Firma "verdient" hat. Das Cash Flow Statement sagt dir, was wirklich auf dem Konto gelandet ist. Das ist ein riesiger Unterschied – wegen Accrual Accounting.
 
-## 📋 SLIDE-FÜR-SLIDE-ÄNDERUNGEN
-
-### Slide 1 – Briefing (sanftere Einleitung)
-
-**Marcus-Quote ändern:**
-
-VORHER:
-> "Diese Lektion deckt 8 von 12 GuV-Fragen ab, die in 90% aller Spring-Week- und Summer-Internship-Interviews vorkommen. Mach sie ordentlich – beim zweiten Mal mit Live-Interviewer ist es zu spät."
-
-NACHHER (gentle tone):
-> "Willkommen bei Lektion 1. Wir starten mit der GuV – dem ersten Bericht, den jeder IB-Analyst lesen muss. Ich gehe das Schritt für Schritt mit dir durch. Keine Vorkenntnisse nötig."
-
-**Stat-Card-Wert ändern:** "DAUER 6 MIN" (statt 8 – realistisch für vereinfachte Lektion).
-
-**Learning Outcomes umformulieren** (von "können" zu "verstehen"):
-- VORHER: "GuV von Top zu Bottom durchgehen"
-- NACHHER: "Verstehen, was eine GuV überhaupt zeigt"
-- VORHER: "4 Margen aus dem Kopf berechnen"
-- NACHHER: "Den Unterschied zwischen Brutto- und Nettogewinn kennen"
-- VORHER: "EBITDA vs. EBIT in 10 Sekunden erklären"
-- NACHHER: "Wissen, wann man EBITDA hört (und warum es jeder nennt)"
-
-### Slide 2 – Bilanz vs. GuV (bleibt fast gleich)
-
-Marcus-Quote bei Korrekt anpassen:
-
-VORHER:
-> "Korrekt. GuV = Film über einen Zeitraum. Bilanz = Foto an einem Stichtag. Wer das verwechselt, fliegt im First Round."
-
-NACHHER (gentle):
-> "Genau. Eine GuV erzählt eine Geschichte über einen Zeitraum – wie ein Film. Eine Bilanz zeigt einen einzigen Moment – wie ein Foto. Diese Unterscheidung ist der wichtigste erste Schritt."
-
-### Slide 3 – Wasserfall (KOMPLETTE NEUSTRUKTURIERUNG)
-
-**Header bleibt:** "Vom Umsatz zum Gewinn"
-**Subline ändern:** "5 Stationen, die du kennen musst." (statt "11 Stationen")
-
-Neue Daten-Struktur:
+Tap-to-reveal Beispiel (neu: drei Karten statt zwei):
 
 ```ts
-// data.ts
-export const waterfallSteps = [
+const cards = [
   {
-    type: 'main',
-    label: 'Revenue',
-    de: 'Umsatzerlöse',
-    explanation: 'Alles, was die Firma verkauft hat. Der Top-Line-Wert.',
-    value: 100,
-    barWidth: 100,
+    id: 'guv',
+    icon: 'TrendingUp',
+    title: 'GuV: +€10M Net Income',
+    subtitle: 'Sieht gut aus',
+    reveal: 'Aber: Vielleicht wurde davon €8M noch nicht bezahlt (Accounts Receivable). Tatsächlicher Cash: nur €2M.',
   },
   {
-    type: 'preview',
-    label: '−Aufwendungen',
-    de: 'COGS, SG&A, etc.',
-    explanation: 'Hier werden alle Kosten abgezogen. In Lektion 2 schauen wir uns die einzelnen Aufwandsarten an.',
-    value: -60,
-  },
-  {
-    type: 'main',
-    label: 'EBITDA',
-    de: 'Op. Ergebnis vor Abschreibungen',
-    explanation: 'Was übrig bleibt, bevor Abschreibungen, Zinsen und Steuern abgezogen werden. Wichtigste Profit-Kennzahl in der Praxis.',
-    value: 40,
-    barWidth: 40,
-  },
-  {
-    type: 'preview',
-    label: '−Abschreibungen',
-    de: 'D&A',
-    explanation: 'Kosten für Maschinen und Software, die über mehrere Jahre verteilt werden. Lektion 3.',
-    value: -10,
-  },
-  {
-    type: 'main',
-    label: 'EBIT',
-    de: 'Operatives Ergebnis',
-    explanation: 'EBITDA minus Abschreibungen. Realistisches Bild der operativen Profitabilität.',
-    value: 30,
-    barWidth: 30,
-  },
-  {
-    type: 'preview',
-    label: '−Zinsen + Steuern',
-    de: 'Interest + Taxes',
-    explanation: 'Bank und Staat wollen auch was. Lektion 4.',
-    value: -12,
-  },
-  {
-    type: 'main',
-    label: 'Net Income',
-    de: 'Jahresüberschuss',
-    explanation: 'Was am Ende für die Aktionäre übrig bleibt. Bottom-Line.',
-    value: 18,
-    barWidth: 18,
-    highlighted: true,
+    id: 'cfs',
+    icon: 'DollarSign',
+    title: 'CFS: +€2M Cash from Ops',
+    subtitle: 'Die Wahrheit',
+    reveal: 'Das ist, was wirklich auf dem Konto gelandet ist. Profitable Firma, aber fast kein Cash. Gefährlich.',
   },
 ]
 ```
 
-**Visuelle Differenzierung:**
+Aufgabe: `'Welcher Bericht zeigt den tatsächlichen Cash-Eingang?'`
 
-`type: 'main'` (5 Hauptpositionen):
-- Volle Balken-Höhe (`h-12`)
-- Volle Schrift-Größe
-- Akzent-Farbe oder Off-White-Balken
-- Klickbar mit ausführlichem Tooltip
+Korrekte Auswahl (rechts): Marcus: `'Genau. Das CFS zeigt was wirklich passiert ist. Viele große Firmen sind pleite gegangen, weil sie "profitabel" waren aber kein Cash hatten. Enron ist das bekannteste Beispiel.'`
 
-`type: 'preview'` (6 Vorschau-Abzüge):
-- Halbe Balken-Höhe (`h-6`)
-- Schrift `text-xs text-text-muted`
-- Dünner roter Akzent statt voller Balken
-- Klickbar mit Tooltip "→ Mehr dazu in Lektion X"
-
-**Sektion-Trenner ENTFERNEN** (zu komplex für Beginner). Stattdessen: durchgängiger Wasserfall mit visueller Hierarchie.
-
-**Marcus-Quote unter dem Wasserfall** (gentle):
-> "Diese 5 Stationen sind alles, was du heute brauchst. Die kleineren Posten dazwischen lernst du in den nächsten Lektionen kennen – jeder einzeln, mit Beispielen. Niemand erwartet, dass du das schon alles kannst."
-
-### Slide 4 – Margen (NUR NOCH 2)
-
-**Header:** "Zwei Margen, die jeder kennt." (statt "Vier Margen, eine Geschichte.")
-
-Reduzierte Daten:
+### Slide 03 – Die drei Sektionen
 
 ```ts
-const margins = [
+export const cfsSections = [
   {
-    key: 'gross',
-    label: 'Bruttomarge',
-    enLabel: 'Gross Margin',
-    value: 40,
-    abs: '€40M',
-    highlighted: true,
-    explanation: 'Was nach den Produktionskosten übrig bleibt – im Verhältnis zum Umsatz. Apple hat hohe Bruttomargen (~40%), Walmart niedrige (~25%).',
+    number: '01',
+    label: 'Cash Flow from Operations',
+    abbr: 'CFO',
+    labelDe: 'Operativer Cashflow',
+    description: 'Beginnt mit Net Income. Addiert nicht-cash Aufwendungen (D&A, SBC) zurück. Adjustiert für Working-Capital-Veränderungen.',
+    startsWith: 'Net Income',
+    examples: ['+ Depreciation & Amortization', '+ Stock-Based Compensation', '± Changes in Working Capital'],
+    color: 'border-accent',
+    insight: 'Das Wichtigste. Zeigt, ob das Kerngeschäft Cash generiert.',
   },
   {
-    key: 'net',
-    label: 'Nettomarge',
-    enLabel: 'Net Margin',
-    value: 9,
-    abs: '€9M',
-    explanation: 'Was am Ende für die Aktionäre übrig bleibt – im Verhältnis zum Umsatz. Tech-Firmen oft 20%+, Supermärkte 2-3%.',
+    number: '02',
+    label: 'Cash Flow from Investing',
+    abbr: 'CFI',
+    labelDe: 'Investitions-Cashflow',
+    description: 'Zeigt Käufe und Verkäufe von langfristigen Assets.',
+    examples: ['− Capital Expenditures (CapEx)', '+ Verkauf von Assets', '− Akquisitionen'],
+    color: 'border-gold',
+    insight: 'Meist negativ – Firmen investieren mehr als sie durch Asset-Verkäufe einnehmen. Das ist normal.',
+  },
+  {
+    number: '03',
+    label: 'Cash Flow from Financing',
+    abbr: 'CFF',
+    labelDe: 'Finanzierungs-Cashflow',
+    description: 'Zeigt Transaktionen mit Kapitalgebern – Aktionären und Gläubigern.',
+    examples: ['+ Neue Schulden aufgenommen', '− Schulden zurückgezahlt', '− Dividenden gezahlt', '+ Aktien ausgegeben'],
+    color: 'border-success',
+    insight: 'Positiv = Firma nimmt Geld auf. Negativ = Firma zahlt zurück oder kauft Aktien zurück.',
   },
 ]
 ```
 
-EBITDA-Marge und Operating Margin werden in Lektion 3 eingeführt.
+Jede Sektion als aufklappbare Card. Darunter die Zusammenfassung:
+```
+Net Change in Cash = CFO + CFI + CFF
+```
+In monospace. Hinweis: "Dieser Wert = Veränderung der Cash-Position in der Bilanz."
 
-**Marcus-Quote:**
-> "Diese zwei Margen reichen für den Anfang. Brutto = wie viel bleibt nach den Produktionskosten. Netto = wie viel bleibt am Ende. Apple hat hohe Margen, Supermärkte niedrige. Mehr braucht es heute nicht."
+Marcus-Note: `'Reihenfolge beim Memorieren: Operations (Kerngeschäft), Investing (Wachstum), Financing (Kapitalstruktur). In dieser Reihenfolge gehen auch die meisten Analysten vor.'`
 
-**Mit konkreten Firmenbeispielen** unter dem Diagramm einen kleinen Vergleich:
+### Slide 04 – Das Depreciation-Puzzle
+
+**Das ist der didaktisch wichtigste Slide der ganzen Lektion.** Die Frage "Why does Depreciation affect cash if it's non-cash?" ist Pflicht in jedem Interview.
+
+Layout: Zwei-Schritt-Logik als visueller Flow.
+
+**Schritt 1 – Die Frage:**
+> D&A ist eine non-cash Ausgabe. Trotzdem beeinflusst sie den Cash-Bestand. Wie kann das sein?
+
+Tap-to-reveal: User klickt auf "Erklärung zeigen"
+
+**Schritt 2 – Die Antwort (erscheint nach Klick):**
+Drei Boxen als Flow (`→`):
 
 ```
-APPLE             ~25% Net Margin
-WALMART           ~3%  Net Margin
-NETFLIX           ~15% Net Margin
+[D&A senkt Pre-Tax Income]  →  [Niedrigeres Taxable Income]  →  [Weniger Steuern gezahlt]
 ```
 
-Das gibt Beginnern einen Anker an reale Firmen statt abstrakter Zahlen.
+Darunter der Kernsatz:
+> D&A selbst ist non-cash – aber Steuern sind cash. Weil D&A die Steuerlast senkt, bleibt mehr Cash. Das ist der Mechanismus.
 
-### Slide 5 – Formel-Drill (vereinfacht)
+**Zahlenbeispiel:**
+```
+Ohne D&A:  Pre-Tax Income €100M × 40% Steuer = €40M Steuern → €60M Cash bleibt
+Mit D&A:   Pre-Tax Income €90M × 40% Steuer  = €36M Steuern → €54M Cash bleibt
 
-**Header bleibt:** "Schreib die Formel."
-**Subline:** "Bruttomarge in 4 Bausteinen."
+Differenz: €4M mehr Cash durch €10M D&A
+```
 
-Formel bleibt: `Gross Margin = ( ___ − ___ ) / ___ × 100%`
+Dazu die Walk-Through Regel aus der PDF prominent:
+> "Mit dieser Art von Fragen immer in dieser Reihenfolge: 1. Income Statement → 2. Cash Flow Statement → 3. Balance Sheet"
 
-Wortpool reduzieren auf 3 (kein Distraktor mehr):
+Marcus-Note: `'Diese Frage kommt in fast jedem Interview. Wer sagt "D&A ist non-cash, also kein Effekt auf Cash" hat nicht verstanden, dass Steuern cash sind. Merkregel: Non-cash ≠ kein Steuereffekt.'`
+
+### Slide 05 – Desert Island Frage
+
+**Format: Multiple Choice Tap-to-reveal** mit besonderer Dramatik.
+
+Header: `'Die berühmteste Accounting-Frage im Interview.'`
+
+Frage (groß, serif): `'Du bist auf einer einsamen Insel gestrandet. Du hast nur ein Dokument dabei. Welches der drei Statements nimmst du, um die finanzielle Gesundheit einer Firma zu beurteilen?'`
+
+Drei Optionen als Cards:
+- A) Income Statement
+- B) Balance Sheet
+- C) Cash Flow Statement *(richtig)*
+
+Bei C:
+Marcus-Note: `'Korrekt. Das CFS zeigt, wie viel Cash die Firma wirklich generiert – unabhängig von allen non-cash Aufwendungen. Das ist das #1 Kriterium für finanzielle Gesundheit. Wer das CFS auf der Insel hat, kann die anderen beiden rekonstruieren.'`
+
+Bei A oder B:
+Marcus-Note: `'Nicht optimal. GuV und Bilanz können durch Accounting-Methoden beeinflusst werden. Das CFS nicht – hier zählt nur, was wirklich bezahlt wurde und was wirklich eingegangen ist. Das ist die ehrlichste Quelle.'`
+
+Bonus-Info nach Auflösung:
+> Direkt danach: "Wenn ich 2 Statements hätte?" → Income Statement + Balance Sheet, weil man daraus das CFS rekonstruieren kann.
+
+### Slide 06 – Non-Cash Items + CapEx (Track B + C only)
 
 ```ts
-const tokens = ['Revenue', 'COGS', 'Revenue']
+export const nonCashItems = [
+  {
+    label: 'Depreciation & Amortization',
+    section: 'CFO',
+    direction: '+',
+    reason: 'Non-cash Aufwand – kein Cash abgeflossen, deshalb zurückaddiert.',
+  },
+  {
+    label: 'Stock-Based Compensation',
+    section: 'CFO',
+    direction: '+',
+    reason: 'Non-cash – Mitarbeiter bekommen Aktien statt Cash. Trotzdem Aufwand in der GuV.',
+  },
+  {
+    label: 'Capital Expenditures (CapEx)',
+    section: 'CFI',
+    direction: '−',
+    reason: 'Kauf von PP&E – echter Cash-Abfluss, erscheint aber nicht in der GuV (wird kapitalisiert).',
+  },
+  {
+    label: 'Changes in Working Capital',
+    section: 'CFO',
+    direction: '±',
+    reason: 'Asset steigt → Cash sinkt. Liability steigt → Cash steigt. Gegenläufige Logik.',
+  },
+]
 ```
 
-Begründung: Distraktoren sind didaktisch wertvoll für Fortgeschrittene, aber für Beginner frustrierend, wenn sie noch nicht sicher sind, was COGS überhaupt heißt.
+Dargestellt als zweispaltige Tabelle: `POSITION | SECTION | RICHTUNG | WARUM`. Jede Zeile klickbar für Tooltip.
 
-**Marcus-Quote bei Erfolg (gentle):**
-> "Stark. Diese Formel siehst du immer wieder. Wenn du sie einmal verstehst, hast du den Schlüssel zu allen anderen Margen."
+Marcus-Note: `'Merke: Asset going up = Cash down. Liability going up = Cash up. Diese Gegenläufigkeit ist die häufigste Fehlerquelle im Interview.'`
 
-### Slide 6 – Cheat Sheet (vereinfacht)
+### Slide 07 – Pro-Tipps
 
-Aktuelle Cheat-Sheet-Card mit 11 Positionen ist Overload. Reduziere auf:
-
-```
-GUV CHEAT SHEET                       [01]
-──────────────────────────────────────────
-DIE 5 STATIONEN
-Revenue  →  Gross Profit  →  EBITDA
-         →  EBIT  →  Net Income
-
-DIE 2 MARGEN
-Bruttomarge = Gross Profit / Revenue
-Nettomarge  = Net Income  / Revenue
-
-REGEL
-Marge in % zeigt, wie effizient ein
-Unternehmen Geld verdient.
-──────────────────────────────────────────
-```
-
-Buttons "Als PNG speichern" und "Weiter" bleiben. "In Notion kopieren" entfernen (zu nischig für Beginner).
-
-### Slide 7 – Pro-Tipps (KOMPLETT NEUE INHALTE)
-
-Aktuelle Tipps sind Profi-Niveau ("Walk me through the income statement"). Beginner-Tipps sind anders – sie helfen beim **Lernen**, nicht beim Performen.
-
-**Header ändern:** "Drei Dinge, die dir das Lernen leichter machen." (statt "Drei Moves, die dich vom Rest abheben.")
-
-**Card 1 – Tag: `LERNTIPP`**
-> "Wenn du einen englischen Begriff zum ersten Mal siehst, sag ihn dir laut vor. EBITDA = 'I-bitt-da'. Dein Gehirn merkt sich Dinge besser, wenn du sie hörst, nicht nur liest."
-
-**Card 2 – Tag: `MERKE`**
-> "Brutto und Netto: Stell dir Brutto wie deinen Bruttogehalt vor – das, was am Anfang draufsteht. Netto ist, was am Ende auf deinem Konto landet. Bei Firmen ist das genauso."
-
-**Card 3 – Tag: `NÄCHSTER SCHRITT`**
-> "In Lektion 2 schauen wir uns an, was 'Aufwendungen' eigentlich sind. Spoiler: Es gibt mehr als nur Materialkosten. Bis dahin reicht es zu wissen: Aufwendungen reduzieren den Gewinn."
-
-Alle drei Tipps sind ermutigend, konkret, beginner-relevant.
-
-### Slide 8 – Quiz Frage 1 (vereinfacht: ENTFÄLLT der Drag-Sort)
-
-Drag-Sort mit 6 Positionen ist für Beginner zu schwer (sie haben gerade die Reihenfolge zum ersten Mal gesehen). Ersetze durch eine Multiple-Choice-Frage:
-
-**Frage:** "Welcher Bericht zeigt einen Zeitraum (z.B. das ganze Jahr 2024)?"
-
-Optionen:
-- A) Bilanz
-- B) Gewinn- und Verlustrechnung (richtig)
-- C) Eigenkapitalveränderungsrechnung
-- D) Kapitalflussrechnung
-
-Das ist die wichtigste konzeptionelle Erkenntnis aus Slide 2 – ideal als erste Quiz-Frage.
-
-**Marcus-Feedback (gentle, korrekt):**
-> "Genau das. Diese Unterscheidung ist der wichtigste Punkt aus Lektion 1."
-
-**Marcus-Feedback (gentle, falsch):**
-> "Kein Stress – das verwechselt fast jeder am Anfang. Die Bilanz zeigt einen einzigen Stichtag. Die GuV zeigt einen Zeitraum. Versuch's nochmal."
-
-### Slide 9 – Quiz Frage 2 (Bruttomarge bleibt, aber sanfter)
-
-Frage und Optionen bleiben:
-> "TechCo: Umsatz €200M, COGS €120M. Wie hoch ist die Bruttomarge?"
-- 60%, **40%** (richtig), 80%, 20%
-
-**Aber:** Beim ersten Klick auf "Antwort prüfen" zeigt der Hint **immer**, auch wenn richtig:
-
-> "Rechenweg: (Umsatz − COGS) / Umsatz = (200 − 120) / 200 = 80/200 = 40%"
-
-Das bestätigt Beginner und gibt ihnen die Logik mit, nicht nur das Ergebnis.
-
-**Marcus (gentle, korrekt):**
-> "Sehr gut. Du hast gerade deine erste Margen-Berechnung gemacht – genau so läuft das in echten Pitchbooks."
-
-### Slides 10 + 11 – ENTFALLEN (in Beginner-Lektion)
-
-EBITDA-Auflösung (Slide 10) und Margen-Hierarchie (Slide 11) sind für Beginner zu früh. Sie kommen in Lektion 3 (EBITDA-Vertiefung).
-
-Stattdessen wird Slide 10 zur **Cliffhanger-Slide:**
-
-**Slide 10 (NEU) – EBITDA-Vorschau**
-
-Komponente: `Slide10EbitdaPreview.tsx`
-
-Layout:
-
-1. Header: **"Da war noch ein Begriff: EBITDA."** in `font-serif text-3xl`
-2. Subline: "Den hast du im Wasserfall gesehen. Hier ein Vorgeschmack."
-3. **Mini-Erklärungs-Card:**
-
-```
-EBITDA  /ˈiː.bɪt.dɑː/  Substantiv
-Earnings Before Interest, Taxes,
-Depreciation and Amortization
-
-= Gewinn bevor Bank, Staat und Buchhalter
-  ihren Anteil bekommen haben.
+```ts
+export const proTips = [
+  {
+    tag: 'INTERVIEW-MOVE',
+    tagColor: 'text-accent',
+    body: '"Walk me through the Cash Flow Statement" – fang IMMER mit Net Income an. Dann: Add back non-cash items (D&A, SBC), adjust for Working Capital changes, dann CFI und CFF. Diese Reihenfolge zeigt strukturiertes Denken.',
+  },
+  {
+    tag: 'WARNUNG',
+    tagColor: 'text-gold',
+    body: 'Sage nie "CapEx erscheint auf dem Income Statement" – CapEx wird kapitalisiert und erscheint als PP&E in der Bilanz, dann als D&A in der GuV. Direkt auf dem IS steht es nicht. Klassischer Fehler.',
+  },
+  {
+    tag: 'MERKE',
+    tagColor: 'text-success',
+    body: 'Free Cash Flow = CFO − CapEx. Das ist die meistgenutzte Zahl in Valuation. Wenn jemand "FCF" sagt, meint er das. Du brauchst CFO und CapEx aus dem CFS, um es zu berechnen.',
+  },
+]
 ```
 
-4. **Kontext-Box:**
-> "Warum jeder EBITDA nennt: Es zeigt die operative Profitabilität, unabhängig davon, wie eine Firma finanziert ist oder wo sie steuerlich sitzt. Perfekt zum Vergleichen.
-> 
-> Warum manche es hassen: Es blendet echte Kosten aus (z.B. für Maschinen). Warren Buffett ist berühmt dafür, EBITDA als 'BS-Kennzahl' zu bezeichnen.
->
-> **Lektion 3 widmet sich komplett EBITDA. Heute reicht es zu wissen: Du wirst diesen Begriff täglich hören.**"
+### Slide 08 – Quiz Frage 1
 
-CTA: `Lektion abschließen →`
-
-Diese Slide schafft genau den Pull-Effekt, den wir wollen: User verstehen, dass es noch mehr gibt, und wollen weiter.
-
-### Slide 11 wird zu Slide 10 → Slide 12 wird Slide 11 (Retention Hub bleibt strukturell gleich)
-
-**Total reduziert: von 12 auf 11 Slides.**
-
-Anpassungen am Retention Hub (Slide 11):
-
-- "Modul 01 abgeschlossen." bleibt
-- Stats: `4/4` → ändern zu `2/2` (nur noch 2 Quiz-Fragen)
-- XP-Wert anpassen: aus 55 wird 25 (10 + 10 + 5 Completion-Bonus)
-- Marcus-Email (gentle):
-
-> **Re:** Erste Lektion geschafft
-> "Gut gemacht. Du verstehst jetzt, was eine GuV ist und wie Brutto- und Nettomarge funktionieren. Das ist die Basis für alles, was kommt. In Lektion 2 schauen wir uns die einzelnen Aufwandsarten an – COGS, SG&A und was sonst noch alles vom Umsatz abgezogen wird. Bis dann."
-
-- Next-Action-Card: "Modul 02 — Aufwendungen" (5 Min · +30 XP)
-
-## 🎨 SPRACHLICHE ÄNDERUNGEN GLOBAL
-
-### Englisch-Deutsch-Hierarchie umkehren für Beginner
-
-In der Profi-Variante zeigen wir "Revenue" groß, "Umsatzerlöse" klein. Für Beginner umkehren:
-
-```tsx
-// VORHER (Profi):
-<span className="text-base font-mono text-text-primary">Revenue</span>
-<span className="text-xs font-mono text-text-muted">Umsatzerlöse</span>
-
-// NACHHER (Beginner, Lektion 1-3):
-<span className="text-base font-mono text-text-primary">Umsatz</span>
-<span className="text-xs font-mono text-text-muted">(engl. Revenue)</span>
+```ts
+export const quiz1 = {
+  header: 'Frage 1 / 2 · +10 XP',
+  question: 'In welcher Sektion des Cash Flow Statements erscheint der Kauf einer neuen Fabrik (CapEx)?',
+  options: [
+    { id: 'A', label: 'Cash Flow from Operations', correct: false },
+    { id: 'B', label: 'Cash Flow from Investing', correct: true },
+    { id: 'C', label: 'Cash Flow from Financing', correct: false },
+    { id: 'D', label: 'Direkt im Income Statement', correct: false },
+  ],
+  feedback: {
+    correct: {
+      gentle: 'Richtig. CapEx ist eine Investition in langfristige Assets und erscheint deshalb im CFI. In der GuV erscheint nur die jährliche Abschreibung (D&A), nicht der volle Kaufpreis.',
+      sharp: 'Korrekt. CapEx = CFI. D&A davon = IS und CFO (add-back). Sauber auseinanderhalten.',
+    },
+    wrong: 'CapEx ist kein Aufwand im IS (wird kapitalisiert) und keine Finanzierungstransaktion. Es ist eine Investition → Cash Flow from Investing.',
+    hint: 'CapEx = Kauf von langfristigen Assets. Investitionen = CFI.',
+  },
+}
 ```
 
-Begründung: Beginner muss sich erst mit den deutschen Begriffen sicher fühlen, bevor wir die englischen Profi-Begriffe in den Vordergrund stellen. Ab Lektion 4 dann umgekehrt.
+### Slide 09 – Quiz Frage 2
 
-### Konsistente Begriffsverwendung
+```ts
+export const quiz2 = {
+  header: 'Frage 2 / 2 · +10 XP',
+  question: 'Depreciation steigt um €10M. Angenommen 40% Steuerrate. Was passiert mit dem Cash?',
+  options: [
+    { id: 'A', label: 'Cash sinkt um €10M', correct: false },
+    { id: 'B', label: 'Cash steigt um €4M', correct: true },
+    { id: 'C', label: 'Kein Effekt auf Cash', correct: false },
+    { id: 'D', label: 'Cash steigt um €10M', correct: false },
+  ],
+  workingOut: 'IS: Operating Income −€10M → Net Income −€6M (nach 40% Steuer). CFS: Net Income −€6M, +D&A €10M add-back → CFO +€4M → Cash +€4M.',
+  feedback: {
+    correct: 'Genau. D&A senkt Net Income um €6M (nach Steuern), wird aber im CFS zurückaddiert (+€10M). Netto: +€4M Cash. Der Trick: Steuereinsparung.',
+    wrong: 'Denk zweistufig: 1) D&A senkt Pre-Tax Income um €10M → Net Income sinkt um €6M (×0.6). 2) Im CFS: D&A wird zurückaddiert (+€10M). Net Change: −€6M + €10M = +€4M.',
+  },
+}
+```
 
-Wenn du einen Begriff einmal eingeführt hast, halte dich daran. Aktuelle Inkonsistenzen, die in der Beginner-Variante alle zu **deutscher Form** wechseln:
+### Slide 10 – Cliffhanger (Track A + B)
 
-| Aktuell (gemischt) | Beginner-Variante (konsistent) |
-|---|---|
-| Revenue / Umsatz | **Umsatz** (engl. Revenue) |
-| COGS / Herstellungskosten | **Herstellungskosten** (engl. COGS) |
-| Gross Margin / Bruttomarge | **Bruttomarge** (engl. Gross Margin) |
-| Net Income / Jahresüberschuss | **Jahresüberschuss** oder **Nettogewinn** |
+Titel: `'Da war noch was: Die drei Statements sind verbunden.'`
 
-Englische Akronyme nur dort, wo sie auf Deutsch keinen Standard haben (EBITDA, EBIT).
+Erklärungs-Card:
+> Net Income aus der GuV → fließt in den CFS (oben) UND in Retained Earnings der Bilanz. Das Final-Cash aus dem CFS → entspricht der Cash-Veränderung in der Bilanz. Diese drei Links verstehen = Lektion 4.
 
-## 🧪 ACCEPTANCE CRITERIA Phase 3b
+Marcus: `'Du hast jetzt alle drei Statements einzeln. In Lektion 4 schauen wir, wie sie zusammenspielen. Das ist die häufigste und wichtigste Frage in IB-Interviews. Mach Lektion 4 direkt danach.'`
 
-Bevor du Phase 3b als fertig betrachtest:
+CTA: `'Lektion abschließen →'`
 
-1. Die Lektion umfasst jetzt **11 Slides** (statt 12)
-2. Wasserfall (Slide 3) zeigt **5 Hauptpositionen + 6 Vorschau-Abzüge** mit visueller Differenzierung
-3. Margen (Slide 4) zeigt **nur 2 Margen** mit Firmenbeispielen
-4. Formel-Drill (Slide 5) hat **keinen Distraktor**
-5. Quiz hat **2 Fragen** statt 4
-6. Slide 10 ist die neue **EBITDA-Cliffhanger-Slide**
-7. Marcus-Tonfall ist **durchgehend gentle** in dieser Lektion
-8. Deutsche Begriffe sind primär, englische in Klammern
-9. Total-XP der Lektion ist **25** statt 55
-10. Lektions-Dauer-Schätzung: **6 Min** statt 8
+### Slide 11 – Retention Hub
 
-Plus: alle Acceptance Criteria aus Phase 3a sind weiterhin erfüllt (responsive, keine Bugs, Sounds funktionieren).
+Marcus-Email:
+```ts
+const marcusEmail = {
+  subject: 'Re: Lektion 3 – CFS verstanden',
+  gentle: 'Gut gemacht. Du weißt jetzt, dass das CFS bei Net Income startet, non-cash Items zurückaddiert und Working-Capital-Veränderungen berücksichtigt. Und du weißt, warum D&A trotz non-cash den Cash beeinflusst. In Lektion 4 verbinden wir alle drei Statements.',
+  sharp: 'CFS sitzt. Lektion 4 ist die wichtigste des ganzen Accounting-Blocks: wie alle drei Statements zusammenhängen. Dort scheitern 70% der Bewerber.',
+}
+```
 
-## 🚀 IMPLEMENTIERUNGS-REIHENFOLGE
+Next Lesson: `{ title: 'Die drei Statements verlinkt', duration: 10, xp: 40 }`
 
-1. **Branch sicherstellen** (siehe Git-Workflow)
-2. **MarcusNote** um `tone`-Prop erweitern
-3. **Slide 1** Marcus-Quote ersetzen + Outcomes umformulieren
-4. **Slide 2** Marcus-Feedback anpassen
-5. **Slide 3** Wasserfall umbauen auf 5+6-Struktur
-6. **Slide 4** Margen reduzieren + Firmenbeispiele
-7. **Slide 5** Formel-Drill Distraktor entfernen
-8. **Slide 6** Cheat Sheet vereinfachen
-9. **Slide 7** Pro-Tipps neue Inhalte
-10. **Slide 8** Quiz auf MC umstellen (statt Drag-Sort)
-11. **Slide 9** Quiz Hint immer anzeigen
-12. **Slides 10 + 11 entfernen, neue Slide 10** EBITDA-Cliffhanger anlegen
-13. **Retention-Hub** anpassen (XP, Email-Text, Next-Lesson)
-14. **Globale Sprach-Anpassung** Deutsch first
-15. **Manueller Lesefluss-Test:** Geh die Lektion einmal komplett durch, als wärst du Erstsemester
-16. **Push & PR**
+## ✅ AKZEPTANZKRITERIEN
 
-Frag mich nach jedem Slide-Umbau, ob ich Änderungen will.
+1. Route `/lesson/cash-flow-statement` lädt
+2. Track-Routing korrekt
+3. Slide 04 (Depreciation Puzzle) zeigt Flow-Visualisierung korrekt
+4. Desert-Island-Frage auf Slide 05 gibt differenziertes Feedback (richtig/falsch)
+5. Quiz-Frage 2 zeigt immer den Rechenweg nach Submission
+6. Mobile nutzbar
 
-Wenn du an einer Stelle einen besseren Vorschlag hast (z.B. ein noch passenderes Firmenbeispiel, eine elegantere Erklärung), schlage ihn aktiv vor – aber halte dich strikt an den gentle Marcus-Tonfall und die Konzept-Reduktion.
+## 🚀 REIHENFOLGE
 
-Los geht's mit Schritt 2 (MarcusNote tone-Prop).
+1. Branch, dann `data.ts`
+2. Slides 01–05 in Reihenfolge
+3. Slide 06 (Non-Cash, Track B+C)
+4. Slides 07–09
+5. Slide 10 Cliffhanger + Slide 11 Retention
+6. `page.tsx` verdrahten
+7. Testen, pushen
+
+Frag mich nach jedem Slide.
