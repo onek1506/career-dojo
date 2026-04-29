@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, GitBranch, BookOpen, User, Brain } from 'lucide-react';
+import { GitBranch, BookOpen, User, Brain } from 'lucide-react';
 
 interface BottomNavProps {
   lang?: 'en' | 'de';
@@ -12,11 +12,12 @@ interface BottomNavProps {
 export default function BottomNav({ lang = 'de' }: BottomNavProps) {
   const pathname = usePathname();
 
-  // Same nav items across all tracks
+  // Same nav items across all tracks. "Home" was removed — the skill tree
+  // ("Lernen") is already the home page, and the redundant entry only
+  // produced a loading flash via the root-redirect.
   const NAV_ITEMS = [
-    { href: '/', icon: Home, label: 'Home', labelDe: 'Home' },
     { href: '/skill-tree', icon: GitBranch, label: 'Learn', labelDe: 'Lernen' },
-{ href: '/brainteasers', icon: Brain, label: 'Brainteasers', labelDe: 'Brainteasers' },
+    { href: '/brainteasers', icon: Brain, label: 'Brainteasers', labelDe: 'Brainteasers' },
     { href: '/glossary', icon: BookOpen, label: 'Glossary', labelDe: 'Glossar' },
     { href: '/profile', icon: User, label: 'Profile', labelDe: 'Profil' },
   ];
