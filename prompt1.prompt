@@ -1,0 +1,491 @@
+# 🛠️ Phase 3a: Plattform-Stabilisierung (Bug-Fixes + Responsive + Sounds)
+
+Du arbeitest weiter an der Lern-Webapp für IB-Interview-Vorbereitung. Die erste Lektion ("Income Statement") ist inhaltlich fertig, hat aber kritische Plattform-Bugs, die User-Tests zeigen. Diese Phase behebt sie, bevor wir den Content anpassen.
+
+## 🌿 GIT-WORKFLOW
+
+1. Erstelle einen neuen Feature-Branch vom aktuellen `main` (oder vom Branch, in dem die Lektion liegt):
+```bash
+   git checkout main
+   git pull
+   git checkout -b feature/lesson-platform-stability
+```
+2. Committe in logischen Schritten:
+   - `fix(layout): replace fixed bottom CTA with footer slot pattern`
+   - `fix(layout): use h-screen flex layout to prevent page scroll`
+   - `feat(layout): add responsive breakpoints for mobile/tablet/desktop`
+   - `feat(layout): add desktop side-panel with streak and quick stats`
+   - `fix(slides): mobile layout for waterfall, cheat sheet, pro tips`
+   - `fix(slides): pro tips card layout and touch targets`
+   - `fix(quiz): wrong answer feedback and second attempt logic`
+   - `feat(sounds): add sound system with mute toggle`
+   - `chore(slides): reduce marcus quote frequency`
+3. Push nach Abschluss:
+```bash
+   git push origin feature/lesson-platform-stability
+```
+
+## 🐛 KRITISCHE BUGS (höchste Priorität)
+
+### Bug 1: Doppelter Bottom-CTA-Button
+
+**Symptom:** Auf Quiz-Slides (Slides 8, 9, 10, 11) sind gleichzeitig zwei primäre Action-Buttons sichtbar – ein "Antwort prüfen"/"Nächste Frage" innerhalb des Content-Bereichs UND der fixed Bottom-Bar-"Weiter"-Button vom `LessonLayout`-Wrapper.
+
+**Ursache:** `LessonLayout` rendert den Bottom-CTA selbst, aber Quiz-Slides brauchen eigene Submit-Logik.
+
+**Fix:** Ändere `LessonLayout` von "rendert eigenen CTA" zu "akzeptiert Footer-Slot":
+
+```tsx
+// VORHER (FALSCH):
+interface LessonLayoutProps {
+  currentStep: number
+  totalSteps: number
+  onBack: () => void
+  onNext: () => void
+  nextLabel?: string
+  nextDisabled?: boolean
+  children: React.ReactNode
+}
+
+// NACHHER (RICHTIG):
+interface LessonLayoutProps {
+  currentStep: number
+  totalSteps: number
+  onBack: () => void
+  footer: React.ReactNode  // Slide bestimmt selbst, was unten steht
+  children: React.ReactNode
+}
+```
+
+Erstelle eine wiederverwendbare `<LessonFooterCTA>`-Komponente, die der **Default** für alle Slides ist, die nur einen "Weiter"-Button brauchen:
+
+```tsx
+// components/lesson/LessonFooterCTA.tsx
+interface Props {
+  onClick: () => void
+  label?: string
+  disabled?: boolean
+  variant?: 'primary' | 'secondary'
+}
+export function LessonFooterCTA({ onClick, label = 'Weiter', disabled, variant = 'primary' }: Props) {
+  // Stil: bg-accent (primary) oder bg-bg-secondary (secondary)
+}
+```
+
+Quiz-Slides bauen ihren Footer dann selbst (z.B. mit "Antwort prüfen" + nach Submission "Nächste Frage").
+
+### Bug 2: Page-Scrolling auf kleinen Bildschirmen
+
+**Symptom:** Auf manchen Bildschirmen scrollt die ganze Page, der Bottom-CTA überdeckt Content.
+
+**Fix:** Korrekte Viewport-Struktur mit `h-screen flex flex-col`:
+
+```tsx
+// LessonLayout.tsx neue Struktur:
+<div className="h-screen flex flex-col bg-bg-primary">
+  {/* Header (fixed height) */}
+  <header className="h-14 flex-shrink-0 border-b border-bg-border">
+    <TopBar currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} />
+  </header>
+
+  {/* Main (scrollable, takes remaining space) */}
+  <main className="flex-1 overflow-y-auto">
+    <div className="max-w-2xl mx-auto px-6 py-8 lg:py-12">
+      {children}
+    </div>
+  </main>
+
+  {/* Footer (fixed height, no overlap) */}
+  <footer className="flex-shrink-0 border-t border-bg-border bg-bg-primary">
+    <div className="max-w-2xl mx-auto px-6 py-4">
+      {footer}
+    </div>
+  </footer>
+</div>
+```
+
+Dadurch scrollt **nur der Main-Bereich**, nie die ganze Page. Footer bleibt immer sichtbar, ohne Content zu überdecken.
+
+### Bug 3: Falsch-Antwort-Feedback fehlt / unvollständig
+
+Auf Quiz-Slides (besonders Slide 9 Calc): Implementiere die Zweit-Versuch-Logik korrekt.
+
+```tsx
+// In Slide09QuizCalc.tsx:
+type State = 'idle' | 'submitted-wrong-1' | 'submitted-wrong-2' | 'submitted-correct'
+
+const [state, setState] = useState<State>('idle')
+const [selected, setSelected] = useState<string | null>(null)
+
+const handleSubmit = () => {
+  const isCorrect = selected === '40%'
+  if (isCorrect) {
+    setState('submitted-correct')
+    onAnswer('q2', { correct: true, attempts: state === 'submitted-wrong-1' ? 2 : 1 })
+  } else if (state === 'idle') {
+    setState('submitted-wrong-1')
+    // Zeige Hinweis, biete zweiten Versuch
+  } else {
+    setState('submitted-wrong-2')
+    onAnswer('q2', { correct: false, attempts: 2 })
+  }
+}
+```
+
+Visuelles Feedback bei falsch:
+- Falsche Option: `border-error bg-error/10`
+- Hinweis-Box (nur bei wrong-1): "Tipp: Bruttomarge = (Umsatz - COGS) / Umsatz"
+- Footer-CTA wechselt von "Antwort prüfen" zu "Nochmal versuchen" → nach 2. Versuch zu "Nächste Frage"
+
+## 📱 RESPONSIVE DESIGN (komplette Neuauslegung)
+
+Aktueller Zustand: feste Container-Breite, keine echten Breakpoints. Das muss in jedem Slide angepasst werden.
+
+### Breakpoint-Strategie
+
+```ts
+// Tailwind defaults sind ok, nutze:
+// - default (< 640px): Mobile
+// - sm: (≥ 640px): Large mobile
+// - md: (≥ 768px): Tablet
+// - lg: (≥ 1024px): Desktop
+// - xl: (≥ 1280px): Wide desktop
+```
+
+### Mobile (< 640px)
+
+**LessonLayout:**
+- Top-Bar: `h-12` statt `h-14`
+- Content: `px-4 py-6`
+- Footer: `px-4 py-3`
+
+**Slide 01 Briefing:**
+- Headline `text-3xl` statt `text-5xl`
+- Stat-Card: `grid-cols-1` statt `grid-cols-3` (untereinander)
+
+**Slide 02 Bilanz/GuV:**
+- Karten: `grid-cols-1` statt `grid-cols-2` (untereinander), Höhe je 140px
+
+**Slide 03 Wasserfall:**
+- Schrift kleiner: `text-xs` für Labels
+- Position-Layout: Englisches Label oben, deutsches darunter (statt nebeneinander)
+- Werte rechts kleiner: `text-sm`
+- Sektion-Trennlinien dünner
+
+**Slide 04 Margen:**
+- Balken-Höhe: `h-10` statt `h-12`
+- Werte am Ende: kleinere Schrift, ggf. unter den Balken bei Platzmangel
+
+**Slide 05 Formel-Drill:**
+- Formel: `text-lg` statt `text-2xl`, ggf. mit Zeilenumbruch nach `/`
+- Slots: `w-24 h-9` statt `w-32 h-10`
+- Wortpool: 2 Spalten statt 4
+
+**Slide 06 Cheat Sheet:**
+- KOMPLETT NEUES MOBILE-LAYOUT (siehe unten):
+
+```tsx
+// Auf Mobile: Eine quadratische "Card-zum-Screenshotten"
+// Statt monospace-Tabelle, eine vertikale Liste mit größerer Typo
+// Größe: 320×450px, designt zum direkten Screenshot
+<div className="lg:hidden">
+  <CheatSheetMobile />  // Neue Komponente, vertikal, lesbar
+</div>
+<div className="hidden lg:block">
+  <CheatSheetDesktop /> // Aktuelles Bloomberg-Layout
+</div>
+```
+
+`CheatSheetMobile`-Layout:
+- Header: "GuV-Cheat-Sheet" in Serif, mittig
+- Drei Sektionen mit dünnen Trennlinien:
+  1. **Reihenfolge** (Revenue → Net Income), je Position eine Zeile mit `text-sm`
+  2. **Margen-Formeln**, je 2 Zeilen pro Formel
+  3. **Rule of Thumb** in italic
+- Padding: `p-5`, Background: `bg-bg-secondary`, Border: `border border-bg-border rounded-xl`
+- Optimiert für 375px-Display, kein horizontaler Scroll
+
+**Slide 07 Pro-Tips:**
+- Cards: `min-h-[180px]` statt fester Höhe
+- Tag und Avatar in Body-Bereich integriert (kein leerer Header-Bereich)
+- Body-Text `text-sm`
+
+**Slides 08–11 Quiz:**
+- Antwort-Optionen: voll-breit, höher (`py-4` statt `py-3`)
+- Frage-Text: `text-xl` statt `text-2xl`
+
+**Slide 12 Retention:**
+- Stats-Cards: `grid-cols-1` (untereinander)
+- Streak/Level-Cards: `grid-cols-1`
+- Next-Action-Cards: `grid-cols-1`
+- Trophäen-Kreis: 80px statt 120px
+
+### Desktop (≥ 1024px)
+
+**LessonLayout bekommt ein optionales Side-Panel rechts** für mehr Bildschirmnutzung:
+
+```tsx
+<div className="h-screen flex flex-col bg-bg-primary">
+  <header>...</header>
+  <div className="flex-1 flex overflow-hidden">
+    {/* Main Content */}
+    <main className="flex-1 overflow-y-auto">
+      <div className="max-w-2xl mx-auto px-6 py-12">
+        {children}
+      </div>
+    </main>
+    
+    {/* Side-Panel: nur ab lg sichtbar */}
+    <aside className="hidden lg:flex w-72 flex-shrink-0 border-l border-bg-border flex-col">
+      <SidePanel currentStep={currentStep} totalSteps={totalSteps} />
+    </aside>
+  </div>
+  <footer>...</footer>
+</div>
+```
+
+`SidePanel`-Inhalt:
+- Oben: Lektions-Title "Income Statement" (small, monospace)
+- **Streak-Card:** `🔥 Tag 1 / 7` mit Mini-Progress
+- **XP-Card:** "Diese Session: +XX XP" (live-update)
+- **Lesson-Map:** Liste aller 12 Slides als Mini-Indikatoren (1 abgeschlossen = filled, current = highlighted, kommend = empty)
+- Unten: Marcus-Avatar mit "Brauchst du Hilfe?" → öffnet Hint-Modal (nice-to-have, kann später kommen)
+
+Dadurch wirkt Desktop nicht mehr wie eine Mobile-Webview.
+
+## 🔊 SOUND-SYSTEM
+
+Implementiere ein zentrales Sound-System. Sounds müssen:
+- Subtil und premium klingen (kein Cartoon, keine Game-Sounds)
+- Per Mute-Toggle deaktivierbar sein (Persistierung in localStorage)
+- Nicht beim ersten Page-Load triggern (User-Interaction-Anforderung der Browser)
+
+### Sound-Files
+
+Lege diese Files an unter `public/sounds/`:
+
+```
+public/sounds/
+  click.mp3              // Subtle UI tick (~50ms, sehr leise)
+  correct.mp3            // Kurzer "ping" für richtige Antwort (~200ms)
+  wrong.mp3              // Tiefer "thud" für falsche Antwort (~300ms)
+  complete.mp3           // Belohnungs-Chime für Lektion-Ende (~800ms)
+  reveal.mp3             // Soft "swoosh" für Tap-to-reveal (~150ms)
+  streak.mp3             // Subtiler "shing" für Streak-Increase (~400ms)
+```
+
+**Hinweis:** Da wir keine echten Sound-Files haben, dokumentiere im Code, welche Sounds erwartet werden, und nutze Platzhalter. Empfehle dem User, kostenlose Sounds von Quellen wie freesound.org, zapsplat.com oder Mixkit zu beziehen. Teste die Implementierung mit Beep-Tönen oder dummy-Files.
+
+### Sound-Hook
+
+Erstelle `hooks/useSounds.ts`:
+
+```tsx
+'use client'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+export type SoundType = 'click' | 'correct' | 'wrong' | 'complete' | 'reveal' | 'streak'
+
+const SOUND_FILES: Record<SoundType, string> = {
+  click: '/sounds/click.mp3',
+  correct: '/sounds/correct.mp3',
+  wrong: '/sounds/wrong.mp3',
+  complete: '/sounds/complete.mp3',
+  reveal: '/sounds/reveal.mp3',
+  streak: '/sounds/streak.mp3',
+}
+
+const VOLUMES: Record<SoundType, number> = {
+  click: 0.15,
+  correct: 0.4,
+  wrong: 0.35,
+  complete: 0.5,
+  reveal: 0.25,
+  streak: 0.4,
+}
+
+export function useSounds() {
+  const [muted, setMuted] = useState(false)
+  const audioCache = useRef<Partial<Record<SoundType, HTMLAudioElement>>>({})
+
+  // Init from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem('sounds-muted')
+    if (stored === 'true') setMuted(true)
+  }, [])
+
+  const toggleMute = useCallback(() => {
+    setMuted(prev => {
+      const next = !prev
+      localStorage.setItem('sounds-muted', String(next))
+      return next
+    })
+  }, [])
+
+  const play = useCallback((sound: SoundType) => {
+    if (muted) return
+    if (typeof window === 'undefined') return
+    
+    try {
+      let audio = audioCache.current[sound]
+      if (!audio) {
+        audio = new Audio(SOUND_FILES[sound])
+        audio.volume = VOLUMES[sound]
+        audioCache.current[sound] = audio
+      }
+      audio.currentTime = 0
+      audio.play().catch(() => { /* Browser blocked autoplay – ignore */ })
+    } catch (e) {
+      // Sound file might not exist yet
+    }
+  }, [muted])
+
+  return { play, muted, toggleMute }
+}
+```
+
+### Integration
+
+Verbinde den Mute-Toggle in der Top-Bar mit dem Hook:
+
+```tsx
+// LessonLayout.tsx
+const { muted, toggleMute } = useSounds()
+
+<button onClick={toggleMute} aria-label={muted ? 'Sound an' : 'Sound aus'}>
+  {muted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+</button>
+```
+
+Triggere Sounds an folgenden Stellen (Beispiele):
+
+```tsx
+// Beim Klick auf primären CTA
+<button onClick={() => { play('click'); onNext() }}>Weiter</button>
+
+// In Slide02 (Tap-to-reveal):
+const handleSelect = (option: 'left' | 'right') => {
+  const correct = option === 'right'
+  play(correct ? 'correct' : 'wrong')
+  // ...
+}
+
+// In Slide03 (Wasserfall): bei Tap auf Position
+play('reveal')
+
+// In Slide12 (Result-Screen): beim Mount
+useEffect(() => { play('complete') }, [])
+
+// Bei Streak-Update:
+play('streak')
+```
+
+**Wichtig:** Sound-Volume sollte zurückhaltend sein. IB-Studenten lernen oft im Café/Lib – laute Sounds sind disqualifizierend.
+
+## 🎨 WEITERE FIXES (mittlere Priorität)
+
+### Fix 4: Marcus-Frequenz reduzieren
+
+Aktuell spricht Marcus auf fast jeder Slide. Reduzieren auf max. 1 von 3 Slides. Konkret:
+
+- **Slide 1:** Marcus (Intro) – behalten
+- **Slide 2:** Marcus (Erklärung) – behalten
+- **Slide 3:** KEIN Marcus – nur Wasserfall mit Tooltips
+- **Slide 4:** Marcus (Hierarchie-Quote) – behalten
+- **Slide 5:** KEIN Marcus – Formel-Erfolg reicht visuell
+- **Slide 6:** KEIN Marcus
+- **Slide 7:** Marcus auf jeder Card (das ist sein Bereich) – behalten
+- **Slides 8–11:** Marcus nur bei Quiz-Lösung (richtig oder falsch), nicht in der Frage
+- **Slide 12:** Marcus (Final-Email) – behalten
+
+Total: Marcus auf ca. 6 von 12 Slides statt 11 von 12.
+
+### Fix 5: Pro-Tip-Cards Layout
+
+Aktuell zu viel Leerraum oben. Refactor:
+
+```tsx
+// VORHER: Tag oben links, Avatar oben rechts, riesiger leerer Bereich, Body unten
+// NACHHER: 
+<Card className="min-h-[200px] p-6 flex flex-col gap-4">
+  <div className="flex items-center justify-between">
+    <Tag color="strategy">STRATEGY</Tag>
+    {/* KEIN Avatar oben */}
+  </div>
+  <p className="text-base leading-relaxed flex-1">{body}</p>
+  <div className="flex items-center gap-2 pt-3 border-t border-bg-border">
+    <MarcusAvatar size="sm" />
+    <span className="text-xs text-text-muted font-mono">— Marcus Hart</span>
+  </div>
+</Card>
+```
+
+Tag-Farben differenzieren:
+- `STRATEGY` → Akzent-Orange
+- `WARNING` → Amber `#FFB800`
+- `MISTAKE` → Error-Rot
+
+### Fix 6: Stat-Card auf Slide 1 verkleinern
+
+Aktuelle Höhe ca. 100px. Reduzieren auf ~70px durch:
+- `py-3` statt `py-4`
+- Werte `text-xl` statt `text-2xl`
+- Labels noch kleiner: `text-[10px]` mit `tracking-widest`
+
+### Fix 7: "EBIT"-Distraktor in Formel-Drill (Slide 5)
+
+Pool-Bereich klar als "übrig" kennzeichnen:
+
+```tsx
+<div className="mt-4 pt-4 border-t border-bg-border">
+  <p className="text-xs text-text-muted font-mono uppercase mb-2">Nicht verwendet</p>
+  <div className="flex flex-wrap gap-2">
+    {unusedTokens.map(token => <Token>{token}</Token>)}
+  </div>
+</div>
+```
+
+### Fix 8: Subline-Inkonsistenz
+
+Slide 5: "Bruttomarge in 3 Bausteinen" → korrigieren zu "Bruttomarge in 4 Bausteinen" (Revenue, COGS, Revenue, Operator).
+
+### Fix 9: Touch-Targets
+
+Alle interaktiven Elemente min. `min-h-[44px]` und `min-w-[44px]`. Besonders die Drag-Handles in Slide 8 sind aktuell zu klein.
+
+## 🧪 ACCEPTANCE CRITERIA
+
+Bevor du Phase 3a als fertig betrachtest, teste:
+
+1. **Bug 1 weg:** Auf KEINEM Slide sind zwei primäre CTA-Buttons gleichzeitig sichtbar
+2. **Bug 2 weg:** Auf Bildschirmen 600px–1200px Höhe scrollt die Page niemals, nur der Main-Bereich
+3. **Mobile (375px Breite):** Alle 12 Slides sind ohne horizontalen Scroll lesbar und bedienbar
+4. **Tablet (768px):** Layout passt sich an, alles bedienbar
+5. **Desktop (1440px):** Side-Panel ist sichtbar, kein leerer Raum mehr links/rechts
+6. **Quiz-Slide 9:** Falsche Antwort führt zu Hint + Nochmal-Versuch, erst zweite falsche zu nächster Frage
+7. **Sound-System:** Mute-Toggle funktioniert, persistiert in localStorage, Sounds spielen bei den definierten Events
+8. **Marcus-Frequenz:** Max. auf 6 von 12 Slides
+9. **Lighthouse Mobile:** Performance ≥ 85, Accessibility ≥ 90
+10. **Keyboard-Navigation:** Tab durch alle Slides, Enter triggert primäre CTAs
+
+## 🚀 IMPLEMENTIERUNGS-REIHENFOLGE
+
+1. **Branch erstellen** (siehe Git-Workflow)
+2. **LessonLayout refactoren** (Footer-Slot-Pattern + h-screen-Struktur)
+3. **LessonFooterCTA-Komponente** anlegen
+4. **Alle 12 Slides anpassen** an neuen Footer-Pattern (sehr wichtig: keine internen primären CTAs mehr, immer als Footer übergeben)
+5. **Responsive Breakpoints** Slide für Slide umsetzen
+6. **Side-Panel-Komponente** (Desktop) bauen
+7. **CheatSheetMobile** als separate Komponente bauen
+8. **Quiz-Slides:** Falsch-Antwort-Logik mit Zweit-Versuch
+9. **Sound-System:** Hook + Integration in alle relevanten Slides
+10. **Marcus-Reduzierung:** Quote-Komponenten aus Slides entfernen, wo nicht mehr nötig
+11. **Polishing-Fixes** (Pro-Tip-Cards, Stat-Card, Distraktor, Touch-Targets)
+12. **Manuelles Testen** auf 3 Viewport-Größen (375, 768, 1440)
+13. **Push & PR**
+
+Frag mich nach jedem implementierten Schritt, ob du mit den Änderungen weitermachen oder Anpassungen vornehmen sollst.
+
+Phase 3b (Inhaltliche Vereinfachung für Beginner-Niveau) folgt im selben Branch nach Bestätigung.
+
+Los geht's mit Schritt 1 (Branch erstellen + LessonLayout refactoren).

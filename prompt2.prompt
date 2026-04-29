@@ -1,0 +1,442 @@
+# 🎓 Phase 3b: Inhaltliche Vereinfachung für echtes Beginner-Niveau
+
+Phase 3a (Plattform-Stabilisierung) ist abgeschlossen. Du arbeitest weiter im selben Branch `feature/lesson-platform-stability`.
+
+## 🎯 ZIEL DIESER PHASE
+
+Die aktuelle Lektion "Income Statement" ist zu schwer für einen echten Beginner (Profil A: BWL-Erstsemester oder fachfremder Student, hat noch nie EBITDA, COGS, Margin gehört). Sie wirft 11 Konzepte auf einen Slide, mischt Englisch/Deutsch, und Marcus' zynischer Tonfall schreckt Anfänger ab.
+
+Wir bauen die Lektion um auf das echte Beginner-Niveau, **OHNE die Premium-Optik zu verlieren**. Die App bleibt visuell identisch – nur Content, Konzept-Dichte und Marcus-Tonfall werden angepasst.
+
+## 🌿 GIT-WORKFLOW
+
+1. Du bleibst im Branch `feature/lesson-platform-stability` (oder erstelle einen neuen Branch `feature/lesson-beginner-content` aus diesem)
+2. Committe in logischen Schritten:
+   - `refactor(lesson): simplify waterfall to 5 core positions`
+   - `refactor(lesson): reduce margins to gross and net for beginner`
+   - `feat(lesson): add gentle marcus persona for first lessons`
+   - `refactor(quiz): reduce to 2 quiz questions for first lesson`
+   - `feat(lesson): add ebitda cliffhanger preview at end`
+   - `refactor(content): simplify wording and add german-first labels`
+3. Push nach Abschluss + PR
+
+## 📚 KONZEPTIONELLE ÄNDERUNGEN
+
+### Marcus' Persona-Wechsel: "Onboarding Marcus"
+
+Marcus bleibt als Coach, aber sein Tonfall ist in den ersten 3 Lektionen **freundlicher und einladender**, weniger zynisch. Das ist nicht "weichgespült" – das ist einfach didaktisch korrekt: Du brauchst Vertrauen, bevor du Druck ausübst.
+
+**Regel:** In den ersten 3 Lektionen verwendet Marcus:
+- Begrüßung statt Drohung ("Schön, dass du da bist." statt "Mach das ordentlich, sonst...")
+- Konkretes, ermutigendes Lob ("Genau das wollte ich hören." statt "Sauber. Diese Reihenfolge musst du im Schlaf können.")
+- Hilfsangebote bei Fehlern ("Kein Stress – das ist genau die Stelle, an der die meisten stolpern. Hier ist der Trick:...")
+
+**Ab Lektion 4** (Bilanz-Vertiefung) wird Marcus dann der zynische MD, den wir kennen. Das gibt eine echte Charakterentwicklung und einen Anreiz, weiterzumachen.
+
+Erstelle einen `tone`-Parameter für Marcus:
+
+```tsx
+// components/lesson/MarcusNote.tsx erweitern:
+interface MarcusNoteProps {
+  subject?: string
+  body: string | React.ReactNode
+  tone?: 'gentle' | 'sharp'  // gentle = Lektion 1-3, sharp = ab Lektion 4
+}
+```
+
+Visuell ändert sich nichts – nur der Inhalt der Quotes folgt dem Tone.
+
+### Konzept-Dichte: Aus 11 wird 5
+
+Die Wasserfall-Slide wird radikal reduziert. Statt 11 Positionen (Revenue, COGS, Gross Profit, SG&A, EBITDA, D&A, EBIT, Interest, EBT, Taxes, Net Income) zeigen wir nur 5:
+
+1. **Revenue** (Umsatz)
+2. **Gross Profit** (Bruttoergebnis)
+3. **EBITDA**
+4. **EBIT**
+5. **Net Income** (Jahresüberschuss)
+
+Die Abzüge (COGS, SG&A, D&A, Interest, Taxes) werden als kleine `+`-Symbole zwischen den 5 Hauptpositionen angedeutet, mit Tooltip-Text wie:
+
+> *"Hier werden die Herstellungskosten (COGS) abgezogen. Mehr dazu in Lektion 2."*
+
+Das schafft eine klare Hierarchie: 5 muss-wissen-Konzepte, 6 hier-ist-eine-Vorschau-Konzepte.
+
+## 📋 SLIDE-FÜR-SLIDE-ÄNDERUNGEN
+
+### Slide 1 – Briefing (sanftere Einleitung)
+
+**Marcus-Quote ändern:**
+
+VORHER:
+> "Diese Lektion deckt 8 von 12 GuV-Fragen ab, die in 90% aller Spring-Week- und Summer-Internship-Interviews vorkommen. Mach sie ordentlich – beim zweiten Mal mit Live-Interviewer ist es zu spät."
+
+NACHHER (gentle tone):
+> "Willkommen bei Lektion 1. Wir starten mit der GuV – dem ersten Bericht, den jeder IB-Analyst lesen muss. Ich gehe das Schritt für Schritt mit dir durch. Keine Vorkenntnisse nötig."
+
+**Stat-Card-Wert ändern:** "DAUER 6 MIN" (statt 8 – realistisch für vereinfachte Lektion).
+
+**Learning Outcomes umformulieren** (von "können" zu "verstehen"):
+- VORHER: "GuV von Top zu Bottom durchgehen"
+- NACHHER: "Verstehen, was eine GuV überhaupt zeigt"
+- VORHER: "4 Margen aus dem Kopf berechnen"
+- NACHHER: "Den Unterschied zwischen Brutto- und Nettogewinn kennen"
+- VORHER: "EBITDA vs. EBIT in 10 Sekunden erklären"
+- NACHHER: "Wissen, wann man EBITDA hört (und warum es jeder nennt)"
+
+### Slide 2 – Bilanz vs. GuV (bleibt fast gleich)
+
+Marcus-Quote bei Korrekt anpassen:
+
+VORHER:
+> "Korrekt. GuV = Film über einen Zeitraum. Bilanz = Foto an einem Stichtag. Wer das verwechselt, fliegt im First Round."
+
+NACHHER (gentle):
+> "Genau. Eine GuV erzählt eine Geschichte über einen Zeitraum – wie ein Film. Eine Bilanz zeigt einen einzigen Moment – wie ein Foto. Diese Unterscheidung ist der wichtigste erste Schritt."
+
+### Slide 3 – Wasserfall (KOMPLETTE NEUSTRUKTURIERUNG)
+
+**Header bleibt:** "Vom Umsatz zum Gewinn"
+**Subline ändern:** "5 Stationen, die du kennen musst." (statt "11 Stationen")
+
+Neue Daten-Struktur:
+
+```ts
+// data.ts
+export const waterfallSteps = [
+  {
+    type: 'main',
+    label: 'Revenue',
+    de: 'Umsatzerlöse',
+    explanation: 'Alles, was die Firma verkauft hat. Der Top-Line-Wert.',
+    value: 100,
+    barWidth: 100,
+  },
+  {
+    type: 'preview',
+    label: '−Aufwendungen',
+    de: 'COGS, SG&A, etc.',
+    explanation: 'Hier werden alle Kosten abgezogen. In Lektion 2 schauen wir uns die einzelnen Aufwandsarten an.',
+    value: -60,
+  },
+  {
+    type: 'main',
+    label: 'EBITDA',
+    de: 'Op. Ergebnis vor Abschreibungen',
+    explanation: 'Was übrig bleibt, bevor Abschreibungen, Zinsen und Steuern abgezogen werden. Wichtigste Profit-Kennzahl in der Praxis.',
+    value: 40,
+    barWidth: 40,
+  },
+  {
+    type: 'preview',
+    label: '−Abschreibungen',
+    de: 'D&A',
+    explanation: 'Kosten für Maschinen und Software, die über mehrere Jahre verteilt werden. Lektion 3.',
+    value: -10,
+  },
+  {
+    type: 'main',
+    label: 'EBIT',
+    de: 'Operatives Ergebnis',
+    explanation: 'EBITDA minus Abschreibungen. Realistisches Bild der operativen Profitabilität.',
+    value: 30,
+    barWidth: 30,
+  },
+  {
+    type: 'preview',
+    label: '−Zinsen + Steuern',
+    de: 'Interest + Taxes',
+    explanation: 'Bank und Staat wollen auch was. Lektion 4.',
+    value: -12,
+  },
+  {
+    type: 'main',
+    label: 'Net Income',
+    de: 'Jahresüberschuss',
+    explanation: 'Was am Ende für die Aktionäre übrig bleibt. Bottom-Line.',
+    value: 18,
+    barWidth: 18,
+    highlighted: true,
+  },
+]
+```
+
+**Visuelle Differenzierung:**
+
+`type: 'main'` (5 Hauptpositionen):
+- Volle Balken-Höhe (`h-12`)
+- Volle Schrift-Größe
+- Akzent-Farbe oder Off-White-Balken
+- Klickbar mit ausführlichem Tooltip
+
+`type: 'preview'` (6 Vorschau-Abzüge):
+- Halbe Balken-Höhe (`h-6`)
+- Schrift `text-xs text-text-muted`
+- Dünner roter Akzent statt voller Balken
+- Klickbar mit Tooltip "→ Mehr dazu in Lektion X"
+
+**Sektion-Trenner ENTFERNEN** (zu komplex für Beginner). Stattdessen: durchgängiger Wasserfall mit visueller Hierarchie.
+
+**Marcus-Quote unter dem Wasserfall** (gentle):
+> "Diese 5 Stationen sind alles, was du heute brauchst. Die kleineren Posten dazwischen lernst du in den nächsten Lektionen kennen – jeder einzeln, mit Beispielen. Niemand erwartet, dass du das schon alles kannst."
+
+### Slide 4 – Margen (NUR NOCH 2)
+
+**Header:** "Zwei Margen, die jeder kennt." (statt "Vier Margen, eine Geschichte.")
+
+Reduzierte Daten:
+
+```ts
+const margins = [
+  {
+    key: 'gross',
+    label: 'Bruttomarge',
+    enLabel: 'Gross Margin',
+    value: 40,
+    abs: '€40M',
+    highlighted: true,
+    explanation: 'Was nach den Produktionskosten übrig bleibt – im Verhältnis zum Umsatz. Apple hat hohe Bruttomargen (~40%), Walmart niedrige (~25%).',
+  },
+  {
+    key: 'net',
+    label: 'Nettomarge',
+    enLabel: 'Net Margin',
+    value: 9,
+    abs: '€9M',
+    explanation: 'Was am Ende für die Aktionäre übrig bleibt – im Verhältnis zum Umsatz. Tech-Firmen oft 20%+, Supermärkte 2-3%.',
+  },
+]
+```
+
+EBITDA-Marge und Operating Margin werden in Lektion 3 eingeführt.
+
+**Marcus-Quote:**
+> "Diese zwei Margen reichen für den Anfang. Brutto = wie viel bleibt nach den Produktionskosten. Netto = wie viel bleibt am Ende. Apple hat hohe Margen, Supermärkte niedrige. Mehr braucht es heute nicht."
+
+**Mit konkreten Firmenbeispielen** unter dem Diagramm einen kleinen Vergleich:
+
+```
+APPLE             ~25% Net Margin
+WALMART           ~3%  Net Margin
+NETFLIX           ~15% Net Margin
+```
+
+Das gibt Beginnern einen Anker an reale Firmen statt abstrakter Zahlen.
+
+### Slide 5 – Formel-Drill (vereinfacht)
+
+**Header bleibt:** "Schreib die Formel."
+**Subline:** "Bruttomarge in 4 Bausteinen."
+
+Formel bleibt: `Gross Margin = ( ___ − ___ ) / ___ × 100%`
+
+Wortpool reduzieren auf 3 (kein Distraktor mehr):
+
+```ts
+const tokens = ['Revenue', 'COGS', 'Revenue']
+```
+
+Begründung: Distraktoren sind didaktisch wertvoll für Fortgeschrittene, aber für Beginner frustrierend, wenn sie noch nicht sicher sind, was COGS überhaupt heißt.
+
+**Marcus-Quote bei Erfolg (gentle):**
+> "Stark. Diese Formel siehst du immer wieder. Wenn du sie einmal verstehst, hast du den Schlüssel zu allen anderen Margen."
+
+### Slide 6 – Cheat Sheet (vereinfacht)
+
+Aktuelle Cheat-Sheet-Card mit 11 Positionen ist Overload. Reduziere auf:
+
+```
+GUV CHEAT SHEET                       [01]
+──────────────────────────────────────────
+DIE 5 STATIONEN
+Revenue  →  Gross Profit  →  EBITDA
+         →  EBIT  →  Net Income
+
+DIE 2 MARGEN
+Bruttomarge = Gross Profit / Revenue
+Nettomarge  = Net Income  / Revenue
+
+REGEL
+Marge in % zeigt, wie effizient ein
+Unternehmen Geld verdient.
+──────────────────────────────────────────
+```
+
+Buttons "Als PNG speichern" und "Weiter" bleiben. "In Notion kopieren" entfernen (zu nischig für Beginner).
+
+### Slide 7 – Pro-Tipps (KOMPLETT NEUE INHALTE)
+
+Aktuelle Tipps sind Profi-Niveau ("Walk me through the income statement"). Beginner-Tipps sind anders – sie helfen beim **Lernen**, nicht beim Performen.
+
+**Header ändern:** "Drei Dinge, die dir das Lernen leichter machen." (statt "Drei Moves, die dich vom Rest abheben.")
+
+**Card 1 – Tag: `LERNTIPP`**
+> "Wenn du einen englischen Begriff zum ersten Mal siehst, sag ihn dir laut vor. EBITDA = 'I-bitt-da'. Dein Gehirn merkt sich Dinge besser, wenn du sie hörst, nicht nur liest."
+
+**Card 2 – Tag: `MERKE`**
+> "Brutto und Netto: Stell dir Brutto wie deinen Bruttogehalt vor – das, was am Anfang draufsteht. Netto ist, was am Ende auf deinem Konto landet. Bei Firmen ist das genauso."
+
+**Card 3 – Tag: `NÄCHSTER SCHRITT`**
+> "In Lektion 2 schauen wir uns an, was 'Aufwendungen' eigentlich sind. Spoiler: Es gibt mehr als nur Materialkosten. Bis dahin reicht es zu wissen: Aufwendungen reduzieren den Gewinn."
+
+Alle drei Tipps sind ermutigend, konkret, beginner-relevant.
+
+### Slide 8 – Quiz Frage 1 (vereinfacht: ENTFÄLLT der Drag-Sort)
+
+Drag-Sort mit 6 Positionen ist für Beginner zu schwer (sie haben gerade die Reihenfolge zum ersten Mal gesehen). Ersetze durch eine Multiple-Choice-Frage:
+
+**Frage:** "Welcher Bericht zeigt einen Zeitraum (z.B. das ganze Jahr 2024)?"
+
+Optionen:
+- A) Bilanz
+- B) Gewinn- und Verlustrechnung (richtig)
+- C) Eigenkapitalveränderungsrechnung
+- D) Kapitalflussrechnung
+
+Das ist die wichtigste konzeptionelle Erkenntnis aus Slide 2 – ideal als erste Quiz-Frage.
+
+**Marcus-Feedback (gentle, korrekt):**
+> "Genau das. Diese Unterscheidung ist der wichtigste Punkt aus Lektion 1."
+
+**Marcus-Feedback (gentle, falsch):**
+> "Kein Stress – das verwechselt fast jeder am Anfang. Die Bilanz zeigt einen einzigen Stichtag. Die GuV zeigt einen Zeitraum. Versuch's nochmal."
+
+### Slide 9 – Quiz Frage 2 (Bruttomarge bleibt, aber sanfter)
+
+Frage und Optionen bleiben:
+> "TechCo: Umsatz €200M, COGS €120M. Wie hoch ist die Bruttomarge?"
+- 60%, **40%** (richtig), 80%, 20%
+
+**Aber:** Beim ersten Klick auf "Antwort prüfen" zeigt der Hint **immer**, auch wenn richtig:
+
+> "Rechenweg: (Umsatz − COGS) / Umsatz = (200 − 120) / 200 = 80/200 = 40%"
+
+Das bestätigt Beginner und gibt ihnen die Logik mit, nicht nur das Ergebnis.
+
+**Marcus (gentle, korrekt):**
+> "Sehr gut. Du hast gerade deine erste Margen-Berechnung gemacht – genau so läuft das in echten Pitchbooks."
+
+### Slides 10 + 11 – ENTFALLEN (in Beginner-Lektion)
+
+EBITDA-Auflösung (Slide 10) und Margen-Hierarchie (Slide 11) sind für Beginner zu früh. Sie kommen in Lektion 3 (EBITDA-Vertiefung).
+
+Stattdessen wird Slide 10 zur **Cliffhanger-Slide:**
+
+**Slide 10 (NEU) – EBITDA-Vorschau**
+
+Komponente: `Slide10EbitdaPreview.tsx`
+
+Layout:
+
+1. Header: **"Da war noch ein Begriff: EBITDA."** in `font-serif text-3xl`
+2. Subline: "Den hast du im Wasserfall gesehen. Hier ein Vorgeschmack."
+3. **Mini-Erklärungs-Card:**
+
+```
+EBITDA  /ˈiː.bɪt.dɑː/  Substantiv
+Earnings Before Interest, Taxes,
+Depreciation and Amortization
+
+= Gewinn bevor Bank, Staat und Buchhalter
+  ihren Anteil bekommen haben.
+```
+
+4. **Kontext-Box:**
+> "Warum jeder EBITDA nennt: Es zeigt die operative Profitabilität, unabhängig davon, wie eine Firma finanziert ist oder wo sie steuerlich sitzt. Perfekt zum Vergleichen.
+> 
+> Warum manche es hassen: Es blendet echte Kosten aus (z.B. für Maschinen). Warren Buffett ist berühmt dafür, EBITDA als 'BS-Kennzahl' zu bezeichnen.
+>
+> **Lektion 3 widmet sich komplett EBITDA. Heute reicht es zu wissen: Du wirst diesen Begriff täglich hören.**"
+
+CTA: `Lektion abschließen →`
+
+Diese Slide schafft genau den Pull-Effekt, den wir wollen: User verstehen, dass es noch mehr gibt, und wollen weiter.
+
+### Slide 11 wird zu Slide 10 → Slide 12 wird Slide 11 (Retention Hub bleibt strukturell gleich)
+
+**Total reduziert: von 12 auf 11 Slides.**
+
+Anpassungen am Retention Hub (Slide 11):
+
+- "Modul 01 abgeschlossen." bleibt
+- Stats: `4/4` → ändern zu `2/2` (nur noch 2 Quiz-Fragen)
+- XP-Wert anpassen: aus 55 wird 25 (10 + 10 + 5 Completion-Bonus)
+- Marcus-Email (gentle):
+
+> **Re:** Erste Lektion geschafft
+> "Gut gemacht. Du verstehst jetzt, was eine GuV ist und wie Brutto- und Nettomarge funktionieren. Das ist die Basis für alles, was kommt. In Lektion 2 schauen wir uns die einzelnen Aufwandsarten an – COGS, SG&A und was sonst noch alles vom Umsatz abgezogen wird. Bis dann."
+
+- Next-Action-Card: "Modul 02 — Aufwendungen" (5 Min · +30 XP)
+
+## 🎨 SPRACHLICHE ÄNDERUNGEN GLOBAL
+
+### Englisch-Deutsch-Hierarchie umkehren für Beginner
+
+In der Profi-Variante zeigen wir "Revenue" groß, "Umsatzerlöse" klein. Für Beginner umkehren:
+
+```tsx
+// VORHER (Profi):
+<span className="text-base font-mono text-text-primary">Revenue</span>
+<span className="text-xs font-mono text-text-muted">Umsatzerlöse</span>
+
+// NACHHER (Beginner, Lektion 1-3):
+<span className="text-base font-mono text-text-primary">Umsatz</span>
+<span className="text-xs font-mono text-text-muted">(engl. Revenue)</span>
+```
+
+Begründung: Beginner muss sich erst mit den deutschen Begriffen sicher fühlen, bevor wir die englischen Profi-Begriffe in den Vordergrund stellen. Ab Lektion 4 dann umgekehrt.
+
+### Konsistente Begriffsverwendung
+
+Wenn du einen Begriff einmal eingeführt hast, halte dich daran. Aktuelle Inkonsistenzen, die in der Beginner-Variante alle zu **deutscher Form** wechseln:
+
+| Aktuell (gemischt) | Beginner-Variante (konsistent) |
+|---|---|
+| Revenue / Umsatz | **Umsatz** (engl. Revenue) |
+| COGS / Herstellungskosten | **Herstellungskosten** (engl. COGS) |
+| Gross Margin / Bruttomarge | **Bruttomarge** (engl. Gross Margin) |
+| Net Income / Jahresüberschuss | **Jahresüberschuss** oder **Nettogewinn** |
+
+Englische Akronyme nur dort, wo sie auf Deutsch keinen Standard haben (EBITDA, EBIT).
+
+## 🧪 ACCEPTANCE CRITERIA Phase 3b
+
+Bevor du Phase 3b als fertig betrachtest:
+
+1. Die Lektion umfasst jetzt **11 Slides** (statt 12)
+2. Wasserfall (Slide 3) zeigt **5 Hauptpositionen + 6 Vorschau-Abzüge** mit visueller Differenzierung
+3. Margen (Slide 4) zeigt **nur 2 Margen** mit Firmenbeispielen
+4. Formel-Drill (Slide 5) hat **keinen Distraktor**
+5. Quiz hat **2 Fragen** statt 4
+6. Slide 10 ist die neue **EBITDA-Cliffhanger-Slide**
+7. Marcus-Tonfall ist **durchgehend gentle** in dieser Lektion
+8. Deutsche Begriffe sind primär, englische in Klammern
+9. Total-XP der Lektion ist **25** statt 55
+10. Lektions-Dauer-Schätzung: **6 Min** statt 8
+
+Plus: alle Acceptance Criteria aus Phase 3a sind weiterhin erfüllt (responsive, keine Bugs, Sounds funktionieren).
+
+## 🚀 IMPLEMENTIERUNGS-REIHENFOLGE
+
+1. **Branch sicherstellen** (siehe Git-Workflow)
+2. **MarcusNote** um `tone`-Prop erweitern
+3. **Slide 1** Marcus-Quote ersetzen + Outcomes umformulieren
+4. **Slide 2** Marcus-Feedback anpassen
+5. **Slide 3** Wasserfall umbauen auf 5+6-Struktur
+6. **Slide 4** Margen reduzieren + Firmenbeispiele
+7. **Slide 5** Formel-Drill Distraktor entfernen
+8. **Slide 6** Cheat Sheet vereinfachen
+9. **Slide 7** Pro-Tipps neue Inhalte
+10. **Slide 8** Quiz auf MC umstellen (statt Drag-Sort)
+11. **Slide 9** Quiz Hint immer anzeigen
+12. **Slides 10 + 11 entfernen, neue Slide 10** EBITDA-Cliffhanger anlegen
+13. **Retention-Hub** anpassen (XP, Email-Text, Next-Lesson)
+14. **Globale Sprach-Anpassung** Deutsch first
+15. **Manueller Lesefluss-Test:** Geh die Lektion einmal komplett durch, als wärst du Erstsemester
+16. **Push & PR**
+
+Frag mich nach jedem Slide-Umbau, ob ich Änderungen will.
+
+Wenn du an einer Stelle einen besseren Vorschlag hast (z.B. ein noch passenderes Firmenbeispiel, eine elegantere Erklärung), schlage ihn aktiv vor – aber halte dich strikt an den gentle Marcus-Tonfall und die Konzept-Reduktion.
+
+Los geht's mit Schritt 2 (MarcusNote tone-Prop).
