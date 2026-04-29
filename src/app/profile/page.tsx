@@ -395,7 +395,7 @@ export default function ProfilePage() {
             onClick={() => {
               if (confirm(t('Reset all progress? This cannot be undone!', 'Gesamten Fortschritt zurücksetzen? Das kann nicht rückgängig gemacht werden!'))) {
                 resetProgress();
-                window.location.href = '/onboarding';
+                window.location.href = '/onboarding/start';
               }
             }}
             className="w-full py-3 rounded-xl border-2 border-[var(--duo-red)] text-[var(--duo-red)] font-bold text-sm btn-press transition flex items-center justify-center gap-2 hover:bg-[rgba(255,75,75,0.1)]"

@@ -31,7 +31,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (loaded && !progress.onboardingComplete) {
-      router.push('/onboarding');
+      router.push('/onboarding/start');
     }
   }, [loaded, progress.onboardingComplete, router]);
 
