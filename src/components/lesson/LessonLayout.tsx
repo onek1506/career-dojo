@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
-import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
-import { getSoundEnabled, setSoundEnabled } from '@/lib/sounds';
+import type { ReactNode } from 'react';
+import { ArrowLeft } from 'lucide-react';
 
 export interface LessonLayoutProps {
   currentStep: number;
@@ -21,18 +20,6 @@ export default function LessonLayout({
   sidePanel,
   children,
 }: LessonLayoutProps) {
-  const [soundOn, setSoundOn] = useState(true);
-
-  useEffect(() => {
-    setSoundOn(getSoundEnabled());
-  }, []);
-
-  const toggleSound = () => {
-    const next = !soundOn;
-    setSoundOn(next);
-    setSoundEnabled(next);
-  };
-
   const progress = Math.min(100, Math.max(0, (currentStep / totalSteps) * 100));
   const stepCounter = `${String(currentStep).padStart(2, '0')} / ${String(totalSteps).padStart(2, '0')}`;
 
@@ -68,19 +55,9 @@ export default function LessonLayout({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          <button
-            type="button"
-            onClick={toggleSound}
-            aria-label={soundOn ? 'Sound aus' : 'Sound an'}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center text-is-text-muted hover:text-is-text-primary transition-colors duration-200"
-          >
-            {soundOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
-          </button>
-          <span className="font-[family-name:var(--font-is-mono)] text-[11px] sm:text-xs text-is-text-muted tabular-nums">
-            {stepCounter}
-          </span>
-        </div>
+        <span className="font-[family-name:var(--font-is-mono)] text-[11px] sm:text-xs text-is-text-muted tabular-nums min-w-[44px] text-right">
+          {stepCounter}
+        </span>
       </header>
 
       {/* Main + optional side panel.

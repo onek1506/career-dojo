@@ -1,491 +1,527 @@
-# 🛠️ Phase 3a: Plattform-Stabilisierung (Bug-Fixes + Responsive + Sounds)
+# 📚 Lektion 02: Balance Sheet (Bilanz)
 
-Du arbeitest weiter an der Lern-Webapp für IB-Interview-Vorbereitung. Die erste Lektion ("Income Statement") ist inhaltlich fertig, hat aber kritische Plattform-Bugs, die User-Tests zeigen. Diese Phase behebt sie, bevor wir den Content anpassen.
+Du baust die zweite Lektion der Career-Dojo Lern-Webapp für IB-Interview-Vorbereitung. Die Architektur, das Design-System, alle Komponenten und Templates existieren bereits aus Lektion 01 (Income Statement). Du wiederverwendest sie konsequent – keine neue Infrastruktur, nur neue Inhalte.
 
 ## 🌿 GIT-WORKFLOW
 
-1. Erstelle einen neuen Feature-Branch vom aktuellen `main` (oder vom Branch, in dem die Lektion liegt):
 ```bash
-   git checkout main
-   git pull
-   git checkout -b feature/lesson-platform-stability
+git checkout master
+git pull origin master
+git checkout -b feature/lesson-02-balance-sheet
 ```
-2. Committe in logischen Schritten:
-   - `fix(layout): replace fixed bottom CTA with footer slot pattern`
-   - `fix(layout): use h-screen flex layout to prevent page scroll`
-   - `feat(layout): add responsive breakpoints for mobile/tablet/desktop`
-   - `feat(layout): add desktop side-panel with streak and quick stats`
-   - `fix(slides): mobile layout for waterfall, cheat sheet, pro tips`
-   - `fix(slides): pro tips card layout and touch targets`
-   - `fix(quiz): wrong answer feedback and second attempt logic`
-   - `feat(sounds): add sound system with mute toggle`
-   - `chore(slides): reduce marcus quote frequency`
-3. Push nach Abschluss:
+
+Commit-Messages:
+- `feat(lesson-02): add balance sheet lesson data and slide content`
+- `feat(lesson-02): implement two-column asset/liability interactive slide`
+- `feat(lesson-02): wire up track-based slide visibility`
+- `feat(lesson-02): add lesson route and register in lesson registry`
+
+Push nach Abschluss:
 ```bash
-   git push origin feature/lesson-platform-stability
+git push origin feature/lesson-02-balance-sheet
 ```
 
-## 🐛 KRITISCHE BUGS (höchste Priorität)
+## 📁 DATEIEN, DIE DU ANLEGST
 
-### Bug 1: Doppelter Bottom-CTA-Button
-
-**Symptom:** Auf Quiz-Slides (Slides 8, 9, 10, 11) sind gleichzeitig zwei primäre Action-Buttons sichtbar – ein "Antwort prüfen"/"Nächste Frage" innerhalb des Content-Bereichs UND der fixed Bottom-Bar-"Weiter"-Button vom `LessonLayout`-Wrapper.
-
-**Ursache:** `LessonLayout` rendert den Bottom-CTA selbst, aber Quiz-Slides brauchen eigene Submit-Logik.
-
-**Fix:** Ändere `LessonLayout` von "rendert eigenen CTA" zu "akzeptiert Footer-Slot":
-
-```tsx
-// VORHER (FALSCH):
-interface LessonLayoutProps {
-  currentStep: number
-  totalSteps: number
-  onBack: () => void
-  onNext: () => void
-  nextLabel?: string
-  nextDisabled?: boolean
-  children: React.ReactNode
-}
-
-// NACHHER (RICHTIG):
-interface LessonLayoutProps {
-  currentStep: number
-  totalSteps: number
-  onBack: () => void
-  footer: React.ReactNode  // Slide bestimmt selbst, was unten steht
-  children: React.ReactNode
-}
+```
+app/
+  lesson/
+    balance-sheet/
+      page.tsx
+components/
+  lesson/
+    balance-sheet/
+      Slide01Briefing.tsx
+      Slide02RecapTapReveal.tsx
+      Slide03ThreeSections.tsx
+      Slide04Positions.tsx
+      Slide05EquilibriumExample.tsx
+      Slide06ShareholdersEquity.tsx      // Track B+C only
+      Slide07NegativeEquity.tsx          // Track B+C only
+      Slide08WorkingCapital.tsx
+      Slide09ProTips.tsx
+      Slide10QuizAssets.tsx
+      Slide11QuizCalculation.tsx
+      Slide12Cliffhanger.tsx
+      Slide13Retention.tsx
+      data.ts
 ```
 
-Erstelle eine wiederverwendbare `<LessonFooterCTA>`-Komponente, die der **Default** für alle Slides ist, die nur einen "Weiter"-Button brauchen:
+## 🎨 DESIGN-SYSTEM
 
-```tsx
-// components/lesson/LessonFooterCTA.tsx
-interface Props {
-  onClick: () => void
-  label?: string
-  disabled?: boolean
-  variant?: 'primary' | 'secondary'
-}
-export function LessonFooterCTA({ onClick, label = 'Weiter', disabled, variant = 'primary' }: Props) {
-  // Stil: bg-accent (primary) oder bg-bg-secondary (secondary)
-}
-```
+Identisch zu Lektion 01. Nutze exakt dieselben Tailwind-Tokens:
+- Farben: bg-primary (#0A0A0B), bg-secondary (#141416), accent (#FF6B00), text-primary (#F5F5F0), text-secondary, text-muted, success, error, gold
+- Fonts: font-serif (Headlines), font-mono (Zahlen/Labels), font-sans (Fließtext)
+- Animationen: max. 600ms, ease-out
 
-Quiz-Slides bauen ihren Footer dann selbst (z.B. mit "Antwort prüfen" + nach Submission "Nächste Frage").
+Marcus-Tonfall in dieser Lektion:
+- **Track A + B:** gentle (ermutigend, erklärend)
+- **Track C:** sharp (knapp, direkt, kein Padding)
 
-### Bug 2: Page-Scrolling auf kleinen Bildschirmen
+## 📊 LEKTIONS-META
 
-**Symptom:** Auf manchen Bildschirmen scrollt die ganze Page, der Bottom-CTA überdeckt Content.
-
-**Fix:** Korrekte Viewport-Struktur mit `h-screen flex flex-col`:
-
-```tsx
-// LessonLayout.tsx neue Struktur:
-<div className="h-screen flex flex-col bg-bg-primary">
-  {/* Header (fixed height) */}
-  <header className="h-14 flex-shrink-0 border-b border-bg-border">
-    <TopBar currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} />
-  </header>
-
-  {/* Main (scrollable, takes remaining space) */}
-  <main className="flex-1 overflow-y-auto">
-    <div className="max-w-2xl mx-auto px-6 py-8 lg:py-12">
-      {children}
-    </div>
-  </main>
-
-  {/* Footer (fixed height, no overlap) */}
-  <footer className="flex-shrink-0 border-t border-bg-border bg-bg-primary">
-    <div className="max-w-2xl mx-auto px-6 py-4">
-      {footer}
-    </div>
-  </footer>
-</div>
-```
-
-Dadurch scrollt **nur der Main-Bereich**, nie die ganze Page. Footer bleibt immer sichtbar, ohne Content zu überdecken.
-
-### Bug 3: Falsch-Antwort-Feedback fehlt / unvollständig
-
-Auf Quiz-Slides (besonders Slide 9 Calc): Implementiere die Zweit-Versuch-Logik korrekt.
-
-```tsx
-// In Slide09QuizCalc.tsx:
-type State = 'idle' | 'submitted-wrong-1' | 'submitted-wrong-2' | 'submitted-correct'
-
-const [state, setState] = useState<State>('idle')
-const [selected, setSelected] = useState<string | null>(null)
-
-const handleSubmit = () => {
-  const isCorrect = selected === '40%'
-  if (isCorrect) {
-    setState('submitted-correct')
-    onAnswer('q2', { correct: true, attempts: state === 'submitted-wrong-1' ? 2 : 1 })
-  } else if (state === 'idle') {
-    setState('submitted-wrong-1')
-    // Zeige Hinweis, biete zweiten Versuch
-  } else {
-    setState('submitted-wrong-2')
-    onAnswer('q2', { correct: false, attempts: 2 })
+```ts
+// data.ts
+export const lessonMeta = {
+  id: 'acc-2-balance-sheet',
+  title: 'Balance Sheet',
+  titleDe: 'Bilanz',
+  module: 'MODUL 01 · ACCOUNTING',
+  duration: 8,
+  xp: 30,
+  difficulty: 1,
+  prerequisite: 'acc-1-income-statement',
+  trackConfig: {
+    A: { slidesToShow: [1,2,3,4,5,8,9,10,11,12,13], duration: 6 },
+    B: { slidesToShow: [1,2,3,4,5,6,7,8,9,10,11,13], duration: 8 },
+    C: { slidesToShow: [1,3,4,5,6,7,8,9,10,11,13], duration: 6 },
   }
 }
 ```
 
-Visuelles Feedback bei falsch:
-- Falsche Option: `border-error bg-error/10`
-- Hinweis-Box (nur bei wrong-1): "Tipp: Bruttomarge = (Umsatz - COGS) / Umsatz"
-- Footer-CTA wechselt von "Antwort prüfen" zu "Nochmal versuchen" → nach 2. Versuch zu "Nächste Frage"
+## 📋 SLIDE-INHALTE
 
-## 📱 RESPONSIVE DESIGN (komplette Neuauslegung)
+### Slide 01 – Briefing
 
-Aktueller Zustand: feste Container-Breite, keine echten Breakpoints. Das muss in jedem Slide angepasst werden.
+Identische Struktur wie Lektion 01 Slide 01. Nutze die bestehende `Slide01Briefing`-Komponente als Vorlage.
 
-### Breakpoint-Strategie
+Marcus-Note Body:
+```ts
+const marcusBody = {
+  gentle: 'Die Bilanz zeigt, was eine Firma zu einem bestimmten Moment besitzt und was sie schuldet. Sie ist das Gegenstück zur GuV: keine Geschichte über Zeit – ein Foto an einem Stichtag. Heute lernst du lesen, was drauf ist.',
+  sharp: 'Bilanz. Drei Sektionen, eine Gleichung: Assets = Liabilities + Equity. Wenn die nicht aufgeht, ist entweder das Modell falsch oder du hast einen Fehler. Diese Lektion in 6 Minuten durch.',
+}
+```
+
+Stat-Card: `DAUER 8 MIN · XP +30 · SCHWIERIG. ★☆☆☆☆`
+
+Learning Outcomes:
+- `→ Verstehen, was die Bilanz zeigt (und was nicht)`
+- `→ Die drei Sektionen und wichtigsten Positionen kennen`
+- `→ Warum Assets = Liabilities + Equity immer gilt`
+
+CTA: `Briefing starten →`
+
+### Slide 02 – Recap Tap-to-reveal (Track A + B)
+
+**Wiederverwendet exakt die Tap-to-reveal-Mechanik aus Lektion 01 Slide 02.** Neue Karten:
+
+Aufgabe: `'Tippe den Bericht an, der einen Stichtag zeigt.'`
 
 ```ts
-// Tailwind defaults sind ok, nutze:
-// - default (< 640px): Mobile
-// - sm: (≥ 640px): Large mobile
-// - md: (≥ 768px): Tablet
-// - lg: (≥ 1024px): Desktop
-// - xl: (≥ 1280px): Wide desktop
+const cards = [
+  {
+    id: 'guv',
+    icon: 'Film',
+    title: 'GuV',
+    subtitle: 'Zeitraum · Q1–Q4 2024',
+    isCorrect: false,
+  },
+  {
+    id: 'bilanz',
+    icon: 'Camera',
+    title: 'Bilanz',
+    subtitle: 'Stichtag · 31.12.2024',
+    isCorrect: true,
+  },
+]
 ```
 
-### Mobile (< 640px)
+Marcus korrekt: `'Korrekt. Die Bilanz ist immer auf einen Stichtag bezogen. Du wirst in Interviews oft gefragt, ob du den Unterschied kennst – und jetzt weißt du ihn.'`
 
-**LessonLayout:**
-- Top-Bar: `h-12` statt `h-14`
-- Content: `px-4 py-6`
-- Footer: `px-4 py-3`
+Marcus falsch: `'Nochmal: Die GuV ist der Film. Die Bilanz ist das Foto. Das Foto wird zu einem festen Datum aufgenommen – dem Stichtag.'`
 
-**Slide 01 Briefing:**
-- Headline `text-3xl` statt `text-5xl`
-- Stat-Card: `grid-cols-1` statt `grid-cols-3` (untereinander)
+### Slide 03 – Die drei Sektionen
 
-**Slide 02 Bilanz/GuV:**
-- Karten: `grid-cols-1` statt `grid-cols-2` (untereinander), Höhe je 140px
+Visueller Stack aus drei farblich differenzierten Blöcken:
 
-**Slide 03 Wasserfall:**
-- Schrift kleiner: `text-xs` für Labels
-- Position-Layout: Englisches Label oben, deutsches darunter (statt nebeneinander)
-- Werte rechts kleiner: `text-sm`
-- Sektion-Trennlinien dünner
-
-**Slide 04 Margen:**
-- Balken-Höhe: `h-10` statt `h-12`
-- Werte am Ende: kleinere Schrift, ggf. unter den Balken bei Platzmangel
-
-**Slide 05 Formel-Drill:**
-- Formel: `text-lg` statt `text-2xl`, ggf. mit Zeilenumbruch nach `/`
-- Slots: `w-24 h-9` statt `w-32 h-10`
-- Wortpool: 2 Spalten statt 4
-
-**Slide 06 Cheat Sheet:**
-- KOMPLETT NEUES MOBILE-LAYOUT (siehe unten):
-
-```tsx
-// Auf Mobile: Eine quadratische "Card-zum-Screenshotten"
-// Statt monospace-Tabelle, eine vertikale Liste mit größerer Typo
-// Größe: 320×450px, designt zum direkten Screenshot
-<div className="lg:hidden">
-  <CheatSheetMobile />  // Neue Komponente, vertikal, lesbar
-</div>
-<div className="hidden lg:block">
-  <CheatSheetDesktop /> // Aktuelles Bloomberg-Layout
-</div>
+```ts
+export const threeSections = [
+  {
+    id: 'assets',
+    label: 'ASSETS',
+    labelDe: 'Vermögenswerte',
+    tag: 'Was die Firma hat',
+    examples: ['Cash', 'Accounts Receivable', 'Inventory', 'PP&E', 'Goodwill'],
+    color: 'text-text-primary',
+    borderColor: 'border-accent',
+  },
+  {
+    id: 'liabilities',
+    label: 'LIABILITIES',
+    labelDe: 'Verbindlichkeiten',
+    tag: 'Was die Firma schuldet',
+    examples: ['Accounts Payable', 'Accrued Expenses', 'Debt'],
+    color: 'text-error',
+    borderColor: 'border-error',
+  },
+  {
+    id: 'equity',
+    label: "SHAREHOLDERS' EQUITY",
+    labelDe: 'Eigenkapital',
+    tag: 'Was den Aktionären gehört',
+    examples: ['Common Stock', 'Retained Earnings', 'APIC'],
+    color: 'text-success',
+    borderColor: 'border-success',
+  },
+]
 ```
 
-`CheatSheetMobile`-Layout:
-- Header: "GuV-Cheat-Sheet" in Serif, mittig
-- Drei Sektionen mit dünnen Trennlinien:
-  1. **Reihenfolge** (Revenue → Net Income), je Position eine Zeile mit `text-sm`
-  2. **Margen-Formeln**, je 2 Zeilen pro Formel
-  3. **Rule of Thumb** in italic
-- Padding: `p-5`, Background: `bg-bg-secondary`, Border: `border border-bg-border rounded-xl`
-- Optimiert für 375px-Display, kein horizontaler Scroll
-
-**Slide 07 Pro-Tips:**
-- Cards: `min-h-[180px]` statt fester Höhe
-- Tag und Avatar in Body-Bereich integriert (kein leerer Header-Bereich)
-- Body-Text `text-sm`
-
-**Slides 08–11 Quiz:**
-- Antwort-Optionen: voll-breit, höher (`py-4` statt `py-3`)
-- Frage-Text: `text-xl` statt `text-2xl`
-
-**Slide 12 Retention:**
-- Stats-Cards: `grid-cols-1` (untereinander)
-- Streak/Level-Cards: `grid-cols-1`
-- Next-Action-Cards: `grid-cols-1`
-- Trophäen-Kreis: 80px statt 120px
-
-### Desktop (≥ 1024px)
-
-**LessonLayout bekommt ein optionales Side-Panel rechts** für mehr Bildschirmnutzung:
-
-```tsx
-<div className="h-screen flex flex-col bg-bg-primary">
-  <header>...</header>
-  <div className="flex-1 flex overflow-hidden">
-    {/* Main Content */}
-    <main className="flex-1 overflow-y-auto">
-      <div className="max-w-2xl mx-auto px-6 py-12">
-        {children}
-      </div>
-    </main>
-    
-    {/* Side-Panel: nur ab lg sichtbar */}
-    <aside className="hidden lg:flex w-72 flex-shrink-0 border-l border-bg-border flex-col">
-      <SidePanel currentStep={currentStep} totalSteps={totalSteps} />
-    </aside>
-  </div>
-  <footer>...</footer>
-</div>
+Darunter die Gleichung prominent in monospace:
 ```
-
-`SidePanel`-Inhalt:
-- Oben: Lektions-Title "Income Statement" (small, monospace)
-- **Streak-Card:** `🔥 Tag 1 / 7` mit Mini-Progress
-- **XP-Card:** "Diese Session: +XX XP" (live-update)
-- **Lesson-Map:** Liste aller 12 Slides als Mini-Indikatoren (1 abgeschlossen = filled, current = highlighted, kommend = empty)
-- Unten: Marcus-Avatar mit "Brauchst du Hilfe?" → öffnet Hint-Modal (nice-to-have, kann später kommen)
-
-Dadurch wirkt Desktop nicht mehr wie eine Mobile-Webview.
-
-## 🔊 SOUND-SYSTEM
-
-Implementiere ein zentrales Sound-System. Sounds müssen:
-- Subtil und premium klingen (kein Cartoon, keine Game-Sounds)
-- Per Mute-Toggle deaktivierbar sein (Persistierung in localStorage)
-- Nicht beim ersten Page-Load triggern (User-Interaction-Anforderung der Browser)
-
-### Sound-Files
-
-Lege diese Files an unter `public/sounds/`:
-
+ASSETS  =  LIABILITIES  +  SHAREHOLDERS' EQUITY
 ```
-public/sounds/
-  click.mp3              // Subtle UI tick (~50ms, sehr leise)
-  correct.mp3            // Kurzer "ping" für richtige Antwort (~200ms)
-  wrong.mp3              // Tiefer "thud" für falsche Antwort (~300ms)
-  complete.mp3           // Belohnungs-Chime für Lektion-Ende (~800ms)
-  reveal.mp3             // Soft "swoosh" für Tap-to-reveal (~150ms)
-  streak.mp3             // Subtiler "shing" für Streak-Increase (~400ms)
-```
+Das `=`-Zeichen in `text-accent`.
 
-**Hinweis:** Da wir keine echten Sound-Files haben, dokumentiere im Code, welche Sounds erwartet werden, und nutze Platzhalter. Empfehle dem User, kostenlose Sounds von Quellen wie freesound.org, zapsplat.com oder Mixkit zu beziehen. Teste die Implementierung mit Beep-Tönen oder dummy-Files.
+Marcus-Note: `'Diese Gleichung ist unverletzlich. Immer. Wenn du ein Modell baust und sie nicht aufgeht, hast du einen Fehler. Diese einfache Wahrheit prüft jeder Banker täglich.'`
 
-### Sound-Hook
+### Slide 04 – Wichtige Positionen (NEUER SLIDE-TYP: Zwei-Spalten-Klickliste)
 
-Erstelle `hooks/useSounds.ts`:
+**Das ist die einzige wirklich neue Interaktions-Mechanik in dieser Lektion.** Baue sie sorgfältig als wiederverwendbares Template.
 
-```tsx
-'use client'
-import { useCallback, useEffect, useRef, useState } from 'react'
+Layout: Zwei Spalten nebeneinander (`grid grid-cols-1 md:grid-cols-2 gap-6`). Jede Position ist ein klickbarer Button. Bei Klick öffnet sich ein Akkordeon-Panel darunter mit Tooltip-Text.
 
-export type SoundType = 'click' | 'correct' | 'wrong' | 'complete' | 'reveal' | 'streak'
-
-const SOUND_FILES: Record<SoundType, string> = {
-  click: '/sounds/click.mp3',
-  correct: '/sounds/correct.mp3',
-  wrong: '/sounds/wrong.mp3',
-  complete: '/sounds/complete.mp3',
-  reveal: '/sounds/reveal.mp3',
-  streak: '/sounds/streak.mp3',
-}
-
-const VOLUMES: Record<SoundType, number> = {
-  click: 0.15,
-  correct: 0.4,
-  wrong: 0.35,
-  complete: 0.5,
-  reveal: 0.25,
-  streak: 0.4,
-}
-
-export function useSounds() {
-  const [muted, setMuted] = useState(false)
-  const audioCache = useRef<Partial<Record<SoundType, HTMLAudioElement>>>({})
-
-  // Init from localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem('sounds-muted')
-    if (stored === 'true') setMuted(true)
-  }, [])
-
-  const toggleMute = useCallback(() => {
-    setMuted(prev => {
-      const next = !prev
-      localStorage.setItem('sounds-muted', String(next))
-      return next
-    })
-  }, [])
-
-  const play = useCallback((sound: SoundType) => {
-    if (muted) return
-    if (typeof window === 'undefined') return
-    
-    try {
-      let audio = audioCache.current[sound]
-      if (!audio) {
-        audio = new Audio(SOUND_FILES[sound])
-        audio.volume = VOLUMES[sound]
-        audioCache.current[sound] = audio
-      }
-      audio.currentTime = 0
-      audio.play().catch(() => { /* Browser blocked autoplay – ignore */ })
-    } catch (e) {
-      // Sound file might not exist yet
-    }
-  }, [muted])
-
-  return { play, muted, toggleMute }
+```ts
+export const balanceSheetPositions = {
+  assets: [
+    {
+      group: 'CURRENT ASSETS',
+      items: [
+        {
+          label: 'Cash',
+          tooltip: 'Bargeld und sofort verfügbare Mittel. Der wichtigste Single-Posten – zeigt die sofortige Liquidität.',
+        },
+        {
+          label: 'Accounts Receivable',
+          tooltip: 'Was Kunden noch schulden. Ware geliefert, Geld noch nicht erhalten. Zu hohes AR kann auf schwache Zahlungsmoral hinweisen.',
+        },
+        {
+          label: 'Inventory',
+          tooltip: 'Vorräte: Rohstoffe, halbfertige und fertige Produkte. Relevant für Produktionsfirmen, irrelevant für Software.',
+        },
+      ],
+    },
+    {
+      group: 'NON-CURRENT ASSETS',
+      items: [
+        {
+          label: 'PP&E',
+          tooltip: 'Plants, Property & Equipment – Maschinen, Gebäude, Fahrzeuge. Wird abgeschrieben (Depreciation), deshalb sinkt PP&E jedes Jahr.',
+        },
+        {
+          label: 'Goodwill',
+          tooltip: 'Entsteht nur bei Übernahmen. Premium, den Käufer über den Buchwert zahlt. Nicht amortisierbar, kann aber impaired werden.',
+        },
+        {
+          label: 'Intangibles',
+          tooltip: 'Marken, Patente, Kundenbeziehungen. Werden amortisiert – ähnlich wie PP&E abgeschrieben, nur für immaterielle Werte.',
+        },
+      ],
+    },
+  ],
+  liabilitiesAndEquity: [
+    {
+      group: 'CURRENT LIABILITIES',
+      items: [
+        {
+          label: 'Accounts Payable',
+          tooltip: 'Was die Firma noch an Lieferanten schuldet. Spiegel von Accounts Receivable – hier ist die Firma der Schuldner.',
+        },
+        {
+          label: 'Accrued Expenses',
+          tooltip: 'Aufgelaufene Kosten – Gehälter, Zinsen, Steuern, die noch nicht bezahlt wurden, aber schon angefallen sind.',
+        },
+        {
+          label: 'Short-Term Debt',
+          tooltip: 'Schulden, die in weniger als 12 Monaten fällig sind. Viel davon ohne ausreichend Cash: kritisches Warnsignal.',
+        },
+      ],
+    },
+    {
+      group: 'LONG-TERM LIABILITIES',
+      items: [
+        {
+          label: 'Long-Term Debt',
+          tooltip: 'Anleihen, Bankdarlehen mit Laufzeit über 1 Jahr. Die größte Verbindlichkeit bei den meisten Unternehmen.',
+        },
+      ],
+    },
+    {
+      group: "SHAREHOLDERS' EQUITY",
+      items: [
+        {
+          label: 'Common Stock',
+          tooltip: 'Nennwert der ausgegebenen Aktien. In der Praxis meist eine sehr kleine Zahl.',
+        },
+        {
+          label: 'Retained Earnings',
+          tooltip: 'Kumulierte einbehaltene Gewinne seit Gründung minus alle Dividenden. Wächst jedes Jahr, wenn die Firma profitabel ist.',
+        },
+        {
+          label: 'Additional Paid-in Capital',
+          tooltip: 'Betrag den Aktionäre über den Nennwert zahlten. Enthält auch Stock-Based Compensation.',
+        },
+      ],
+    },
+  ],
 }
 ```
 
-### Integration
+Jede Gruppe hat einen Header in `font-mono text-xs text-text-muted uppercase tracking-wider`. Jede Position: `bg-bg-secondary border border-bg-border rounded-lg px-4 py-3 hover:bg-bg-tertiary cursor-pointer font-mono text-sm`. Geklickte Position: `border-accent`.
 
-Verbinde den Mute-Toggle in der Top-Bar mit dem Hook:
+Marcus-Note (erscheint nach erstem Klick auf irgendeine Position): `'Du musst das nicht alles auswendig kennen. Aber Cash, AR, Inventory, PP&E auf der Asset-Seite und Debt, AP, Retained Earnings auf der anderen – die musst du reflexartig benennen können.'`
 
-```tsx
-// LessonLayout.tsx
-const { muted, toggleMute } = useSounds()
+### Slide 05 – Gleichgewichts-Logik mit TechCo-Beispiel
 
-<button onClick={toggleMute} aria-label={muted ? 'Sound an' : 'Sound aus'}>
-  {muted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-</button>
-```
+Erklärungs-Text:
+> Die Gleichung Assets = Liabilities + Equity ist buchhalterische Logik. Jeder Euro, den eine Firma besitzt, kommt von irgendwoher: entweder von Gläubigern (Liabilities) oder von Aktionären (Equity). Es gibt keine dritte Quelle.
 
-Triggere Sounds an folgenden Stellen (Beispiele):
+Danach eine TechCo-Bilanz-Card im Bloomberg-Stil mit `font-mono`:
 
-```tsx
-// Beim Klick auf primären CTA
-<button onClick={() => { play('click'); onNext() }}>Weiter</button>
-
-// In Slide02 (Tap-to-reveal):
-const handleSelect = (option: 'left' | 'right') => {
-  const correct = option === 'right'
-  play(correct ? 'correct' : 'wrong')
-  // ...
+```ts
+export const techcoBilanz = {
+  assets: [
+    { label: 'Cash',              value: 30 },
+    { label: 'Accounts Rec.',     value: 20 },
+    { label: 'Inventory',         value: 10 },
+    { label: 'PP&E',              value: 60 },
+    { label: 'Goodwill',          value: 30 },
+  ],
+  totalAssets: 150,
+  liabilities: [
+    { label: 'Accounts Payable',  value: 20 },
+    { label: 'Long-Term Debt',    value: 50 },
+  ],
+  totalLiabilities: 70,
+  equity: [
+    { label: 'Common Stock',      value: 10 },
+    { label: 'Retained Earnings', value: 70 },
+  ],
+  totalEquity: 80,
+  totalLE: 150,
 }
-
-// In Slide03 (Wasserfall): bei Tap auf Position
-play('reveal')
-
-// In Slide12 (Result-Screen): beim Mount
-useEffect(() => { play('complete') }, [])
-
-// Bei Streak-Update:
-play('streak')
 ```
 
-**Wichtig:** Sound-Volume sollte zurückhaltend sein. IB-Studenten lernen oft im Café/Lib – laute Sounds sind disqualifizierend.
+Layout: Zwei Spalten. Beide enden auf `€150M` – diese Zahl in `text-accent` mit einem `✓` daneben.
 
-## 🎨 WEITERE FIXES (mittlere Priorität)
+Darunter Tap-to-check-Frage:
+- Frage: `'Was sind Retained Earnings?'`
+- Option A: `'Der Gewinn dieses Jahres'` → Falsch. Marcus: `'Nein. Retained Earnings ist kumulativ – alles, was die Firma über die Jahre verdient und NICHT ausgeschüttet hat. Der Gewinn dieses Jahres ist Net Income auf der GuV.'`
+- Option B: `'Kumulierte einbehaltene Gewinne über alle Jahre'` → Richtig. Marcus: `'Genau. Retained Earnings = alle Jahresüberschüsse seit Gründung, minus alle Dividenden. Es wächst jedes Jahr, wenn die Firma profitabel ist.'`
 
-### Fix 4: Marcus-Frequenz reduzieren
+### Slide 06 – Shareholders' Equity im Detail (Track B + C only)
 
-Aktuell spricht Marcus auf fast jeder Slide. Reduzieren auf max. 1 von 3 Slides. Konkret:
-
-- **Slide 1:** Marcus (Intro) – behalten
-- **Slide 2:** Marcus (Erklärung) – behalten
-- **Slide 3:** KEIN Marcus – nur Wasserfall mit Tooltips
-- **Slide 4:** Marcus (Hierarchie-Quote) – behalten
-- **Slide 5:** KEIN Marcus – Formel-Erfolg reicht visuell
-- **Slide 6:** KEIN Marcus
-- **Slide 7:** Marcus auf jeder Card (das ist sein Bereich) – behalten
-- **Slides 8–11:** Marcus nur bei Quiz-Lösung (richtig oder falsch), nicht in der Frage
-- **Slide 12:** Marcus (Final-Email) – behalten
-
-Total: Marcus auf ca. 6 von 12 Slides statt 11 von 12.
-
-### Fix 5: Pro-Tip-Cards Layout
-
-Aktuell zu viel Leerraum oben. Refactor:
-
-```tsx
-// VORHER: Tag oben links, Avatar oben rechts, riesiger leerer Bereich, Body unten
-// NACHHER: 
-<Card className="min-h-[200px] p-6 flex flex-col gap-4">
-  <div className="flex items-center justify-between">
-    <Tag color="strategy">STRATEGY</Tag>
-    {/* KEIN Avatar oben */}
-  </div>
-  <p className="text-base leading-relaxed flex-1">{body}</p>
-  <div className="flex items-center gap-2 pt-3 border-t border-bg-border">
-    <MarcusAvatar size="sm" />
-    <span className="text-xs text-text-muted font-mono">— Marcus Hart</span>
-  </div>
-</Card>
+```ts
+export const equityComponents = [
+  {
+    label: 'Common Stock',
+    formula: null,
+    description: 'Nennwert aller ausgegebenen Aktien. In der Praxis oft winzig (z.B. $0,01 per Aktie).',
+  },
+  {
+    label: 'Retained Earnings',
+    formula: 'RE = Vorjahr-RE + Net Income − Dividenden',
+    description: 'Direkte Verbindung zur GuV: Jeder Jahresüberschuss fließt hinein. Jede Dividende fließt heraus.',
+    highlight: true,
+  },
+  {
+    label: 'Additional Paid-In Capital (APIC)',
+    formula: 'APIC = Alter APIC + Stock-Based Comp + Wert neuer Options',
+    description: 'Bei Technologiefirmen oft sehr groß wegen hoher Stock-Based Compensation.',
+  },
+  {
+    label: 'Treasury Stock',
+    formula: null,
+    description: 'Aktien, die die Firma zurückgekauft hat. Reduziert das Eigenkapital.',
+  },
+]
 ```
 
-Tag-Farben differenzieren:
-- `STRATEGY` → Akzent-Orange
-- `WARNING` → Amber `#FFB800`
-- `MISTAKE` → Error-Rot
+Formeln werden in `font-mono bg-bg-secondary rounded-md px-3 py-2` dargestellt.
 
-### Fix 6: Stat-Card auf Slide 1 verkleinern
+Marcus-Note: `'Im Interview reicht es fast immer: Retained Earnings ist der wichtigste Posten im Equity. Er verlinkt Bilanz und GuV. Wenn du das verstehst, verstehst du 80% aller Bilanzfragen.'`
 
-Aktuelle Höhe ca. 100px. Reduzieren auf ~70px durch:
-- `py-3` statt `py-4`
-- Werte `text-xl` statt `text-2xl`
-- Labels noch kleiner: `text-[10px]` mit `tracking-widest`
+### Slide 07 – Negatives Eigenkapital (Track B + C only)
 
-### Fix 7: "EBIT"-Distraktor in Formel-Drill (Slide 5)
+Frage-Antwort-Format:
 
-Pool-Bereich klar als "übrig" kennzeichnen:
+**Frage (als Header):** "Kann Shareholders' Equity negativ sein?"
 
-```tsx
-<div className="mt-4 pt-4 border-t border-bg-border">
-  <p className="text-xs text-text-muted font-mono uppercase mb-2">Nicht verwendet</p>
-  <div className="flex flex-wrap gap-2">
-    {unusedTokens.map(token => <Token>{token}</Token>)}
-  </div>
-</div>
+**Antwort:** Ja – in zwei Szenarien:
+
+```ts
+export const negativeEquityScenarios = [
+  {
+    number: '01',
+    title: 'LBO + Dividend Recap',
+    body: 'PE-Fonds hat nach dem Kauf so viel Cash als Dividende herausgezogen, dass das Eigenkapital negativ wurde. Normal im LBO-Kontext.',
+  },
+  {
+    number: '02',
+    title: 'Anhaltende Verluste',
+    body: 'Wenn Retained Earnings durch jahrelange negative Net Incomes immer negativer wird. Kann auf finanzielle Schieflage hinweisen.',
+  },
+]
 ```
 
-### Fix 8: Subline-Inkonsistenz
+Marcus-Note (sharp): `'Im Interview: Siehst du negatives Shareholders' Equity, frage zuerst: War da ein LBO? Dann ist es normal. Wenn nicht – dann ist das ein Warnsignal, das du erklären können musst.'`
 
-Slide 5: "Bruttomarge in 3 Bausteinen" → korrigieren zu "Bruttomarge in 4 Bausteinen" (Revenue, COGS, Revenue, Operator).
+### Slide 08 – Working Capital
 
-### Fix 9: Touch-Targets
+```ts
+export const workingCapital = {
+  formula1: 'Working Capital = Current Assets − Current Liabilities',
+  formula2: 'Operating Working Capital = (Current Assets − Cash) − (Current Liabilities − Debt)',
+  scenarios: [
+    {
+      title: 'Subscriptions / Deferred Revenue',
+      companies: 'Amazon, Netflix',
+      description: 'Sammeln Cash im Voraus, bevor Leistung erbracht wird. Negatives WC = Stärke.',
+      sentiment: 'positive',
+    },
+    {
+      title: 'Retail-Modell',
+      companies: 'Walmart, McDonald\'s',
+      description: 'Kunden zahlen sofort, Lieferanten werden später bezahlt. Zeichen von Verhandlungsmacht.',
+      sentiment: 'positive',
+    },
+    {
+      title: 'Finanzielle Notlage',
+      companies: 'Krisenunternehmen',
+      description: 'Hohe kurzfristige Schulden, kein Cash. Echtes Warnsignal.',
+      sentiment: 'negative',
+    },
+  ],
+}
+```
 
-Alle interaktiven Elemente min. `min-h-[44px]` und `min-w-[44px]`. Besonders die Drag-Handles in Slide 8 sind aktuell zu klein.
+Scenarios als aufklappbare Mini-Cards. `sentiment: 'positive'` → `border-success/40`, `sentiment: 'negative'` → `border-error/40`.
 
-## 🧪 ACCEPTANCE CRITERIA
+Marcus-Note: `'Negatives Working Capital ist eine der häufigsten Trick-Fragen. Standardantwort: "Kommt drauf an." Dann die drei Szenarien nennen. Wer einfach sagt "ist schlecht", fliegt raus.'`
 
-Bevor du Phase 3a als fertig betrachtest, teste:
+### Slide 09 – Pro-Tipps
 
-1. **Bug 1 weg:** Auf KEINEM Slide sind zwei primäre CTA-Buttons gleichzeitig sichtbar
-2. **Bug 2 weg:** Auf Bildschirmen 600px–1200px Höhe scrollt die Page niemals, nur der Main-Bereich
-3. **Mobile (375px Breite):** Alle 12 Slides sind ohne horizontalen Scroll lesbar und bedienbar
-4. **Tablet (768px):** Layout passt sich an, alles bedienbar
-5. **Desktop (1440px):** Side-Panel ist sichtbar, kein leerer Raum mehr links/rechts
-6. **Quiz-Slide 9:** Falsche Antwort führt zu Hint + Nochmal-Versuch, erst zweite falsche zu nächster Frage
-7. **Sound-System:** Mute-Toggle funktioniert, persistiert in localStorage, Sounds spielen bei den definierten Events
-8. **Marcus-Frequenz:** Max. auf 6 von 12 Slides
-9. **Lighthouse Mobile:** Performance ≥ 85, Accessibility ≥ 90
-10. **Keyboard-Navigation:** Tab durch alle Slides, Enter triggert primäre CTAs
+Identische Carousel-Mechanik wie Lektion 01 Slide 07. Drei Cards:
 
-## 🚀 IMPLEMENTIERUNGS-REIHENFOLGE
+```ts
+export const proTips = [
+  {
+    tag: 'STRATEGIE',
+    tagColor: 'text-accent',
+    body: 'Wenn ein MD die Bilanz zeigt und fragt "Was fällt dir auf?", geh immer in dieser Reihenfolge: Cash und Debt zuerst (Liquidität), dann Working Capital (Kurzzeit-Gesundheit), dann Retained Earnings (historische Profitabilität).',
+  },
+  {
+    tag: 'WARNUNG',
+    tagColor: 'text-gold',
+    body: 'Verwechsle nie Shareholders\' Equity mit Equity Value. Shareholders\' Equity ist der Buchwert aus der Bilanz. Equity Value ist der Marktwert. Bei gesunden Firmen ist Equity Value fast immer deutlich höher.',
+  },
+  {
+    tag: 'REGEL',
+    tagColor: 'text-success',
+    body: 'Die Bilanz balanciert immer. Wenn dein Modell nicht balanciert, hast du einen Fehler – keine Ausnahme, kein "fast richtig". Das ist die eine absolute Regel in Accounting.',
+  },
+]
+```
 
-1. **Branch erstellen** (siehe Git-Workflow)
-2. **LessonLayout refactoren** (Footer-Slot-Pattern + h-screen-Struktur)
-3. **LessonFooterCTA-Komponente** anlegen
-4. **Alle 12 Slides anpassen** an neuen Footer-Pattern (sehr wichtig: keine internen primären CTAs mehr, immer als Footer übergeben)
-5. **Responsive Breakpoints** Slide für Slide umsetzen
-6. **Side-Panel-Komponente** (Desktop) bauen
-7. **CheatSheetMobile** als separate Komponente bauen
-8. **Quiz-Slides:** Falsch-Antwort-Logik mit Zweit-Versuch
-9. **Sound-System:** Hook + Integration in alle relevanten Slides
-10. **Marcus-Reduzierung:** Quote-Komponenten aus Slides entfernen, wo nicht mehr nötig
-11. **Polishing-Fixes** (Pro-Tip-Cards, Stat-Card, Distraktor, Touch-Targets)
-12. **Manuelles Testen** auf 3 Viewport-Größen (375, 768, 1440)
-13. **Push & PR**
+### Slide 10 – Quiz Frage 1
 
-Frag mich nach jedem implementierten Schritt, ob du mit den Änderungen weitermachen oder Anpassungen vornehmen sollst.
+```ts
+export const quiz1 = {
+  header: 'Frage 1 / 2 · +10 XP',
+  question: 'Was gehört zu den Current Assets (Umlaufvermögen)?',
+  options: [
+    { id: 'A', label: 'Long-Term Debt', correct: false },
+    { id: 'B', label: 'Accounts Receivable', correct: true },
+    { id: 'C', label: 'Goodwill', correct: false },
+    { id: 'D', label: 'PP&E', correct: false },
+  ],
+  feedback: {
+    correct: {
+      gentle: 'Richtig. Accounts Receivable ist ein Current Asset – wird innerhalb von 12 Monaten zu Cash. Long-Term Debt ist eine Liability, Goodwill und PP&E sind Non-Current Assets.',
+      sharp: 'Korrekt. AR = Current Asset. Goodwill und PP&E = Non-Current. Diese Klassifikation musst du blind abrufen können.',
+    },
+    wrong: 'Nicht ganz. Long-Term Debt ist eine Liability. Goodwill und PP&E sind Assets, aber Non-Current. Accounts Receivable ist das einzige Current Asset hier.',
+    hint: 'Current = innerhalb von 12 Monaten zu Cash konvertierbar oder fällig.',
+  },
+}
+```
 
-Phase 3b (Inhaltliche Vereinfachung für Beginner-Niveau) folgt im selben Branch nach Bestätigung.
+### Slide 11 – Quiz Frage 2
 
-Los geht's mit Schritt 1 (Branch erstellen + LessonLayout refactoren).
+```ts
+export const quiz2 = {
+  header: 'Frage 2 / 2 · +10 XP',
+  question: 'TechCo hat Total Assets von €150M und Total Liabilities von €70M. Wie hoch ist das Shareholders\' Equity?',
+  options: [
+    { id: 'A', label: '€220M', correct: false },
+    { id: 'B', label: '€70M', correct: false },
+    { id: 'C', label: '€80M', correct: true },
+    { id: 'D', label: '€150M', correct: false },
+  ],
+  workingOut: 'Assets = Liabilities + Equity → €150M = €70M + Equity → Equity = €80M',
+  feedback: {
+    correct: 'Genau. Assets = Liabilities + Equity, umgeformt: Equity = Assets − Liabilities = €150M − €70M = €80M.',
+    wrong: 'Denk an die Gleichung: Assets = Liabilities + Equity → Equity = Assets − Liabilities = €150M − €70M = €80M.',
+  },
+}
+```
+
+### Slide 12 – Cliffhanger (Track A only, andere Tracks überspringen)
+
+Titel: `'Da war noch etwas: PP&E und Depreciation.'`
+Subline: `'Den hast du in der Bilanz gesehen. Hier ein Vorgeschmack.'`
+
+Erklärungs-Card:
+> PP&E sinkt jedes Jahr durch Abschreibungen (Depreciation). Das erscheint nicht nur in der Bilanz, sondern auch in der GuV als Aufwand und im Cash Flow Statement als non-cash Add-back. Das ist der erste direkte Link zwischen den drei Berichten.
+
+Marcus: `'PP&E und Depreciation sind der Dreh- und Angelpunkt zwischen Bilanz, GuV und Cash Flow. Wenn du das einmal wirklich verstehst, macht alles andere Sinn. Lektion 3 und 4 widmen sich genau diesem Link.'`
+
+### Slide 13 – Retention Hub
+
+Identische Struktur wie Lektion 01. Quiz-Ergebnis: 2/2.
+
+Marcus-Email Body:
+```ts
+const marcusEmail = {
+  subject: 'Re: Lektion 2 abgeschlossen',
+  gentle: 'Gut gemacht. Du verstehst jetzt den Aufbau der Bilanz – Assets, Liabilities, Equity – und weißt, warum sie immer balancieren muss. In Lektion 3 schauen wir uns das Cash Flow Statement an – den einzigen Bericht, den du auf einer einsamen Insel bräuchtest.',
+  sharp: 'Bilanz sitzt. In Lektion 3 kommt das Cash Flow Statement – das ehrlichste der drei Statements. Die Desert-Island-Frage dazu lernst du dann.',
+}
+```
+
+Next Lesson: `{ title: 'Cash Flow Statement', duration: 8, xp: 30 }`
+
+## ✅ AKZEPTANZKRITERIEN
+
+1. Route `/lesson/balance-sheet` lädt korrekt
+2. Track-Routing funktioniert: Track A sieht 9 Slides, B sieht 12, C sieht 11
+3. Slide 04 (Zwei-Spalten-Klickliste) öffnet Tooltips korrekt per Tap/Click
+4. Quiz 1 + 2 funktionieren mit Streak-Logik (nur First-Try)
+5. TechCo-Bilanz auf Slide 05 balanciert visuell (beide Seiten zeigen €150M)
+6. Lesson-Duration-Tracking läuft von Slide 1 bis Retention-Hub
+7. Alle Farben und Fonts aus dem Design-System, keine neuen Töne eingeführt
+8. Mobile (375px): alle Slides ohne horizontalen Scroll nutzbar
+9. Slide 04 auf Mobile: Zwei-Spalten-Grid wird zu einer Spalte (`grid-cols-1`)
+
+## 🚀 REIHENFOLGE
+
+1. Branch erstellen
+2. `data.ts` mit allen obigen Daten anlegen
+3. `Slide01Briefing.tsx` (Copy von Lektion 01, neue Daten)
+4. `Slide02RecapTapReveal.tsx` (Copy von Lektion 01 Slide02, neue Karten)
+5. `Slide03ThreeSections.tsx`
+6. `Slide04Positions.tsx` (neuer Typ – hier Zeit lassen)
+7. `Slide05EquilibriumExample.tsx`
+8. `Slide06ShareholdersEquity.tsx`
+9. `Slide07NegativeEquity.tsx`
+10. `Slide08WorkingCapital.tsx`
+11. `Slide09ProTips.tsx` (Copy von Lektion 01 Slide07, neue Daten)
+12. `Slide10QuizAssets.tsx` + `Slide11QuizCalculation.tsx`
+13. `Slide12Cliffhanger.tsx`
+14. `Slide13Retention.tsx`
+15. `page.tsx` mit Track-Routing verdrahten
+16. Mobile testen, pushen
+
+Frag mich nach jedem Slide, ob ich Änderungen will.
+
+Los geht's mit Schritt 1.

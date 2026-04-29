@@ -2,41 +2,31 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, RotateCcw } from 'lucide-react';
+import { ArrowRight, RotateCcw, Lightbulb } from 'lucide-react';
 import LessonLayout from '../LessonLayout';
 import MarcusNote from '../MarcusNote';
 import { playClickSound, playCorrectSound, playWrongSound, playStreakSound } from '@/lib/sounds';
 import { calculateQuizXp } from '@/lib/lesson/xp';
+import { quiz1 } from './data';
 import { priorStreakFor, type SlideProps } from './types';
 
-// Slide 08 in the beginner variant: a single multiple-choice question that
-// asks the most important conceptual takeaway from slide 02. The original
-// drag-and-sort with 6 statements proved too hard for fresh beginners
-// who had only seen the order once on slide 03.
-const OPTIONS = [
-  { letter: 'A', value: 'Bilanz' },
-  { letter: 'B', value: 'Gewinn- und Verlustrechnung' },
-  { letter: 'C', value: 'Eigenkapitalveränderungsrechnung' },
-  { letter: 'D', value: 'Kapitalflussrechnung' },
-] as const;
-
-const CORRECT_LETTER = 'B';
 const BASE_XP = 10;
 
 type State = 'idle' | 'submitted-wrong-1' | 'submitted-wrong-2' | 'submitted-correct';
 
-export default function Slide08QuizSort({
+export default function Slide08QuizSection({
   currentStep,
   totalSteps,
   onBack,
   onNext,
   onAnswer,
   quizResults,
-  sidePanel,
+  tone,
 }: SlideProps) {
   const [selected, setSelected] = useState<string | null>(null);
   const [state, setState] = useState<State>('idle');
   const [solvedOnAttempt, setSolvedOnAttempt] = useState<1 | 2 | null>(null);
+  const [showHint, setShowHint] = useState(false);
 
   const isCorrect = state === 'submitted-correct';
   const isWrongFirst = state === 'submitted-wrong-1';
@@ -46,7 +36,7 @@ export default function Slide08QuizSort({
 
   const handleSubmit = () => {
     if (!selected) return;
-    const correct = selected === CORRECT_LETTER;
+    const correct = quiz1.options.find((o) => o.id === selected)?.correct === true;
     if (correct) {
       const attempts: 1 | 2 = state === 'submitted-wrong-1' ? 2 : 1;
       const xpInfo = calculateQuizXp(true, attempts, BASE_XP);
@@ -66,10 +56,7 @@ export default function Slide08QuizSort({
     }
   };
 
-  const handleRetry = () => {
-    setSelected(null);
-  };
-
+  const handleRetry = () => setSelected(null);
   const handleNext = () => {
     playClickSound();
     onNext();
@@ -78,11 +65,9 @@ export default function Slide08QuizSort({
   let ctaLabel: string;
   let ctaAction: () => void;
   let ctaDisabled = false;
-  let ctaIcon = false;
   if (isResolved) {
     ctaLabel = 'Nächste Frage';
     ctaAction = handleNext;
-    ctaIcon = true;
   } else if (isWrongFirst) {
     if (selected) {
       ctaLabel = 'Antwort prüfen';
@@ -112,51 +97,42 @@ export default function Slide08QuizSort({
     >
       {isWrongFirst && selected ? <RotateCcw size={14} /> : null}
       {ctaLabel}
-      {ctaIcon && <ArrowRight size={16} />}
+      {isResolved && <ArrowRight size={16} />}
     </button>
   );
 
   return (
-    <LessonLayout currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} sidePanel={sidePanel} footer={footer}>
+    <LessonLayout currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} footer={footer}>
       <div className="flex flex-col gap-5">
         <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted tracking-wider uppercase">
-          Frage 1 / 2 · {state === 'submitted-correct' ? '' : '+10 XP'}
+          {quiz1.header}
         </span>
 
         <h2 className="font-[family-name:var(--font-is-serif)] text-xl sm:text-3xl font-medium text-is-text-primary leading-tight">
-          Welcher Bericht zeigt einen Zeitraum (z.B. das ganze Jahr 2024)?
+          {quiz1.question}
         </h2>
 
         <div className="flex flex-col gap-2">
-          {OPTIONS.map((opt) => {
-            const isSelected = selected === opt.letter;
-            const wasMostRecentlySubmitted =
-              (isWrongFirst || isWrongFinal) && isSelected;
-            const isCorrectOpt = opt.letter === CORRECT_LETTER;
-
+          {quiz1.options.map((opt) => {
+            const isSelected = selected === opt.id;
+            const wasSubmittedWrong = (isWrongFirst || isWrongFinal) && isSelected;
             let stateClass = 'border-is-bg-border hover:bg-is-bg-tertiary';
-            if (isCorrect && isCorrectOpt) {
-              stateClass = 'border-is-success bg-is-success-muted';
-            } else if (isCorrect) {
-              stateClass = 'border-is-bg-border opacity-60';
-            } else if (isWrongFinal) {
-              if (isCorrectOpt) stateClass = 'border-is-success bg-is-success-muted';
-              else if (wasMostRecentlySubmitted) stateClass = 'border-is-error bg-is-error-muted';
+            if (isCorrect && opt.correct) stateClass = 'border-is-success bg-is-success-muted';
+            else if (isCorrect) stateClass = 'border-is-bg-border opacity-60';
+            else if (isWrongFinal) {
+              if (opt.correct) stateClass = 'border-is-success bg-is-success-muted';
+              else if (wasSubmittedWrong) stateClass = 'border-is-error bg-is-error-muted';
               else stateClass = 'border-is-bg-border opacity-60';
-            } else if (isWrongFirst && wasMostRecentlySubmitted) {
+            } else if (isWrongFirst && wasSubmittedWrong)
               stateClass = 'border-is-error bg-is-error-muted';
-            } else if (isSelected) {
-              stateClass = 'border-is-text-primary';
-            }
-
-            const disabled = isResolved;
+            else if (isSelected) stateClass = 'border-is-text-primary';
 
             return (
               <button
-                key={opt.letter}
+                key={opt.id}
                 type="button"
-                onClick={() => !disabled && setSelected(opt.letter)}
-                disabled={disabled}
+                onClick={() => !isResolved && setSelected(opt.id)}
+                disabled={isResolved}
                 className={[
                   'flex items-center gap-4 p-4 min-h-[44px] rounded-lg bg-is-bg-secondary border text-left',
                   'transition-all duration-200 cursor-pointer disabled:cursor-default',
@@ -164,10 +140,10 @@ export default function Slide08QuizSort({
                 ].join(' ')}
               >
                 <span className="font-[family-name:var(--font-is-mono)] text-sm text-is-text-muted w-4 shrink-0">
-                  {opt.letter}
+                  {opt.id}
                 </span>
                 <span className="font-[family-name:var(--font-is-sans)] text-base text-is-text-primary">
-                  {opt.value}
+                  {opt.label}
                 </span>
               </button>
             );
@@ -184,87 +160,71 @@ export default function Slide08QuizSort({
               transition={{ duration: 0.25 }}
               className="flex flex-col gap-3"
             >
-              <MarcusNote
-                tone="gentle"
-                body={<>Genau das. Diese Unterscheidung ist der wichtigste Punkt aus Lektion 1.</>}
-              />
-              <StreakReadout
-                priorStreak={priorStreak}
-                outcome={solvedOnAttempt === 1 ? 'first-try' : 'second-try'}
-              />
+              <MarcusNote tone={tone} body={tone === 'sharp' ? quiz1.feedback.correct.sharp : quiz1.feedback.correct.gentle} />
+              {solvedOnAttempt === 1 ? (
+                <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-bg-border">
+                  <span aria-hidden className="text-is-accent">🔥</span>
+                  <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-secondary">
+                    {priorStreak + 1} in Folge richtig
+                  </span>
+                </div>
+              ) : (
+                <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted">
+                  Beim zweiten Versuch geschafft · +5 XP
+                </span>
+              )}
             </motion.div>
           )}
+
           {isWrongFirst && (
             <motion.div
-              key="wrong1"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              <MarcusNote
-                tone="gentle"
-                subject="Re: Kein Stress"
-                body={
-                  <>
-                    Das verwechselt fast jeder am Anfang. Die Bilanz zeigt einen einzigen <strong className="not-italic">Stichtag</strong>. Die GuV zeigt einen <strong className="not-italic">Zeitraum</strong>. Versuch&apos;s nochmal.
-                  </>
-                }
-              />
-            </motion.div>
-          )}
-          {isWrongFinal && (
-            <motion.div
-              key="wrong2"
+              key="wf"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               className="flex flex-col gap-3"
             >
-              <MarcusNote
-                tone="gentle"
-                body={<>Kein Problem, das verstehst du jetzt für nächstes Mal. Weiter geht&apos;s.</>}
-              />
-              <StreakReadout outcome="broken" priorStreak={priorStreak} />
+              <MarcusNote tone={tone} subject="Re: Korrektur" body={quiz1.feedback.wrong} />
+              {!showHint ? (
+                <button
+                  type="button"
+                  onClick={() => setShowHint(true)}
+                  className="self-start flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-is-bg-secondary border border-is-bg-border text-is-text-secondary hover:text-is-text-primary hover:border-is-text-muted transition-all duration-200 font-[family-name:var(--font-is-mono)] text-xs"
+                >
+                  <Lightbulb size={12} />
+                  Hinweis zeigen
+                </button>
+              ) : (
+                <div className="bg-is-bg-tertiary border border-is-bg-border rounded-md p-3">
+                  <p className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-secondary">
+                    {quiz1.feedback.hint}
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {isWrongFinal && (
+            <motion.div
+              key="wd"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="flex flex-col gap-3"
+            >
+              <MarcusNote tone={tone} body={quiz1.feedback.wrong} />
+              <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-error">
+                <span aria-hidden className="text-is-error">🔥</span>
+                <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-error">
+                  0 · Streak unterbrochen
+                </span>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
     </LessonLayout>
-  );
-}
-
-function StreakReadout({
-  outcome,
-  priorStreak,
-}: {
-  outcome: 'first-try' | 'second-try' | 'broken';
-  priorStreak: number;
-}) {
-  if (outcome === 'first-try') {
-    return (
-      <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-bg-border">
-        <span aria-hidden className="text-is-accent">🔥</span>
-        <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-secondary">
-          {priorStreak + 1} in Folge richtig
-        </span>
-      </div>
-    );
-  }
-  if (outcome === 'second-try') {
-    return (
-      <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted">
-        Beim zweiten Versuch geschafft · +5 XP
-      </span>
-    );
-  }
-  return (
-    <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-error">
-      <span aria-hidden className="text-is-error">🔥</span>
-      <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-error">
-        0 · Streak unterbrochen
-      </span>
-    </div>
   );
 }

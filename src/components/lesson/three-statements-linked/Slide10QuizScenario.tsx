@@ -7,29 +7,21 @@ import LessonLayout from '../LessonLayout';
 import MarcusNote from '../MarcusNote';
 import { playClickSound, playCorrectSound, playWrongSound, playStreakSound } from '@/lib/sounds';
 import { calculateQuizXp } from '@/lib/lesson/xp';
+import { quiz3 } from './data';
 import { priorStreakFor, type SlideProps } from './types';
 
 const BASE_XP = 10;
 
-const OPTIONS = [
-  { letter: 'A', value: '60%' },
-  { letter: 'B', value: '40%' },
-  { letter: 'C', value: '80%' },
-  { letter: 'D', value: '20%' },
-] as const;
-
-const CORRECT_LETTER = 'B';
-
 type State = 'idle' | 'submitted-wrong-1' | 'submitted-wrong-2' | 'submitted-correct';
 
-export default function Slide09QuizCalc({
+export default function Slide10QuizScenario({
   currentStep,
   totalSteps,
   onBack,
   onNext,
   onAnswer,
   quizResults,
-  sidePanel,
+  tone,
 }: SlideProps) {
   const [selected, setSelected] = useState<string | null>(null);
   const [state, setState] = useState<State>('idle');
@@ -39,12 +31,12 @@ export default function Slide09QuizCalc({
   const isWrongFirst = state === 'submitted-wrong-1';
   const isWrongFinal = state === 'submitted-wrong-2';
   const isResolved = isCorrect || isWrongFinal;
-  const showHint = isResolved || isWrongFirst; // always once submitted
-  const priorStreak = priorStreakFor('q2', quizResults);
+  const showHint = isResolved || isWrongFirst;
+  const priorStreak = priorStreakFor('q3', quizResults);
 
   const handleSubmit = () => {
     if (!selected) return;
-    const correct = selected === CORRECT_LETTER;
+    const correct = quiz3.options.find((o) => o.id === selected)?.correct === true;
     if (correct) {
       const attempts: 1 | 2 = state === 'submitted-wrong-1' ? 2 : 1;
       const xpInfo = calculateQuizXp(true, attempts, BASE_XP);
@@ -52,7 +44,7 @@ export default function Slide09QuizCalc({
       if (xpInfo.countsForStreak) window.setTimeout(() => playStreakSound(), 250);
       setSolvedOnAttempt(attempts);
       setState('submitted-correct');
-      onAnswer?.('q2', { correct: true, attempts, ...xpInfo });
+      onAnswer?.('q3', { correct: true, attempts, ...xpInfo });
     } else if (state === 'idle') {
       playWrongSound();
       setState('submitted-wrong-1');
@@ -60,15 +52,11 @@ export default function Slide09QuizCalc({
       const xpInfo = calculateQuizXp(false, 2, BASE_XP);
       playWrongSound();
       setState('submitted-wrong-2');
-      onAnswer?.('q2', { correct: false, attempts: 2, ...xpInfo });
+      onAnswer?.('q3', { correct: false, attempts: 2, ...xpInfo });
     }
   };
 
-  const handleRetry = () => {
-    setSelected(null);
-    // keep state as wrong-1; user picks again and submits
-  };
-
+  const handleRetry = () => setSelected(null);
   const handleNext = () => {
     playClickSound();
     onNext();
@@ -77,11 +65,9 @@ export default function Slide09QuizCalc({
   let ctaLabel: string;
   let ctaAction: () => void;
   let ctaDisabled = false;
-  let ctaIcon = false;
   if (isResolved) {
-    ctaLabel = 'Nächste Frage';
+    ctaLabel = 'Weiter';
     ctaAction = handleNext;
-    ctaIcon = true;
   } else if (isWrongFirst) {
     if (selected) {
       ctaLabel = 'Antwort prüfen';
@@ -89,7 +75,7 @@ export default function Slide09QuizCalc({
     } else {
       ctaLabel = 'Nochmal versuchen';
       ctaAction = handleRetry;
-      ctaDisabled = true; // wait for selection
+      ctaDisabled = true;
     }
   } else {
     ctaLabel = 'Antwort prüfen';
@@ -111,51 +97,42 @@ export default function Slide09QuizCalc({
     >
       {isWrongFirst && selected ? <RotateCcw size={14} /> : null}
       {ctaLabel}
-      {ctaIcon && <ArrowRight size={16} />}
+      {isResolved && <ArrowRight size={16} />}
     </button>
   );
 
   return (
-    <LessonLayout currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} sidePanel={sidePanel} footer={footer}>
+    <LessonLayout currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} footer={footer}>
       <div className="flex flex-col gap-5">
-        <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted tracking-wider uppercase">
-          Frage 2 / 2 · +{state === 'submitted-wrong-1' || state === 'submitted-wrong-2' ? 5 : 10} XP
+        <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-gold tracking-wider uppercase">
+          {quiz3.header}
         </span>
 
         <h2 className="font-[family-name:var(--font-is-serif)] text-xl sm:text-3xl font-medium text-is-text-primary leading-tight">
-          TechCo · Umsatz €200M, COGS €120M. Wie hoch ist die Bruttomarge?
+          {quiz3.question}
         </h2>
 
         <div className="flex flex-col gap-2">
-          {OPTIONS.map((opt) => {
-            const isSelected = selected === opt.letter;
-            const wasMostRecentlySubmitted =
-              (isWrongFirst || isWrongFinal) && isSelected;
-            const isCorrectOpt = opt.letter === CORRECT_LETTER;
-
+          {quiz3.options.map((opt) => {
+            const isSelected = selected === opt.id;
+            const wasSubmittedWrong = (isWrongFirst || isWrongFinal) && isSelected;
             let stateClass = 'border-is-bg-border hover:bg-is-bg-tertiary';
-            if (isCorrect && isCorrectOpt) {
-              stateClass = 'border-is-success bg-is-success-muted';
-            } else if (isCorrect) {
-              stateClass = 'border-is-bg-border opacity-60';
-            } else if (isWrongFinal) {
-              if (isCorrectOpt) stateClass = 'border-is-success bg-is-success-muted';
-              else if (wasMostRecentlySubmitted) stateClass = 'border-is-error bg-is-error-muted';
+            if (isCorrect && opt.correct) stateClass = 'border-is-success bg-is-success-muted';
+            else if (isCorrect) stateClass = 'border-is-bg-border opacity-60';
+            else if (isWrongFinal) {
+              if (opt.correct) stateClass = 'border-is-success bg-is-success-muted';
+              else if (wasSubmittedWrong) stateClass = 'border-is-error bg-is-error-muted';
               else stateClass = 'border-is-bg-border opacity-60';
-            } else if (isWrongFirst && wasMostRecentlySubmitted) {
+            } else if (isWrongFirst && wasSubmittedWrong)
               stateClass = 'border-is-error bg-is-error-muted';
-            } else if (isSelected) {
-              stateClass = 'border-is-text-primary';
-            }
-
-            const disabled = isResolved;
+            else if (isSelected) stateClass = 'border-is-text-primary';
 
             return (
               <button
-                key={opt.letter}
+                key={opt.id}
                 type="button"
-                onClick={() => !disabled && setSelected(opt.letter)}
-                disabled={disabled}
+                onClick={() => !isResolved && setSelected(opt.id)}
+                disabled={isResolved}
                 className={[
                   'flex items-center gap-4 p-4 min-h-[44px] rounded-lg bg-is-bg-secondary border text-left',
                   'transition-all duration-200 cursor-pointer disabled:cursor-default',
@@ -163,10 +140,10 @@ export default function Slide09QuizCalc({
                 ].join(' ')}
               >
                 <span className="font-[family-name:var(--font-is-mono)] text-sm text-is-text-muted w-4 shrink-0">
-                  {opt.letter}
+                  {opt.id}
                 </span>
-                <span className="font-[family-name:var(--font-is-sans)] text-base text-is-text-primary tabular-nums">
-                  {opt.value}
+                <span className="font-[family-name:var(--font-is-sans)] text-base text-is-text-primary">
+                  {opt.label}
                 </span>
               </button>
             );
@@ -185,60 +162,32 @@ export default function Slide09QuizCalc({
             >
               <div className="bg-is-bg-secondary border border-is-bg-border rounded-md p-3">
                 <p className="font-[family-name:var(--font-is-mono)] text-xs sm:text-sm text-is-text-secondary leading-relaxed">
-                  Rechenweg <span className="text-is-text-primary">(Umsatz − COGS) / Umsatz = (200 − 120) / 200 = 80 / 200 = 40%</span>
+                  Rechenweg <span className="text-is-text-primary">{quiz3.workingOut}</span>
                 </p>
               </div>
 
               {isCorrect && (
                 <>
-                  <MarcusNote
-                    tone="gentle"
-                    body={
-                      <>
-                        Sehr gut. Du hast gerade deine erste Margen-Berechnung gemacht — genau so läuft das in echten Pitchbooks.
-                      </>
-                    }
-                  />
+                  <MarcusNote tone={tone} body={quiz3.feedback.correct} />
                   {solvedOnAttempt === 1 ? (
                     <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-bg-border">
                       <span aria-hidden className="text-is-accent">🔥</span>
                       <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-secondary">
-                        {priorStreak + 1} in Folge richtig · Quiz abgeschlossen
+                        {priorStreak + 1} in Folge richtig
                       </span>
                     </div>
                   ) : (
                     <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted">
-                      Beim zweiten Versuch geschafft · +5 XP
+                      Beim zweiten Versuch geschafft
                     </span>
                   )}
                 </>
               )}
 
-              {isWrongFirst && (
-                <MarcusNote
-                  tone="gentle"
-                  subject="Re: Beim zweiten Mal"
-                  body={
-                    <>
-                      Schau dir den Rechenweg oben an, dann probier&apos;s nochmal. Beim zweiten Versuch gibt&apos;s noch +5 XP.
-                    </>
-                  }
-                />
-              )}
+              {isWrongFirst && <MarcusNote tone={tone} subject="Re: Beim zweiten Mal" body={quiz3.feedback.wrong} />}
 
               {isWrongFinal && (
-                <>
-                  <MarcusNote
-                    tone="gentle"
-                    body={<>Kein Problem, das verstehst du jetzt für nächstes Mal. Weiter geht&apos;s.</>}
-                  />
-                  <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-error">
-                    <span aria-hidden className="text-is-error">🔥</span>
-                    <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-error">
-                      0 · Streak unterbrochen
-                    </span>
-                  </div>
-                </>
+                <MarcusNote tone={tone} body="Kein Problem. Schau dir den Rechenweg oben an." />
               )}
             </motion.div>
           )}

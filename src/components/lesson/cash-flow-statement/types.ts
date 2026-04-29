@@ -1,12 +1,12 @@
+import type { MarcusTone } from '@/components/lesson/MarcusNote';
+
 export type QuizResult = {
   correct: boolean;
-  attempts: number; // 1 = first try, 2 = second try
+  attempts: number;
   xpEarned: number;
-  countsForStreak: boolean; // true only when correct AND attempts === 1
+  countsForStreak: boolean;
 };
 
-// Beginner variant has 2 quiz questions instead of 4 — q3/q4 were dropped
-// in favor of an EBITDA cliffhanger preview slide.
 export type QuizResults = {
   q1: QuizResult | null;
   q2: QuizResult | null;
@@ -26,16 +26,12 @@ export interface SlideProps {
   totalSteps: number;
   onBack: () => void;
   onNext: () => void;
-  sidePanel?: import('react').ReactNode;
+  tone: MarcusTone;
   onAnswer?: (slideKey: QuizSlideKey, result: QuizResult) => void;
   quizResults?: QuizResults;
   results?: RetentionResults;
 }
 
-// Order of quiz keys as they appear in the lesson — used by quiz slides to
-// compute "consecutive first-try correct" streaks based on prior results.
-// A wrong answer OR a correct answer that needed multiple attempts both
-// reset the streak — only flawless first-try answers extend it.
 export const QUIZ_ORDER: QuizSlideKey[] = ['q1', 'q2'];
 
 export function priorStreakFor(self: QuizSlideKey, results: QuizResults | undefined): number {
@@ -45,7 +41,7 @@ export function priorStreakFor(self: QuizSlideKey, results: QuizResults | undefi
   let run = 0;
   for (let i = 0; i < idx; i++) {
     const r = results[QUIZ_ORDER[i]];
-    if (r?.correct && r.attempts === 1) run += 1;
+    if (r?.countsForStreak) run += 1;
     else run = 0;
   }
   return run;

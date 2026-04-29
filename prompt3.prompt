@@ -1,0 +1,431 @@
+# 📚 Lektion 04: Die drei Statements verlinkt
+
+Du baust die vierte und wichtigste Lektion im Accounting-Block. Diese Lektion deckt die meistgestellte Frage in IB-Interviews ab: "How do the 3 statements link together?" und die daraus abgeleiteten Walk-Through-Fragen ("Walk me through how Depreciation going up by $10 would affect the statements").
+
+Alle Architektur, Design-System und Templates existieren.
+
+## 🌿 GIT-WORKFLOW
+
+```bash
+git checkout master
+git pull origin master
+git checkout -b feature/lesson-04-three-statements-linked
+```
+
+Commit-Messages:
+- `feat(lesson-04): add three statements linked lesson data`
+- `feat(lesson-04): implement interactive link diagram slide`
+- `feat(lesson-04): implement walk-through quiz mechanics`
+- `feat(lesson-04): add lesson route`
+
+Push: `git push origin feature/lesson-04-three-statements-linked`
+
+## 📁 DATEIEN
+
+```
+app/
+  lesson/
+    three-statements-linked/
+      page.tsx
+components/
+  lesson/
+    three-statements-linked/
+      Slide01Briefing.tsx
+      Slide02ThreeLinksOverview.tsx
+      Slide03LinkDiagramInteractive.tsx
+      Slide04DepreciationWalkthrough.tsx
+      Slide05WalkThroughRule.tsx
+      Slide06InventoryScenario.tsx        // Track B+C only
+      Slide07ProTips.tsx
+      Slide08QuizWhichStatement.tsx
+      Slide09QuizWalkThrough.tsx
+      Slide10QuizScenario.tsx             // Track B+C only
+      Slide11Retention.tsx
+      data.ts
+```
+
+## 📊 LEKTIONS-META
+
+```ts
+export const lessonMeta = {
+  id: 'acc-4-three-statements-linked',
+  title: 'Die drei Statements verlinkt',
+  titleEn: 'The 3 Statements – How They Link',
+  module: 'MODUL 01 · ACCOUNTING',
+  duration: 10,
+  xp: 40,
+  difficulty: 2,
+  prerequisite: 'acc-3-cash-flow-statement',
+  trackConfig: {
+    A: { slidesToShow: [1,2,3,4,5,7,8,9,11], duration: 8 },
+    B: { slidesToShow: [1,2,3,4,5,6,7,8,9,10,11], duration: 10 },
+    C: { slidesToShow: [1,3,4,5,6,7,8,9,10,11], duration: 8 },
+  }
+}
+```
+
+## 📋 SLIDE-INHALTE
+
+### Slide 01 – Briefing
+
+Marcus-Note Body:
+```ts
+const marcusBody = {
+  gentle: 'Das ist die wichtigste Lektion im ganzen Accounting-Block. Nicht weil sie am schwierigsten ist – sondern weil diese Verbindungen in JEDEM Interview kommen. Wenn du heute verstehst, wie Net Income durch alle drei Statements fließt, bist du besser vorbereitet als 80% der Mitbewerber.',
+  sharp: '"How do the 3 statements link together?" – Pflichtfrage in jedem Interview. Diese Lektion bereitet dich darauf vor, sie in 60 Sekunden sauber zu beantworten. Und auf die Walk-Through-Varianten danach.',
+}
+```
+
+Stat-Card: `DAUER 10 MIN · XP +40 · SCHWIERIG. ★★☆☆☆`
+
+Learning Outcomes:
+- `→ Die drei direkten Links zwischen den Statements erklären`
+- `→ Die Standard-Walk-Through-Antwort auswendig können`
+- `→ Szenarien durchrechnen: Was ändert sich wenn X passiert?`
+
+### Slide 02 – Die drei Links im Überblick
+
+Erklärungs-Text:
+> Es gibt drei direkte Verbindungen, die jeder IB-Analyst auswendig kennt.
+
+Drei nummerierte Punkte, jeder als eigene Card:
+
+```ts
+export const threeLinks = [
+  {
+    number: '01',
+    title: 'Net Income → CFS + Bilanz',
+    description: 'Net Income aus der GuV fließt an die Spitze des Cash Flow Statements UND in Retained Earnings der Bilanz.',
+    fromStatement: 'GuV',
+    toStatements: ['CFS', 'Bilanz'],
+    color: 'text-accent',
+  },
+  {
+    number: '02',
+    title: 'Working Capital Changes → CFS',
+    description: 'Veränderungen an Bilanz-Positionen (AR, Inventory, AP) erscheinen als Working-Capital-Anpassungen im Cash Flow from Operations.',
+    fromStatement: 'Bilanz',
+    toStatements: ['CFS'],
+    color: 'text-gold',
+  },
+  {
+    number: '03',
+    title: 'Finales Cash → Bilanz',
+    description: 'Die Net Change in Cash am Ende des CFS entspricht der Veränderung der Cash-Position in der Bilanz. Cash ist das "Plug".',
+    fromStatement: 'CFS',
+    toStatements: ['Bilanz'],
+    color: 'text-success',
+  },
+]
+```
+
+Marcus-Note: `'Diese drei Links musst du auf Zuruf nennen können. Fang immer beim Net Income an. Das ist der Dreh- und Angelpunkt aller drei Statements.'`
+
+### Slide 03 – Interaktives Link-Diagramm (NEUER SLIDE-TYP)
+
+**Das ist der visuell und didaktisch aufwändigste Slide der gesamten App bisher.**
+
+Layout: Drei Boxen nebeneinander (auf Mobile untereinander) – eine pro Statement. Zwischen den Boxen Pfeile, die die Verbindungen zeigen. Klickt man auf einen Pfeil, erscheint eine Erklärung der Verbindung.
+
+```ts
+export const linkDiagram = {
+  statements: [
+    {
+      id: 'is',
+      label: 'Income Statement',
+      labelDe: 'GuV',
+      color: 'border-accent',
+      keyItem: 'Net Income',
+      position: 'left',
+    },
+    {
+      id: 'cfs',
+      label: 'Cash Flow Statement',
+      labelDe: 'Kapitalflussrechnung',
+      color: 'border-gold',
+      keyItem: 'Net Change in Cash',
+      position: 'center',
+    },
+    {
+      id: 'bs',
+      label: 'Balance Sheet',
+      labelDe: 'Bilanz',
+      color: 'border-success',
+      keyItem: 'Cash + Retained Earnings',
+      position: 'right',
+    },
+  ],
+  links: [
+    {
+      id: 'ni-cfs',
+      from: 'is',
+      to: 'cfs',
+      label: 'Net Income',
+      explanation: 'Net Income aus der GuV fließt als erste Zeile in den Cash Flow Statement.',
+      direction: 'right',
+    },
+    {
+      id: 'ni-bs',
+      from: 'is',
+      to: 'bs',
+      label: 'Net Income → RE',
+      explanation: 'Net Income erhöht Retained Earnings in der Bilanz (minus Dividenden).',
+      direction: 'right-diagonal',
+    },
+    {
+      id: 'wc-cfs',
+      from: 'bs',
+      to: 'cfs',
+      label: 'Working Capital Δ',
+      explanation: 'Veränderungen in Current Assets/Liabilities der Bilanz erscheinen als WC-Anpassungen im CFO.',
+      direction: 'left',
+    },
+    {
+      id: 'cash-bs',
+      from: 'cfs',
+      to: 'bs',
+      label: 'Net Change in Cash',
+      explanation: 'Der finale Cash-Wert aus dem CFS = Veränderung der Cash-Position in der Bilanz. Cash ist das "Plug".',
+      direction: 'right',
+    },
+  ],
+}
+```
+
+**Implementierung:**
+- Nutze SVG für Pfeile oder `absolute`-positionierte Divs mit Border
+- Jeder Pfeil ist klickbar: `onClick` → öffnet Tooltip-Overlay mit Erklärung
+- Auf Mobile: vertikales Layout, Pfeile von oben nach unten
+- Framer-Motion: beim Mount erscheinen die Pfeile sequenziell mit 200ms Delay
+
+Aufgabe unter dem Diagramm: `'Tippe auf jeden Pfeil, um die Verbindung zu verstehen.'`
+
+Marcus erscheint nach allen vier Klicks: `'Diese vier Verbindungen sind das Herz von Accounting. Wenn du sie verstehst, kannst du jede Walk-Through-Frage systematisch beantworten.'`
+
+### Slide 04 – Depreciation Walk-Through (DAS Kernbeispiel)
+
+**Format: Schritt-für-Schritt-Reveal mit Nutzer-Interaktion**
+
+Kontext oben: `'PDF-Frage 6: "Walk me through how Depreciation going up by $10 would affect the statements."'`
+
+Die Musterlösung wird nicht sofort gezeigt, sondern per Tap-Schritt aufgebaut:
+
+```ts
+export const depreciationWalkthrough = {
+  scenario: 'Depreciation steigt um €10M. Steuerrate: 40%.',
+  steps: [
+    {
+      step: 1,
+      statement: 'Income Statement',
+      action: 'Depreciation +€10M',
+      effect: 'Operating Income −€10M → Pre-Tax Income −€10M → Net Income −€6M (nach 40% Steuer)',
+      tapLabel: 'Income Statement →',
+    },
+    {
+      step: 2,
+      statement: 'Cash Flow Statement',
+      action: 'Net Income −€6M, D&A Add-back +€10M',
+      effect: 'CFO: −€6M + €10M = +€4M. Net Change in Cash: +€4M.',
+      tapLabel: 'Cash Flow Statement →',
+    },
+    {
+      step: 3,
+      statement: 'Balance Sheet',
+      action: 'PP&E −€10M, Cash +€4M',
+      effect: 'Assets: −€6M gesamt. Equity: Retained Earnings −€6M. Beide Seiten: −€6M. ✓ Balanciert.',
+      tapLabel: 'Balance Sheet →',
+    },
+  ],
+}
+```
+
+Layout: Nach jedem Tap erscheint der nächste Statement-Block mit einer kleinen Animation. Jeder Block hat ein farbiges Label (IS = accent, CFS = gold, BS = success).
+
+Am Ende erscheint die **Schlüsselregel** prominent:
+> "Immer in dieser Reihenfolge: 1. Income Statement → 2. Cash Flow Statement → 3. Balance Sheet. So kannst du am Ende prüfen, ob die Bilanz balanciert."
+
+Marcus-Note: `'Diese Frage bekommst du mit 90% Wahrscheinlichkeit im Interview. Die Antwort ist immer gleich aufgebaut. Übe sie laut – 3 Sätze pro Statement, in Reihenfolge.'`
+
+### Slide 05 – Die Walk-Through Regel
+
+Kurze, merkbare Slide ohne neue Inhalte. Nur die Regel, prominent formatiert:
+
+```
+DIE WALK-THROUGH REGEL
+
+Schritt 1: Income Statement
+  → Was ändert sich am Net Income?
+
+Schritt 2: Cash Flow Statement
+  → Add-backs? Working Capital? Net Change in Cash?
+
+Schritt 3: Balance Sheet
+  → Cash + das Equity-Plug. Balanciert es?
+
+MERKE: Asset going up → Cash down.
+       Liability going up → Cash up.
+```
+
+Alles in monospace, formatiert wie ein Terminal. In `bg-bg-secondary border border-bg-border rounded-xl p-6`.
+
+Darunter kleiner CTA zum Speichern/Merken: `'Als Cheat Sheet speichern'` (triggert den gleichen PNG-Export wie Lektion 01).
+
+### Slide 06 – Inventory-Szenario (Track B + C only)
+
+Format: Identisch zu Slide 04, aber für ein anderes Szenario.
+
+```ts
+export const inventoryWalkthrough = {
+  scenario: 'Apple kauft €10M Inventory mit Cash. Noch keine Verkäufe.',
+  steps: [
+    {
+      step: 1,
+      statement: 'Income Statement',
+      effect: 'Keine Änderung. Inventory-Kosten erscheinen erst in der GuV, wenn es verkauft wird (als COGS).',
+      insight: 'Häufiger Fehler: Inventory-Kauf als COGS verbuchen. Falsch.',
+    },
+    {
+      step: 2,
+      statement: 'Cash Flow Statement',
+      effect: 'Inventory steigt um €10M → Asset steigt → CFO −€10M. Net Change in Cash: −€10M.',
+      insight: 'Asset steigt → Cash sinkt. Die gegenläufige Logik.',
+    },
+    {
+      step: 3,
+      statement: 'Balance Sheet',
+      effect: 'Inventory +€10M, Cash −€10M. Assets bleiben gleich. Bilanz balanciert. ✓',
+      insight: 'Kein Net Income, kein Equity-Effekt. Nur ein Asset tauscht gegen ein anderes.',
+    },
+  ],
+}
+```
+
+### Slide 07 – Pro-Tipps
+
+```ts
+export const proTips = [
+  {
+    tag: 'STANDARD-ANTWORT',
+    tagColor: 'text-accent',
+    body: '"How do the 3 statements link together?" – Musterlösung: Net Income aus der GuV fließt in den CFS und in Retained Earnings der Bilanz. Working Capital Changes verbinden Bilanz und CFS. Das finale Cash aus dem CFS entspricht der Cash-Veränderung in der Bilanz.',
+  },
+  {
+    tag: 'WARNUNG',
+    tagColor: 'text-gold',
+    body: 'Bei Walk-Through-Fragen: Nie mit der Bilanz anfangen. Immer IS → CFS → BS. Die Bilanz ist der "Check" am Ende. Wer dort anfängt, verwirrt sich selbst und den Interviewer.',
+  },
+  {
+    tag: 'FORTGESCHRITTEN',
+    tagColor: 'text-success',
+    body: 'Bei komplexeren Szenarien (Debt Write-Down, Goodwill Impairment) bleibt die Reihenfolge gleich. Nur der IS-Effekt ist manchmal kontraintuitiv. Beispiel: Liability Write-Down = Gain in der GuV. Das kommt in Lektion 5.',
+  },
+]
+```
+
+### Slide 08 – Quiz Frage 1
+
+```ts
+export const quiz1 = {
+  header: 'Frage 1 / 2 · +15 XP',
+  question: 'Wohin fließt Net Income aus der GuV direkt? (Mehrere Antworten möglich)',
+  type: 'multi-select',
+  options: [
+    { id: 'A', label: 'In den Cash Flow from Operations (oben)', correct: true },
+    { id: 'B', label: 'In die Retained Earnings der Bilanz', correct: true },
+    { id: 'C', label: 'Direkt in Cash der Bilanz', correct: false },
+    { id: 'D', label: 'In Revenue der nächsten GuV', correct: false },
+  ],
+  feedback: {
+    allCorrect: 'Genau. Net Income fließt gleichzeitig in den CFS (als Startpunkt) und in Retained Earnings der Bilanz. Das ist der zentrale Link zwischen allen drei Statements.',
+    partial: 'Fast. Net Income fließt in den CFS (oben) UND in Retained Earnings. Nicht direkt in Cash – Cash wird erst am Ende des CFS berechnet.',
+    wrong: 'Net Income hat zwei direkte Verbindungen: erstens zur Spitze des CFS, zweitens zu Retained Earnings in der Bilanz.',
+  },
+}
+```
+
+**Multi-Select-Mechanik:** Nutze die bereits implementierte Multi-Select-Komponente aus dem Lektion-01-Quiz.
+
+### Slide 09 – Quiz Frage 2 (Walk-Through)
+
+```ts
+export const quiz2 = {
+  header: 'Frage 2 / 2 · +15 XP',
+  question: 'Inventory steigt um €10M (Cash-Kauf). Was passiert mit dem Net Income?',
+  options: [
+    { id: 'A', label: 'Net Income sinkt um €10M', correct: false },
+    { id: 'B', label: 'Net Income sinkt um €6M', correct: false },
+    { id: 'C', label: 'Kein Effekt auf Net Income', correct: true },
+    { id: 'D', label: 'Net Income steigt um €10M', correct: false },
+  ],
+  workingOut: 'Inventory-Kauf ist keine GuV-Transaktion. Es wird erst zu COGS, wenn das Inventory verkauft wird. Solange es im Lager liegt: kein IS-Effekt.',
+  feedback: {
+    correct: 'Korrekt. Inventory-Kauf ≠ Aufwand. Der Aufwand entsteht erst beim Verkauf (als COGS). Das ist einer der häufigsten Denkfehler im Interview.',
+    wrong: 'Inventory-Veränderungen berühren das Income Statement NICHT direkt. Sie erscheinen nur im Cash Flow Statement (als Working Capital Change) und der Bilanz.',
+  },
+}
+```
+
+### Slide 10 – Quiz Frage 3 (Szenario-Quiz, Track B + C only)
+
+```ts
+export const quiz3 = {
+  header: 'Bonus · +10 XP',
+  question: 'Depreciation steigt um €10M (Steuerrate 40%). Was passiert mit der Cash-Position der Bilanz?',
+  options: [
+    { id: 'A', label: 'Sinkt um €10M', correct: false },
+    { id: 'B', label: 'Steigt um €4M', correct: true },
+    { id: 'C', label: 'Sinkt um €6M', correct: false },
+    { id: 'D', label: 'Keine Veränderung', correct: false },
+  ],
+  workingOut: 'IS: Net Income −€6M (D&A ×0.6). CFS: −€6M + €10M Add-back = +€4M CFO. BS: Cash +€4M.',
+  feedback: {
+    correct: 'Sauber durchgedacht. IS → CFS → BS in dieser Reihenfolge. Net Effekt: +€4M Cash durch Steuereinsparung.',
+    wrong: 'Geh Schritt für Schritt: IS: Net Income −€6M (−€10M × 0.6). CFS: Start mit −€6M, D&A Add-back +€10M, ergibt +€4M CFO. BS: Cash +€4M.',
+  },
+}
+```
+
+### Slide 11 – Retention Hub
+
+Marcus-Email:
+```ts
+const marcusEmail = {
+  subject: 'Re: Das Wichtigste verstanden',
+  gentle: 'Gut gemacht. Du weißt jetzt, wie alle drei Statements zusammenhängen und wie du systematisch Walk-Through-Fragen beantwortest. Das ist die Basis, auf der alles andere aufbaut – Valuation, DCF, M&A. In Lektion 5 vertiefst du Advanced Accounting-Szenarien.',
+  sharp: '3-Statement-Link sitzt. Walk-Through-Fragen kannst du. In Lektion 5 kommen fortgeschrittene Szenarien: Write-Downs, Debt Issuance, Goodwill – die Sachen, die dich von 90% der Bewerber unterscheiden.',
+}
+```
+
+Next Lesson:
+```ts
+{ title: 'Advanced Accounting Scenarios', duration: 10, xp: 40 }
+```
+
+**Wichtig:** Im Retention Hub XP auf +40 setzen (Lektion 04 hat mehr Gewicht als 01–03).
+
+## ✅ AKZEPTANZKRITERIEN
+
+1. Route `/lesson/three-statements-linked` lädt
+2. Slide 03 (Interaktives Link-Diagramm) zeigt alle vier Verbindungen mit klickbaren Pfeilen
+3. Slide 04 (Depreciation Walk-Through) baut sich schrittweise per Tap auf
+4. Multi-Select-Quiz auf Slide 08 erlaubt Mehrfachauswahl
+5. Track-Routing korrekt (Track A: 9 Slides, B: 11 Slides, C: 10 Slides)
+6. Quiz-Scores und XP werden korrekt berechnet (+15 pro Frage statt +10)
+7. Cheat-Sheet-Export auf Slide 05 funktioniert
+8. Mobile: Diagramm auf Slide 03 wechselt zu vertikalem Layout
+
+## 🚀 REIHENFOLGE
+
+1. Branch erstellen, `data.ts` anlegen
+2. Slide 01 Briefing
+3. Slide 02 Links-Übersicht
+4. **Slide 03 Diagramm** – zeitintensiv, hier sorgfältig sein
+5. **Slide 04 Walk-Through** – zeitintensiv, schrittweise Reveal-Mechanik
+6. Slide 05 Walk-Through-Regel + Cheat-Sheet-Export
+7. Slide 06 Inventory-Szenario (Track B+C)
+8. Slide 07 Pro-Tipps
+9. Slides 08–10 Quiz
+10. Slide 11 Retention
+11. `page.tsx` verdrahten, Mobile testen, pushen
+
+Frag mich nach Slide 03 und nach Slide 04 explizit, ob die Darstellung stimmt – das sind die kritischen Slides dieser Lektion.
