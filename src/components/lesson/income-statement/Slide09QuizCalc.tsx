@@ -7,18 +7,14 @@ import LessonLayout from '../LessonLayout';
 import MarcusNote from '../MarcusNote';
 import { playClickSound, playCorrectSound, playWrongSound, playStreakSound } from '@/lib/sounds';
 import { calculateQuizXp } from '@/lib/lesson/xp';
+import { shuffle } from '@/lib/utils/shuffle';
 import { priorStreakFor, type SlideProps } from './types';
 
 const BASE_XP = 10;
 
-const OPTIONS = [
-  { letter: 'A', value: '60%' },
-  { letter: 'B', value: '40%' },
-  { letter: 'C', value: '80%' },
-  { letter: 'D', value: '20%' },
-] as const;
-
-const CORRECT_LETTER = 'B';
+const ANSWER_VALUES = ['60%', '40%', '80%', '20%'] as const;
+const CORRECT_VALUE = '40%';
+const LETTERS = ['A', 'B', 'C', 'D'] as const;
 
 type State = 'idle' | 'submitted-wrong-1' | 'submitted-wrong-2' | 'submitted-correct';
 
@@ -34,6 +30,14 @@ export default function Slide09QuizCalc({
   const [selected, setSelected] = useState<string | null>(null);
   const [state, setState] = useState<State>('idle');
   const [solvedOnAttempt, setSolvedOnAttempt] = useState<1 | 2 | null>(null);
+  // Shuffle answer values once per mount, then assign letters A–D.
+  // The correct letter is whatever position the correct value lands in.
+  const [{ options: OPTIONS, correctLetter: CORRECT_LETTER }] = useState(() => {
+    const shuffled = shuffle(ANSWER_VALUES);
+    const options = shuffled.map((value, i) => ({ letter: LETTERS[i], value }));
+    const correctLetter = options.find((o) => o.value === CORRECT_VALUE)!.letter;
+    return { options, correctLetter };
+  });
 
   const isCorrect = state === 'submitted-correct';
   const isWrongFirst = state === 'submitted-wrong-1';

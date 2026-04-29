@@ -9,6 +9,11 @@ import { TRACKS } from '@/data/tracks';
 import Link from 'next/link';
 import { Lock, Check, Star } from 'lucide-react';
 
+// Dev-mode override: every lesson visible and clickable, regardless of XP
+// thresholds or prerequisite completion. Flip to false before shipping
+// real progression to users.
+const DEV_UNLOCK_ALL = true;
+
 export default function SkillTreePage() {
   const { progress, t } = useStore();
   const activeTrack = getTrackData(progress.selectedTrack || 'ib');
@@ -32,7 +37,7 @@ export default function SkillTreePage() {
           <div className={isPEorVC ? 'blur-[3px] pointer-events-none select-none opacity-45' : ''}>
             <div className="flex flex-col items-center gap-4">
               {activeTrack.units.map((unit, unitIdx) => {
-                const isLocked = progress.xp < unit.requiredXp;
+                const isLocked = !DEV_UNLOCK_ALL && progress.xp < unit.requiredXp;
                 const unitLessons = unit.lessons;
                 const completedInUnit = unitLessons.filter(l => progress.completedLessons.includes(l.id)).length;
                 const allDone = completedInUnit === unitLessons.length && unitLessons.length > 0;
@@ -68,7 +73,7 @@ export default function SkillTreePage() {
                           const isDone = progress.completedLessons.includes(lesson.id);
                           const bestScore = progress.completedQuizzes[lesson.id]?.bestScore;
                           const prevDone = i === 0 || progress.completedLessons.includes(unitLessons[i - 1].id);
-                          const isAvailable = prevDone && !isLocked;
+                          const isAvailable = DEV_UNLOCK_ALL || (prevDone && !isLocked);
 
                           return (
                             <Link
