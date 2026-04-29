@@ -7,6 +7,7 @@ import LessonLayout from '../LessonLayout';
 import LessonFooterCTA from '../LessonFooterCTA';
 import MarcusNote from '../MarcusNote';
 import { playClickSound, playCorrectSound, playWrongSound } from '@/lib/sounds';
+import { shuffle } from '@/lib/utils/shuffle';
 import type { SlideProps } from './types';
 
 type WordChip = { id: string; label: string };
@@ -31,6 +32,8 @@ export default function Slide05FormulaDrill({
   const [slots, setSlots] = useState<(WordChip | null)[]>([null, null, null]);
   const [errorSlot, setErrorSlot] = useState<number | null>(null);
   const didCelebrate = useRef(false);
+  // Randomise pool order once at mount so users can't pattern-match position.
+  const [pool] = useState<WordChip[]>(() => shuffle(INITIAL_POOL));
 
   const isComplete = slots.every((s) => s !== null);
   const isCorrect =
@@ -47,7 +50,7 @@ export default function Slide05FormulaDrill({
     () => new Set(slots.filter((s) => s !== null).map((s) => s!.id)),
     [slots]
   );
-  const availablePool = INITIAL_POOL.filter((w) => !usedIds.has(w.id));
+  const availablePool = pool.filter((w) => !usedIds.has(w.id));
 
   const onPickWord = (word: WordChip) => {
     if (isCorrect) return;

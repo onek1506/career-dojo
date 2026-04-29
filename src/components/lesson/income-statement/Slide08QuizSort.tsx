@@ -7,20 +7,21 @@ import LessonLayout from '../LessonLayout';
 import MarcusNote from '../MarcusNote';
 import { playClickSound, playCorrectSound, playWrongSound, playStreakSound } from '@/lib/sounds';
 import { calculateQuizXp } from '@/lib/lesson/xp';
+import { shuffle } from '@/lib/utils/shuffle';
 import { priorStreakFor, type SlideProps } from './types';
 
 // Slide 08 in the beginner variant: a single multiple-choice question that
 // asks the most important conceptual takeaway from slide 02. The original
 // drag-and-sort with 6 statements proved too hard for fresh beginners
 // who had only seen the order once on slide 03.
-const OPTIONS = [
-  { letter: 'A', value: 'Bilanz' },
-  { letter: 'B', value: 'Gewinn- und Verlustrechnung' },
-  { letter: 'C', value: 'Eigenkapitalveränderungsrechnung' },
-  { letter: 'D', value: 'Kapitalflussrechnung' },
+const ANSWER_VALUES = [
+  'Bilanz',
+  'Gewinn- und Verlustrechnung',
+  'Eigenkapitalveränderungsrechnung',
+  'Kapitalflussrechnung',
 ] as const;
-
-const CORRECT_LETTER = 'B';
+const CORRECT_VALUE = 'Gewinn- und Verlustrechnung';
+const LETTERS = ['A', 'B', 'C', 'D'] as const;
 const BASE_XP = 10;
 
 type State = 'idle' | 'submitted-wrong-1' | 'submitted-wrong-2' | 'submitted-correct';
@@ -37,6 +38,15 @@ export default function Slide08QuizSort({
   const [selected, setSelected] = useState<string | null>(null);
   const [state, setState] = useState<State>('idle');
   const [solvedOnAttempt, setSolvedOnAttempt] = useState<1 | 2 | null>(null);
+  // Shuffle answer values once per mount, then assign letters A–D.
+  // The correct letter is whatever position the correct value lands in,
+  // so users can't memorise "the answer is always B".
+  const [{ options: OPTIONS, correctLetter: CORRECT_LETTER }] = useState(() => {
+    const shuffled = shuffle(ANSWER_VALUES);
+    const options = shuffled.map((value, i) => ({ letter: LETTERS[i], value }));
+    const correctLetter = options.find((o) => o.value === CORRECT_VALUE)!.letter;
+    return { options, correctLetter };
+  });
 
   const isCorrect = state === 'submitted-correct';
   const isWrongFirst = state === 'submitted-wrong-1';
