@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 
 export interface OnboardingLayoutProps {
@@ -20,13 +21,14 @@ export default function OnboardingLayout({
   footer,
   children,
 }: OnboardingLayoutProps) {
+  const router = useRouter();
   return (
     <div
       className="h-screen flex flex-col"
       style={{ background: 'var(--is-bg-primary)', color: 'var(--is-text-primary)' }}
     >
       <header
-        className="flex-shrink-0 h-12 flex items-center justify-between px-4 sm:px-6"
+        className="flex-shrink-0 h-12 relative flex items-center px-4 sm:px-6"
         style={{ background: 'var(--is-bg-primary)' }}
       >
         <div className="min-w-[44px]">
@@ -42,14 +44,19 @@ export default function OnboardingLayout({
           )}
         </div>
 
-        {showProgress ? (
-          <ProgressDots currentStep={currentStep} totalSteps={totalSteps} />
-        ) : (
-          <div />
+        {showProgress && (
+          <div className="absolute left-1/2 -translate-x-1/2">
+            <ProgressDots currentStep={currentStep} totalSteps={totalSteps} />
+          </div>
         )}
 
-        {/* Symmetric spacer to keep dots centred */}
-        <div className="min-w-[44px]" />
+        <button
+          type="button"
+          onClick={() => router.push('/skill-tree')}
+          className="ml-auto font-[family-name:var(--font-is-mono)] text-[11px] sm:text-xs text-is-text-muted hover:text-is-text-primary transition-colors duration-200 px-2 -mr-2 min-h-[44px] flex items-center"
+        >
+          Überspringen
+        </button>
       </header>
 
       <main className="flex-1 overflow-y-auto">

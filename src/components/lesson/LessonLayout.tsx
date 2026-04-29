@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 
 export interface LessonLayoutProps {
@@ -20,6 +21,7 @@ export default function LessonLayout({
   sidePanel,
   children,
 }: LessonLayoutProps) {
+  const router = useRouter();
   const progress = Math.min(100, Math.max(0, (currentStep / totalSteps) * 100));
   const stepCounter = `${String(currentStep).padStart(2, '0')} / ${String(totalSteps).padStart(2, '0')}`;
 
@@ -55,9 +57,18 @@ export default function LessonLayout({
           </div>
         </div>
 
-        <span className="font-[family-name:var(--font-is-mono)] text-[11px] sm:text-xs text-is-text-muted tabular-nums min-w-[44px] text-right">
-          {stepCounter}
-        </span>
+        <div className="flex items-center gap-3 sm:gap-4">
+          <span className="font-[family-name:var(--font-is-mono)] text-[11px] sm:text-xs text-is-text-muted tabular-nums">
+            {stepCounter}
+          </span>
+          <button
+            type="button"
+            onClick={() => router.push('/skill-tree')}
+            className="font-[family-name:var(--font-is-mono)] text-[11px] sm:text-xs text-is-text-muted hover:text-is-text-primary transition-colors duration-200 px-2 -mr-2 min-h-[44px] flex items-center"
+          >
+            Menü
+          </button>
+        </div>
       </header>
 
       {/* Main + optional side panel.
