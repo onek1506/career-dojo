@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
+import { saveProfile } from '@/lib/onboarding/profile';
 
 export interface OnboardingLayoutProps {
   currentStep: number;
@@ -22,6 +23,14 @@ export default function OnboardingLayout({
   children,
 }: OnboardingLayoutProps) {
   const router = useRouter();
+
+  const handleSkip = () => {
+    // Stamp completion so AppShell's redirect-on-incomplete guard lets
+    // the user actually reach /skill-tree instead of bouncing back here.
+    saveProfile({ onboardingCompletedAt: new Date().toISOString() });
+    router.push('/skill-tree');
+  };
+
   return (
     <div
       className="h-screen flex flex-col"
@@ -52,7 +61,7 @@ export default function OnboardingLayout({
 
         <button
           type="button"
-          onClick={() => router.push('/skill-tree')}
+          onClick={handleSkip}
           className="ml-auto font-[family-name:var(--font-is-mono)] text-[11px] sm:text-xs text-is-text-muted hover:text-is-text-primary transition-colors duration-200 px-2 -mr-2 min-h-[44px] flex items-center"
         >
           Überspringen

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useStore } from '@/lib/store';
+import { isOnboardingComplete } from '@/lib/onboarding/profile';
 import TopBar from './TopBar';
 import BottomNav from './BottomNav';
 import StreakReminder from './StreakReminder';
@@ -30,9 +31,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }, [loaded, progress.theme]);
 
   useEffect(() => {
-    if (loaded && !progress.onboardingComplete) {
-      router.push('/onboarding/start');
-    }
+    // Two onboarding stores live in this app: the legacy `useStore.progress`
+    // flag and the newer Marcus-onboarding profile in localStorage. Either
+    // one being "done" should let the user out of the redirect loop.
+    if (!loaded) return;
+    if (progress.onboardingComplete) return;
+    if (isOnboardingComplete()) return;
+    router.push('/onboarding/start');
   }, [loaded, progress.onboardingComplete, router]);
 
   // Show notification banner once daily if not enabled
