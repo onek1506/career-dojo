@@ -86,7 +86,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!progress.onboardingComplete) {
+  // Hide chrome (TopBar + BottomNav) only when onboarding is genuinely
+  // incomplete in BOTH stores. The new Marcus profile store is the source
+  // of truth for the redesigned flow; the legacy progress flag still
+  // covers older sessions. Either one being done means show the chrome.
+  if (!progress.onboardingComplete && !isOnboardingComplete()) {
     return <>{children}</>;
   }
 
