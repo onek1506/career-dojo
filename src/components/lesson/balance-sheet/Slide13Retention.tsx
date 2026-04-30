@@ -7,8 +7,13 @@ import LessonLayout from '../LessonLayout';
 import MarcusNote from '../MarcusNote';
 import { playClickSound, playCompleteSound } from '@/lib/sounds';
 import { formatDuration } from '@/lib/lesson/format';
+import { trackQuizAnswer, trackXpEarned } from '@/lib/stats/stats-utils';
+import { generateTestimonialIfMilestone, saveTestimonial } from '@/lib/profile/testimonials';
+import { getUserState } from '@/lib/home/user-state';
 import { marcusTexts } from './data';
 import type { SlideProps } from './types';
+
+const LESSON_TITLE = 'Balance Sheet';
 
 const NEXT_LESSON = { title: 'Cash Flow Statement', duration: '8 Min', xp: 30, path: '/lesson/cash-flow-statement' };
 
@@ -25,7 +30,15 @@ export default function Slide13Retention({ currentStep, totalSteps, onBack, onNe
 
   useEffect(() => {
     playCompleteSound();
-  }, []);
+    if (!results) return;
+    Object.values(results.quizResults).forEach((r) => {
+      if (r) trackQuizAnswer(LESSON_TITLE, r.correct);
+    });
+    trackXpEarned(LESSON_TITLE, results.totalXp);
+    const state = getUserState();
+    const t = generateTestimonialIfMilestone(state.completedLessons.length, LESSON_TITLE);
+    if (t) saveTestimonial(t);
+  }, [results]);
 
   const handleStartNext = () => {
     playClickSound();

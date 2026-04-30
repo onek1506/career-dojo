@@ -7,8 +7,13 @@ import LessonLayout from '../LessonLayout';
 import MarcusNote from '../MarcusNote';
 import { playClickSound, playCompleteSound } from '@/lib/sounds';
 import { formatDuration } from '@/lib/lesson/format';
+import { trackQuizAnswer, trackXpEarned } from '@/lib/stats/stats-utils';
+import { generateTestimonialIfMilestone, saveTestimonial } from '@/lib/profile/testimonials';
+import { getUserState } from '@/lib/home/user-state';
 import { mockRetentionData } from './mockData';
 import type { SlideProps } from './types';
+
+const LESSON_TITLE = 'Income Statement';
 
 export default function Slide12Retention({
   currentStep,
@@ -32,10 +37,18 @@ export default function Slide12Retention({
   const xpToNext = Math.max(0, level.requiredXp - levelXp);
   const levelProgress = Math.min(100, (levelXp / level.requiredXp) * 100);
 
-  // Play complete sound once on mount
+  // Play complete sound + persist quiz/xp/testimonial stats once.
   useEffect(() => {
     playCompleteSound();
-  }, []);
+    if (!results) return;
+    Object.values(results.quizResults).forEach((r) => {
+      if (r) trackQuizAnswer(LESSON_TITLE, r.correct);
+    });
+    trackXpEarned(LESSON_TITLE, results.totalXp);
+    const state = getUserState();
+    const t = generateTestimonialIfMilestone(state.completedLessons.length, LESSON_TITLE);
+    if (t) saveTestimonial(t);
+  }, [results]);
 
   const handleStartNext = () => {
     playClickSound();
