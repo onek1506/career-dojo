@@ -93,6 +93,10 @@ export default function CashFlowLesson() {
   };
 
   const goBack = () => {
+    if (isLast) {
+      router.push('/home');
+      return;
+    }
     if (currentStep === 0) {
       router.back();
       return;

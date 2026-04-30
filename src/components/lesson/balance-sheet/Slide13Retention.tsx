@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowRight, Trophy } from 'lucide-react';
+import { ArrowRight, Trophy, Home, RotateCcw } from 'lucide-react';
 import LessonLayout from '../LessonLayout';
 import MarcusNote from '../MarcusNote';
 import { playClickSound, playCompleteSound } from '@/lib/sounds';
@@ -18,6 +19,7 @@ const LESSON_TITLE = 'Balance Sheet';
 const NEXT_LESSON = { title: 'Cash Flow Statement', duration: '8 Min', xp: 30, path: '/lesson/cash-flow-statement' };
 
 export default function Slide13Retention({ currentStep, totalSteps, onBack, onNext, results, tone }: SlideProps) {
+  const router = useRouter();
   const accuracy = results?.accuracy ?? 0;
   const elapsed = formatDuration(results?.elapsedSeconds ?? 0);
   const xp = results?.totalXp ?? 0;
@@ -45,6 +47,17 @@ export default function Slide13Retention({ currentStep, totalSteps, onBack, onNe
     onNext();
   };
 
+  const handleRepeat = () => {
+    playClickSound();
+    // Hard reload so the lesson re-mounts with a fresh state machine.
+    if (typeof window !== 'undefined') window.location.reload();
+  };
+
+  const handleGoHome = () => {
+    playClickSound();
+    router.push('/home');
+  };
+
   return (
     <LessonLayout currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} footer={null}>
       <div className="flex flex-col gap-6 sm:gap-8">
@@ -69,7 +82,7 @@ export default function Slide13Retention({ currentStep, totalSteps, onBack, onNe
           />
         </section>
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <ActionCard
             tag="EMPFOHLEN"
             title={`Modul 03 — ${NEXT_LESSON.title}`}
@@ -83,8 +96,17 @@ export default function Slide13Retention({ currentStep, totalSteps, onBack, onNe
             title="Lektion wiederholen"
             subtitle="Bilanz nochmal durchgehen"
             ctaLabel="Wiederholen"
-            onClick={() => onBack()}
-            icon={<Trophy size={14} />}
+            onClick={handleRepeat}
+            icon={<RotateCcw size={14} />}
+          />
+          <ActionCard
+            tag="PAUSE"
+            title="Zurück zum Home"
+            subtitle="Streak gesichert"
+            ctaLabel="Home"
+            onClick={handleGoHome}
+            icon={<Home size={14} />}
+            dimmed
           />
         </section>
       </div>
@@ -144,6 +166,7 @@ function ActionCard({
   subtitle,
   ctaLabel,
   primary,
+  dimmed,
   onClick,
   icon,
 }: {
@@ -152,14 +175,16 @@ function ActionCard({
   subtitle: string;
   ctaLabel: string;
   primary?: boolean;
+  dimmed?: boolean;
   onClick: () => void;
   icon?: React.ReactNode;
 }) {
   return (
     <div
       className={[
-        'flex flex-col gap-3 p-4 rounded-lg bg-is-bg-secondary border',
+        'flex flex-col gap-3 p-4 rounded-lg bg-is-bg-secondary border transition-opacity duration-200',
         primary ? 'border-is-accent' : 'border-is-bg-border',
+        dimmed ? 'opacity-80' : '',
       ].join(' ')}
     >
       {tag && (

@@ -2,7 +2,8 @@
 
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Download, Trophy } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ArrowRight, Download, Trophy, Home } from 'lucide-react';
 import LessonLayout from '../LessonLayout';
 import MarcusNote from '../MarcusNote';
 import { playClickSound, playCompleteSound } from '@/lib/sounds';
@@ -50,9 +51,16 @@ export default function Slide12Retention({
     if (t) saveTestimonial(t);
   }, [results]);
 
+  const router = useRouter();
+
   const handleStartNext = () => {
     playClickSound();
     onNext();
+  };
+
+  const handleGoHome = () => {
+    playClickSound();
+    router.push('/home');
   };
 
   return (
@@ -137,8 +145,8 @@ export default function Slide12Retention({
           />
         </section>
 
-        {/* Section 4: Next Action */}
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {/* Section 4: Next Action — 4 cards (incl. Home as exit) */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <ActionCard
             tag="EMPFOHLEN"
             title={`Modul 02 — ${nextLesson.title}`}
@@ -163,6 +171,15 @@ export default function Slide12Retention({
             ctaLabel="Leaderboard ansehen"
             onClick={() => {}}
             icon={<Trophy size={14} />}
+          />
+          <ActionCard
+            tag="PAUSE"
+            title="Zurück zum Home"
+            subtitle="Streak gesichert"
+            ctaLabel="Home"
+            onClick={handleGoHome}
+            icon={<Home size={14} />}
+            dimmed
           />
         </section>
 
@@ -243,6 +260,7 @@ function ActionCard({
   subtitle,
   ctaLabel,
   primary,
+  dimmed,
   onClick,
   icon,
 }: {
@@ -251,14 +269,16 @@ function ActionCard({
   subtitle: string;
   ctaLabel: string;
   primary?: boolean;
+  dimmed?: boolean;
   onClick: () => void;
   icon?: React.ReactNode;
 }) {
   return (
     <div
       className={[
-        'flex flex-col gap-3 p-4 rounded-lg bg-is-bg-secondary border',
+        'flex flex-col gap-3 p-4 rounded-lg bg-is-bg-secondary border transition-opacity duration-200',
         primary ? 'border-is-accent' : 'border-is-bg-border',
+        dimmed ? 'opacity-80' : '',
       ].join(' ')}
     >
       {tag && (

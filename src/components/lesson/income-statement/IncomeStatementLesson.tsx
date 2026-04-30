@@ -83,6 +83,11 @@ export default function IncomeStatementLesson() {
   };
 
   const goBack = () => {
+    // From the retention hub the lesson is done — exit to /home.
+    if (isRetention) {
+      router.push('/home');
+      return;
+    }
     if (currentStep === 0) {
       router.back();
       return;
