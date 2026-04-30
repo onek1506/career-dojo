@@ -12,7 +12,7 @@ import { quiz2 } from './data';
 import { priorStreakFor, type SlideProps } from './types';
 
 const BASE_XP = 15;
-const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'] as const;
+const LETTERS: string[] = ['A', 'B', 'C', 'D', 'E', 'F'];
 
 type State = 'idle' | 'submitted-wrong-1' | 'submitted-wrong-2' | 'submitted-correct';
 
