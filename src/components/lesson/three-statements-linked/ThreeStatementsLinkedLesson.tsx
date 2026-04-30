@@ -34,7 +34,7 @@ const ALL_SLIDES: ComponentType<SlideProps>[] = [
   Slide11Retention,
 ];
 
-const NEXT_LESSON_PATH = '/skill-tree';
+const NEXT_LESSON_PATH = '/course';
 
 export default function ThreeStatementsLinkedLesson() {
   const router = useRouter();
@@ -94,7 +94,7 @@ export default function ThreeStatementsLinkedLesson() {
 
   const goBack = () => {
     if (isLast) {
-      router.push('/skill-tree');
+      router.push('/course');
       return;
     }
     if (currentStep === 0) {

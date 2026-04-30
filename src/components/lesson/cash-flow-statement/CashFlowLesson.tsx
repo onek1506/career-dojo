@@ -94,7 +94,7 @@ export default function CashFlowLesson() {
 
   const goBack = () => {
     if (isLast) {
-      router.push('/skill-tree');
+      router.push('/course');
       return;
     }
     if (currentStep === 0) {

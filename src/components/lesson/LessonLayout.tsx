@@ -63,7 +63,7 @@ export default function LessonLayout({
           </span>
           <button
             type="button"
-            onClick={() => router.push('/skill-tree')}
+            onClick={() => router.push('/course')}
             className="font-[family-name:var(--font-is-mono)] text-[11px] sm:text-xs text-is-text-muted hover:text-is-text-primary transition-colors duration-200 px-2 -mr-2 min-h-[44px] flex items-center"
           >
             Menü

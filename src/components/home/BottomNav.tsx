@@ -17,7 +17,7 @@ interface TabConfig {
 
 const TABS: TabConfig[] = [
   { id: 'home', label: 'Home', icon: Home, route: '/home' },
-  { id: 'course', label: 'Kurs', icon: BookOpen, route: '/skill-tree', matchPrefixes: ['/course'] },
+  { id: 'course', label: 'Kurs', icon: BookOpen, route: '/course', matchPrefixes: ['/skill-tree'] },
   { id: 'stats', label: 'Statistik', icon: BarChart2, route: '/stats' },
   { id: 'profile', label: 'Profil', icon: User, route: '/profile' },
 ];

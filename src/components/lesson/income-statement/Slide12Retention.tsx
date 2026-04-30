@@ -61,7 +61,7 @@ export default function Slide12Retention({
 
   const handleExit = () => {
     playClickSound();
-    router.push('/skill-tree');
+    router.push('/course');
   };
 
   return (

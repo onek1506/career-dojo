@@ -84,9 +84,9 @@ export default function IncomeStatementLesson() {
   };
 
   const goBack = () => {
-    // From the retention hub the lesson is done — exit to skill tree.
+    // From the retention hub the lesson is done — exit to the course view.
     if (isRetention) {
-      router.push('/skill-tree');
+      router.push('/course');
       return;
     }
     if (currentStep === 0) {

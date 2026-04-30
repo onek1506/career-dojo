@@ -58,7 +58,7 @@ export default function Slide11Retention({ currentStep, totalSteps, onBack, onNe
 
   const handleExit = () => {
     playClickSound();
-    router.push('/skill-tree');
+    router.push('/course');
   };
 
   return (

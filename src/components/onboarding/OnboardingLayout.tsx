@@ -26,9 +26,9 @@ export default function OnboardingLayout({
 
   const handleSkip = () => {
     // Stamp completion so AppShell's redirect-on-incomplete guard lets
-    // the user actually reach /skill-tree instead of bouncing back here.
+    // the user actually reach the course instead of bouncing back here.
     saveProfile({ onboardingCompletedAt: new Date().toISOString() });
-    router.push('/skill-tree');
+    router.push('/course');
   };
 
   return (
