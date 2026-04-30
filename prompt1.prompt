@@ -1,527 +1,445 @@
-# 📚 Lektion 02: Balance Sheet (Bilanz)
+# 🏠 Home-Screen: Das tägliche Cockpit
 
-Du baust die zweite Lektion der Career-Dojo Lern-Webapp für IB-Interview-Vorbereitung. Die Architektur, das Design-System, alle Komponenten und Templates existieren bereits aus Lektion 01 (Income Statement). Du wiederverwendest sie konsequent – keine neue Infrastruktur, nur neue Inhalte.
+Du baust den Home-Screen der Career-Dojo Webapp. Dieser Screen ist das Herzstück der täglichen Nutzung – er hat genau eine Aufgabe: Den User in unter 3 Sekunden zur nächsten Lektion zu bringen.
 
 ## 🌿 GIT-WORKFLOW
 
 ```bash
 git checkout master
 git pull origin master
-git checkout -b feature/lesson-02-balance-sheet
+git checkout -b feature/home-screen
 ```
 
-Commit-Messages:
-- `feat(lesson-02): add balance sheet lesson data and slide content`
-- `feat(lesson-02): implement two-column asset/liability interactive slide`
-- `feat(lesson-02): wire up track-based slide visibility`
-- `feat(lesson-02): add lesson route and register in lesson registry`
+Commits:
+- `feat(home): add home screen layout and next lesson card`
+- `feat(home): add dynamic marcus message system`
+- `feat(home): add streak display and interview countdown`
+- `feat(home): add bottom navigation`
 
-Push nach Abschluss:
-```bash
-git push origin feature/lesson-02-balance-sheet
-```
+Push: `git push origin feature/home-screen`
 
-## 📁 DATEIEN, DIE DU ANLEGST
+## 🛠️ TECH-STACK
+
+- Next.js 14+ App Router, TypeScript, React 18+
+- Tailwind CSS mit bestehendem Design-System
+- Framer Motion für Animationen
+- lucide-react für Icons
+- localStorage für User-Profil (kein Supabase noch)
+
+## 🎨 DESIGN-SYSTEM (unverändert)
+
+Farben: bg-primary (#0A0A0B), bg-secondary (#141416), bg-tertiary (#1C1C1F), bg-border (#2A2A2E), text-primary (#F5F5F0), text-secondary (#A3A3A8), text-muted (#6B6B70), accent (#FF6B00), gold (#D4AF37), success (#00C853), error (#FF3B30)
+
+Fonts: font-serif (Instrument Serif), font-mono (JetBrains Mono), font-sans (Inter)
+
+## 📁 NEUE DATEIEN
 
 ```
 app/
-  lesson/
-    balance-sheet/
-      page.tsx
+  home/
+    page.tsx
+  (root)/
+    page.tsx          // Redirect-Logik (schon vorhanden, ggf. anpassen)
 components/
-  lesson/
-    balance-sheet/
-      Slide01Briefing.tsx
-      Slide02RecapTapReveal.tsx
-      Slide03ThreeSections.tsx
-      Slide04Positions.tsx
-      Slide05EquilibriumExample.tsx
-      Slide06ShareholdersEquity.tsx      // Track B+C only
-      Slide07NegativeEquity.tsx          // Track B+C only
-      Slide08WorkingCapital.tsx
-      Slide09ProTips.tsx
-      Slide10QuizAssets.tsx
-      Slide11QuizCalculation.tsx
-      Slide12Cliffhanger.tsx
-      Slide13Retention.tsx
-      data.ts
+  home/
+    NextLessonCard.tsx
+    StreakBar.tsx
+    InterviewCountdown.tsx
+    MarcusDailyMessage.tsx
+    BottomNav.tsx
+lib/
+  home/
+    marcus-messages.ts
+    lesson-registry.ts
+    user-state.ts
 ```
 
-## 🎨 DESIGN-SYSTEM
+## 📊 USER-STATE LESEN
 
-Identisch zu Lektion 01. Nutze exakt dieselben Tailwind-Tokens:
-- Farben: bg-primary (#0A0A0B), bg-secondary (#141416), accent (#FF6B00), text-primary (#F5F5F0), text-secondary, text-muted, success, error, gold
-- Fonts: font-serif (Headlines), font-mono (Zahlen/Labels), font-sans (Fließtext)
-- Animationen: max. 600ms, ease-out
-
-Marcus-Tonfall in dieser Lektion:
-- **Track A + B:** gentle (ermutigend, erklärend)
-- **Track C:** sharp (knapp, direkt, kein Padding)
-
-## 📊 LEKTIONS-META
+In `lib/home/user-state.ts` – liest das bestehende localStorage-Profil:
 
 ```ts
-// data.ts
-export const lessonMeta = {
-  id: 'acc-2-balance-sheet',
-  title: 'Balance Sheet',
-  titleDe: 'Bilanz',
-  module: 'MODUL 01 · ACCOUNTING',
-  duration: 8,
-  xp: 30,
-  difficulty: 1,
-  prerequisite: 'acc-1-income-statement',
-  trackConfig: {
-    A: { slidesToShow: [1,2,3,4,5,8,9,10,11,12,13], duration: 6 },
-    B: { slidesToShow: [1,2,3,4,5,6,7,8,9,10,11,13], duration: 8 },
-    C: { slidesToShow: [1,3,4,5,6,7,8,9,10,11,13], duration: 6 },
+import { getProfile } from '@/lib/onboarding/profile'
+
+export interface UserState {
+  skillProfile: 'A' | 'B' | 'C' | null
+  streakDays: number
+  lastActiveDate: string | null
+  interviewDate: string | null
+  completedLessons: string[]
+  totalXp: number
+  currentLevel: number
+}
+
+export function getUserState(): UserState {
+  const profile = getProfile()
+  const raw = localStorage.getItem('career_dojo_progress')
+  const progress = raw ? JSON.parse(raw) : {}
+
+  return {
+    skillProfile: profile.skillProfile,
+    streakDays: progress.streakDays ?? 0,
+    lastActiveDate: progress.lastActiveDate ?? null,
+    interviewDate: profile.interviewDate ?? null,
+    completedLessons: progress.completedLessons ?? [],
+    totalXp: progress.totalXp ?? 0,
+    currentLevel: calculateLevel(progress.totalXp ?? 0),
   }
 }
-```
 
-## 📋 SLIDE-INHALTE
+function calculateLevel(xp: number): number {
+  if (xp < 200) return 1
+  if (xp < 500) return 2
+  if (xp < 1000) return 3
+  if (xp < 2000) return 4
+  return 5
+}
 
-### Slide 01 – Briefing
+export function getDaysUntilInterview(interviewDate: string | null): number | null {
+  if (!interviewDate) return null
+  const diff = new Date(interviewDate).getTime() - Date.now()
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
+}
 
-Identische Struktur wie Lektion 01 Slide 01. Nutze die bestehende `Slide01Briefing`-Komponente als Vorlage.
-
-Marcus-Note Body:
-```ts
-const marcusBody = {
-  gentle: 'Die Bilanz zeigt, was eine Firma zu einem bestimmten Moment besitzt und was sie schuldet. Sie ist das Gegenstück zur GuV: keine Geschichte über Zeit – ein Foto an einem Stichtag. Heute lernst du lesen, was drauf ist.',
-  sharp: 'Bilanz. Drei Sektionen, eine Gleichung: Assets = Liabilities + Equity. Wenn die nicht aufgeht, ist entweder das Modell falsch oder du hast einen Fehler. Diese Lektion in 6 Minuten durch.',
+export function getStreakStatus(lastActiveDate: string | null): 'active' | 'at_risk' | 'broken' {
+  if (!lastActiveDate) return 'broken'
+  const daysSince = Math.floor(
+    (Date.now() - new Date(lastActiveDate).getTime()) / (1000 * 60 * 60 * 24)
+  )
+  if (daysSince === 0) return 'active'
+  if (daysSince === 1) return 'at_risk'
+  return 'broken'
 }
 ```
 
-Stat-Card: `DAUER 8 MIN · XP +30 · SCHWIERIG. ★☆☆☆☆`
+## 📚 LESSON REGISTRY
 
-Learning Outcomes:
-- `→ Verstehen, was die Bilanz zeigt (und was nicht)`
-- `→ Die drei Sektionen und wichtigsten Positionen kennen`
-- `→ Warum Assets = Liabilities + Equity immer gilt`
-
-CTA: `Briefing starten →`
-
-### Slide 02 – Recap Tap-to-reveal (Track A + B)
-
-**Wiederverwendet exakt die Tap-to-reveal-Mechanik aus Lektion 01 Slide 02.** Neue Karten:
-
-Aufgabe: `'Tippe den Bericht an, der einen Stichtag zeigt.'`
+In `lib/home/lesson-registry.ts` – definiert alle verfügbaren Lektionen in Reihenfolge:
 
 ```ts
-const cards = [
+export interface LessonEntry {
+  id: string
+  title: string
+  titleDe: string
+  route: string
+  duration: number
+  xp: number
+  module: string
+  trackAvailability: ('A' | 'B' | 'C')[]
+}
+
+export const LESSON_REGISTRY: LessonEntry[] = [
   {
-    id: 'guv',
-    icon: 'Film',
-    title: 'GuV',
-    subtitle: 'Zeitraum · Q1–Q4 2024',
-    isCorrect: false,
+    id: 'acc-1-income-statement',
+    title: 'Income Statement',
+    titleDe: 'Gewinn- und Verlustrechnung',
+    route: '/lesson/income-statement',
+    duration: 6,
+    xp: 25,
+    module: 'MODUL 01 · ACCOUNTING',
+    trackAvailability: ['A', 'B', 'C'],
   },
   {
-    id: 'bilanz',
-    icon: 'Camera',
-    title: 'Bilanz',
-    subtitle: 'Stichtag · 31.12.2024',
-    isCorrect: true,
+    id: 'acc-2-balance-sheet',
+    title: 'Balance Sheet',
+    titleDe: 'Bilanz',
+    route: '/lesson/balance-sheet',
+    duration: 8,
+    xp: 30,
+    module: 'MODUL 01 · ACCOUNTING',
+    trackAvailability: ['A', 'B', 'C'],
   },
+  {
+    id: 'acc-3-cash-flow-statement',
+    title: 'Cash Flow Statement',
+    titleDe: 'Kapitalflussrechnung',
+    route: '/lesson/cash-flow-statement',
+    duration: 8,
+    xp: 30,
+    module: 'MODUL 01 · ACCOUNTING',
+    trackAvailability: ['A', 'B', 'C'],
+  },
+  {
+    id: 'acc-4-three-statements-linked',
+    title: 'Die drei Statements verlinkt',
+    titleDe: 'The 3 Statements – How They Link',
+    route: '/lesson/three-statements-linked',
+    duration: 10,
+    xp: 40,
+    module: 'MODUL 01 · ACCOUNTING',
+    trackAvailability: ['A', 'B', 'C'],
+  },
+  // Weitere Lektionen werden hier ergänzt
+]
+
+export function getNextLesson(
+  completedIds: string[],
+  skillProfile: 'A' | 'B' | 'C' | null
+): LessonEntry | null {
+  const profile = skillProfile ?? 'A'
+  const available = LESSON_REGISTRY.filter(l =>
+    l.trackAvailability.includes(profile)
+  )
+  return available.find(l => !completedIds.includes(l.id)) ?? null
+}
+```
+
+## 🗣️ MARCUS DAILY MESSAGES
+
+In `lib/home/marcus-messages.ts`:
+
+```ts
+type MessageContext = {
+  streakStatus: 'active' | 'at_risk' | 'broken'
+  streakDays: number
+  daysUntilInterview: number | null
+  completedCount: number
+  lastLessonTitle?: string
+}
+
+export function getMarcusDailyMessage(ctx: MessageContext): string {
+  const { streakStatus, streakDays, daysUntilInterview, completedCount, lastLessonTitle } = ctx
+
+  // Kein Interview-Datum gesetzt
+  if (!daysUntilInterview) {
+    if (streakStatus === 'broken' && completedCount > 0) {
+      return `Du warst ${completedCount > 5 ? 'eine Weile' : 'kurz'} weg. Kein Problem – aber setz ein Interview-Datum. Ohne Deadline trainierst du ohne Ziel.`
+    }
+    if (streakDays > 7) {
+      return `${streakDays} Tage Streak ohne Interview-Datum. Gut – aber setz einen Termin, damit das Training Kontext hat.`
+    }
+    return `Fang an. Heute erste Lektion, morgen Streak. Die Frage ist nicht ob du interviewst – sondern wann.`
+  }
+
+  // Interview in Sicht
+  if (daysUntilInterview <= 3) {
+    return `${daysUntilInterview} Tag${daysUntilInterview === 1 ? '' : 'e'} bis zum Interview. Keine neuen Themen mehr. Nur wiederholen, was du kennst.`
+  }
+
+  if (daysUntilInterview <= 14) {
+    return `${daysUntilInterview} Tage. Fokus: Schwachstellen schließen. Kein breites Lernen mehr.`
+  }
+
+  if (streakStatus === 'broken') {
+    return `${daysUntilInterview} Tage bis zum Interview. Streak unterbrochen. Heute wiedereinstieg – morgen läuft er wieder.`
+  }
+
+  if (streakStatus === 'at_risk') {
+    return `Heute noch keine Lektion. ${daysUntilInterview} Tage Zeit. Streak schützen.`
+  }
+
+  if (lastLessonTitle) {
+    return `Gestern: ${lastLessonTitle}. Heute nächster Schritt. ${daysUntilInterview} Tage bis zum Interview – du bist im Plan.`
+  }
+
+  if (streakDays >= 7) {
+    return `${streakDays} Tage Streak. ${daysUntilInterview} Tage bis zum Interview. Weiter.`
+  }
+
+  return `${daysUntilInterview} Tage bis zum Interview. Heute eine Lektion. Das ist alles was zählt.`
+}
+```
+
+## 🏠 HOME PAGE (`app/home/page.tsx`)
+
+```tsx
+'use client'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { getUserState, getDaysUntilInterview, getStreakStatus } from '@/lib/home/user-state'
+import { getNextLesson } from '@/lib/home/lesson-registry'
+import { getMarcusDailyMessage } from '@/lib/home/marcus-messages'
+import { NextLessonCard } from '@/components/home/NextLessonCard'
+import { StreakBar } from '@/components/home/StreakBar'
+import { InterviewCountdown } from '@/components/home/InterviewCountdown'
+import { MarcusDailyMessage } from '@/components/home/MarcusDailyMessage'
+import { BottomNav } from '@/components/home/BottomNav'
+
+export default function HomePage() {
+  const router = useRouter()
+  const [state, setState] = useState<ReturnType<typeof getUserState> | null>(null)
+
+  useEffect(() => {
+    const s = getUserState()
+    setState(s)
+  }, [])
+
+  if (!state) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-bg-primary">
+        <div className="font-mono text-text-muted text-sm">Lade...</div>
+      </div>
+    )
+  }
+
+  const nextLesson = getNextLesson(state.completedLessons, state.skillProfile)
+  const daysUntilInterview = getDaysUntilInterview(state.interviewDate)
+  const streakStatus = getStreakStatus(state.lastActiveDate)
+  const marcusMessage = getMarcusDailyMessage({
+    streakStatus,
+    streakDays: state.streakDays,
+    daysUntilInterview,
+    completedCount: state.completedLessons.length,
+  })
+
+  return (
+    <div className="min-h-screen bg-bg-primary flex flex-col">
+      {/* Content */}
+      <main className="flex-1 overflow-y-auto pb-24">
+        <div className="max-w-2xl mx-auto px-6 pt-12 space-y-6">
+
+          {/* Marcus Daily Message */}
+          <MarcusDailyMessage message={marcusMessage} />
+
+          {/* Next Lesson Card – primäre Action */}
+          {nextLesson ? (
+            <NextLessonCard
+              lesson={nextLesson}
+              onStart={() => router.push(nextLesson.route)}
+            />
+          ) : (
+            <AllLessonsCompleteCard />
+          )}
+
+          {/* Streak */}
+          <StreakBar
+            days={state.streakDays}
+            status={streakStatus}
+            targetDays={30}
+          />
+
+          {/* Interview Countdown */}
+          {daysUntilInterview !== null && (
+            <InterviewCountdown days={daysUntilInterview} />
+          )}
+
+        </div>
+      </main>
+
+      {/* Bottom Navigation */}
+      <BottomNav activeTab="home" />
+    </div>
+  )
+}
+```
+
+## 🃏 KOMPONENTEN
+
+### `NextLessonCard.tsx`
+
+Die wichtigste Komponente der gesamten App. Sie entscheidet über den ersten Klick jeder Session.
+
+```tsx
+// Stil:
+// Container: bg-bg-secondary border border-bg-border rounded-xl p-6
+// Hover: hover:border-accent transition-all duration-200 cursor-pointer
+// Modul-Label: font-mono text-xs text-text-muted uppercase tracking-wider
+// Titel: font-serif text-3xl text-text-primary mt-2
+// Stats-Row: grid grid-cols-3 gap-4 mt-6 pt-5 border-t border-bg-border
+// CTA-Button: bg-accent text-bg-primary font-semibold py-4 rounded-lg mt-4
+```
+
+Inhalt der Stats-Row:
+- `DAUER` / `X MIN` in font-mono
+- `XP` / `+XX` in font-mono text-accent
+- `MODUL` / Kürzel in font-mono
+
+Hover-State: die gesamte Card bekommt einen subtilen Akzent-Border-Glow.
+
+Keine weiteren Elemente – diese Card muss so klar sein, dass man sie im Halbschlaf klicken kann.
+
+### `MarcusDailyMessage.tsx`
+
+```tsx
+// Container: border-l-2 border-accent bg-bg-secondary rounded-r-lg px-4 py-3
+// Label: font-mono text-xs text-text-muted tracking-wider "MARCUS HART"
+// Text: font-serif italic text-text-primary text-base leading-relaxed
+```
+
+Kein Avatar, kein MH-Kreis hier. Nur der Border und der Text. Minimalistisch.
+
+### `StreakBar.tsx`
+
+```tsx
+// Container: bg-bg-secondary border border-bg-border rounded-xl p-5
+// Header-Row: "🔥 STREAK" links in font-mono text-xs text-gold uppercase
+//             "X / 30 Tage" rechts in font-mono text-sm text-text-secondary
+// Progress: 30 kleine Segmente als div-Grid
+//   - Vergangene Tage: bg-gold rounded-sm h-2
+//   - Aktueller Tag (wenn active): bg-gold animate-pulse
+//   - Fehlende Tage: bg-bg-border rounded-sm h-2
+// Footnote (at_risk): font-mono text-xs text-error "Heute noch keine Lektion."
+// Footnote (active): font-mono text-xs text-text-muted "Weiter so."
+// Footnote (broken): font-mono text-xs text-error "Streak unterbrochen. Heute neu starten."
+```
+
+### `InterviewCountdown.tsx`
+
+```tsx
+// Container: bg-bg-secondary border border-bg-border rounded-xl px-5 py-4
+//            flex items-center justify-between
+// Links: font-mono text-xs text-text-muted "NÄCHSTES INTERVIEW"
+// Rechts: font-mono text-3xl text-text-primary "47" + text-text-secondary " Tage"
+// Wenn daysUntilInterview <= 14: Rechts-Zahl in text-error
+// Wenn daysUntilInterview <= 7: Container-Border text-error + border-error
+```
+
+### `BottomNav.tsx`
+
+Vier Tabs: Home, Kurs, Statistik, Profil.
+
+```tsx
+// Container: fixed bottom-0 inset-x-0 bg-bg-primary border-t border-bg-border
+//            safe-area-inset-bottom (für iPhone-Notch)
+// Tab-Grid: grid grid-cols-4
+// Jeder Tab:
+//   - Icon (lucide) 22px
+//   - Label font-mono text-[10px] uppercase tracking-wide mt-1
+//   - Aktiv: text-accent
+//   - Inaktiv: text-text-muted hover:text-text-secondary
+//   - Kein Background-Highlight, kein Pill – nur Farbe
+
+const tabs = [
+  { id: 'home',      label: 'Home',      icon: 'Home',        route: '/home' },
+  { id: 'course',    label: 'Kurs',      icon: 'BookOpen',    route: '/course' },
+  { id: 'stats',     label: 'Statistik', icon: 'BarChart2',   route: '/stats' },
+  { id: 'profile',   label: 'Profil',    icon: 'User',        route: '/profile' },
 ]
 ```
 
-Marcus korrekt: `'Korrekt. Die Bilanz ist immer auf einen Stichtag bezogen. Du wirst in Interviews oft gefragt, ob du den Unterschied kennst – und jetzt weißt du ihn.'`
+## 🔄 ROOT REDIRECT ANPASSEN
 
-Marcus falsch: `'Nochmal: Die GuV ist der Film. Die Bilanz ist das Foto. Das Foto wird zu einem festen Datum aufgenommen – dem Stichtag.'`
+Die bestehende `app/page.tsx` (Root-Redirect) soll nach abgeschlossenem Onboarding zu `/home` statt zu `/lesson/income-statement` weiterleiten:
 
-### Slide 03 – Die drei Sektionen
-
-Visueller Stack aus drei farblich differenzierten Blöcken:
-
-```ts
-export const threeSections = [
-  {
-    id: 'assets',
-    label: 'ASSETS',
-    labelDe: 'Vermögenswerte',
-    tag: 'Was die Firma hat',
-    examples: ['Cash', 'Accounts Receivable', 'Inventory', 'PP&E', 'Goodwill'],
-    color: 'text-text-primary',
-    borderColor: 'border-accent',
-  },
-  {
-    id: 'liabilities',
-    label: 'LIABILITIES',
-    labelDe: 'Verbindlichkeiten',
-    tag: 'Was die Firma schuldet',
-    examples: ['Accounts Payable', 'Accrued Expenses', 'Debt'],
-    color: 'text-error',
-    borderColor: 'border-error',
-  },
-  {
-    id: 'equity',
-    label: "SHAREHOLDERS' EQUITY",
-    labelDe: 'Eigenkapital',
-    tag: 'Was den Aktionären gehört',
-    examples: ['Common Stock', 'Retained Earnings', 'APIC'],
-    color: 'text-success',
-    borderColor: 'border-success',
-  },
-]
-```
-
-Darunter die Gleichung prominent in monospace:
-```
-ASSETS  =  LIABILITIES  +  SHAREHOLDERS' EQUITY
-```
-Das `=`-Zeichen in `text-accent`.
-
-Marcus-Note: `'Diese Gleichung ist unverletzlich. Immer. Wenn du ein Modell baust und sie nicht aufgeht, hast du einen Fehler. Diese einfache Wahrheit prüft jeder Banker täglich.'`
-
-### Slide 04 – Wichtige Positionen (NEUER SLIDE-TYP: Zwei-Spalten-Klickliste)
-
-**Das ist die einzige wirklich neue Interaktions-Mechanik in dieser Lektion.** Baue sie sorgfältig als wiederverwendbares Template.
-
-Layout: Zwei Spalten nebeneinander (`grid grid-cols-1 md:grid-cols-2 gap-6`). Jede Position ist ein klickbarer Button. Bei Klick öffnet sich ein Akkordeon-Panel darunter mit Tooltip-Text.
-
-```ts
-export const balanceSheetPositions = {
-  assets: [
-    {
-      group: 'CURRENT ASSETS',
-      items: [
-        {
-          label: 'Cash',
-          tooltip: 'Bargeld und sofort verfügbare Mittel. Der wichtigste Single-Posten – zeigt die sofortige Liquidität.',
-        },
-        {
-          label: 'Accounts Receivable',
-          tooltip: 'Was Kunden noch schulden. Ware geliefert, Geld noch nicht erhalten. Zu hohes AR kann auf schwache Zahlungsmoral hinweisen.',
-        },
-        {
-          label: 'Inventory',
-          tooltip: 'Vorräte: Rohstoffe, halbfertige und fertige Produkte. Relevant für Produktionsfirmen, irrelevant für Software.',
-        },
-      ],
-    },
-    {
-      group: 'NON-CURRENT ASSETS',
-      items: [
-        {
-          label: 'PP&E',
-          tooltip: 'Plants, Property & Equipment – Maschinen, Gebäude, Fahrzeuge. Wird abgeschrieben (Depreciation), deshalb sinkt PP&E jedes Jahr.',
-        },
-        {
-          label: 'Goodwill',
-          tooltip: 'Entsteht nur bei Übernahmen. Premium, den Käufer über den Buchwert zahlt. Nicht amortisierbar, kann aber impaired werden.',
-        },
-        {
-          label: 'Intangibles',
-          tooltip: 'Marken, Patente, Kundenbeziehungen. Werden amortisiert – ähnlich wie PP&E abgeschrieben, nur für immaterielle Werte.',
-        },
-      ],
-    },
-  ],
-  liabilitiesAndEquity: [
-    {
-      group: 'CURRENT LIABILITIES',
-      items: [
-        {
-          label: 'Accounts Payable',
-          tooltip: 'Was die Firma noch an Lieferanten schuldet. Spiegel von Accounts Receivable – hier ist die Firma der Schuldner.',
-        },
-        {
-          label: 'Accrued Expenses',
-          tooltip: 'Aufgelaufene Kosten – Gehälter, Zinsen, Steuern, die noch nicht bezahlt wurden, aber schon angefallen sind.',
-        },
-        {
-          label: 'Short-Term Debt',
-          tooltip: 'Schulden, die in weniger als 12 Monaten fällig sind. Viel davon ohne ausreichend Cash: kritisches Warnsignal.',
-        },
-      ],
-    },
-    {
-      group: 'LONG-TERM LIABILITIES',
-      items: [
-        {
-          label: 'Long-Term Debt',
-          tooltip: 'Anleihen, Bankdarlehen mit Laufzeit über 1 Jahr. Die größte Verbindlichkeit bei den meisten Unternehmen.',
-        },
-      ],
-    },
-    {
-      group: "SHAREHOLDERS' EQUITY",
-      items: [
-        {
-          label: 'Common Stock',
-          tooltip: 'Nennwert der ausgegebenen Aktien. In der Praxis meist eine sehr kleine Zahl.',
-        },
-        {
-          label: 'Retained Earnings',
-          tooltip: 'Kumulierte einbehaltene Gewinne seit Gründung minus alle Dividenden. Wächst jedes Jahr, wenn die Firma profitabel ist.',
-        },
-        {
-          label: 'Additional Paid-in Capital',
-          tooltip: 'Betrag den Aktionäre über den Nennwert zahlten. Enthält auch Stock-Based Compensation.',
-        },
-      ],
-    },
-  ],
+```tsx
+if (profile?.onboardingCompletedAt) {
+  router.replace('/home')
+} else {
+  router.replace('/onboarding/start')
 }
 ```
-
-Jede Gruppe hat einen Header in `font-mono text-xs text-text-muted uppercase tracking-wider`. Jede Position: `bg-bg-secondary border border-bg-border rounded-lg px-4 py-3 hover:bg-bg-tertiary cursor-pointer font-mono text-sm`. Geklickte Position: `border-accent`.
-
-Marcus-Note (erscheint nach erstem Klick auf irgendeine Position): `'Du musst das nicht alles auswendig kennen. Aber Cash, AR, Inventory, PP&E auf der Asset-Seite und Debt, AP, Retained Earnings auf der anderen – die musst du reflexartig benennen können.'`
-
-### Slide 05 – Gleichgewichts-Logik mit TechCo-Beispiel
-
-Erklärungs-Text:
-> Die Gleichung Assets = Liabilities + Equity ist buchhalterische Logik. Jeder Euro, den eine Firma besitzt, kommt von irgendwoher: entweder von Gläubigern (Liabilities) oder von Aktionären (Equity). Es gibt keine dritte Quelle.
-
-Danach eine TechCo-Bilanz-Card im Bloomberg-Stil mit `font-mono`:
-
-```ts
-export const techcoBilanz = {
-  assets: [
-    { label: 'Cash',              value: 30 },
-    { label: 'Accounts Rec.',     value: 20 },
-    { label: 'Inventory',         value: 10 },
-    { label: 'PP&E',              value: 60 },
-    { label: 'Goodwill',          value: 30 },
-  ],
-  totalAssets: 150,
-  liabilities: [
-    { label: 'Accounts Payable',  value: 20 },
-    { label: 'Long-Term Debt',    value: 50 },
-  ],
-  totalLiabilities: 70,
-  equity: [
-    { label: 'Common Stock',      value: 10 },
-    { label: 'Retained Earnings', value: 70 },
-  ],
-  totalEquity: 80,
-  totalLE: 150,
-}
-```
-
-Layout: Zwei Spalten. Beide enden auf `€150M` – diese Zahl in `text-accent` mit einem `✓` daneben.
-
-Darunter Tap-to-check-Frage:
-- Frage: `'Was sind Retained Earnings?'`
-- Option A: `'Der Gewinn dieses Jahres'` → Falsch. Marcus: `'Nein. Retained Earnings ist kumulativ – alles, was die Firma über die Jahre verdient und NICHT ausgeschüttet hat. Der Gewinn dieses Jahres ist Net Income auf der GuV.'`
-- Option B: `'Kumulierte einbehaltene Gewinne über alle Jahre'` → Richtig. Marcus: `'Genau. Retained Earnings = alle Jahresüberschüsse seit Gründung, minus alle Dividenden. Es wächst jedes Jahr, wenn die Firma profitabel ist.'`
-
-### Slide 06 – Shareholders' Equity im Detail (Track B + C only)
-
-```ts
-export const equityComponents = [
-  {
-    label: 'Common Stock',
-    formula: null,
-    description: 'Nennwert aller ausgegebenen Aktien. In der Praxis oft winzig (z.B. $0,01 per Aktie).',
-  },
-  {
-    label: 'Retained Earnings',
-    formula: 'RE = Vorjahr-RE + Net Income − Dividenden',
-    description: 'Direkte Verbindung zur GuV: Jeder Jahresüberschuss fließt hinein. Jede Dividende fließt heraus.',
-    highlight: true,
-  },
-  {
-    label: 'Additional Paid-In Capital (APIC)',
-    formula: 'APIC = Alter APIC + Stock-Based Comp + Wert neuer Options',
-    description: 'Bei Technologiefirmen oft sehr groß wegen hoher Stock-Based Compensation.',
-  },
-  {
-    label: 'Treasury Stock',
-    formula: null,
-    description: 'Aktien, die die Firma zurückgekauft hat. Reduziert das Eigenkapital.',
-  },
-]
-```
-
-Formeln werden in `font-mono bg-bg-secondary rounded-md px-3 py-2` dargestellt.
-
-Marcus-Note: `'Im Interview reicht es fast immer: Retained Earnings ist der wichtigste Posten im Equity. Er verlinkt Bilanz und GuV. Wenn du das verstehst, verstehst du 80% aller Bilanzfragen.'`
-
-### Slide 07 – Negatives Eigenkapital (Track B + C only)
-
-Frage-Antwort-Format:
-
-**Frage (als Header):** "Kann Shareholders' Equity negativ sein?"
-
-**Antwort:** Ja – in zwei Szenarien:
-
-```ts
-export const negativeEquityScenarios = [
-  {
-    number: '01',
-    title: 'LBO + Dividend Recap',
-    body: 'PE-Fonds hat nach dem Kauf so viel Cash als Dividende herausgezogen, dass das Eigenkapital negativ wurde. Normal im LBO-Kontext.',
-  },
-  {
-    number: '02',
-    title: 'Anhaltende Verluste',
-    body: 'Wenn Retained Earnings durch jahrelange negative Net Incomes immer negativer wird. Kann auf finanzielle Schieflage hinweisen.',
-  },
-]
-```
-
-Marcus-Note (sharp): `'Im Interview: Siehst du negatives Shareholders' Equity, frage zuerst: War da ein LBO? Dann ist es normal. Wenn nicht – dann ist das ein Warnsignal, das du erklären können musst.'`
-
-### Slide 08 – Working Capital
-
-```ts
-export const workingCapital = {
-  formula1: 'Working Capital = Current Assets − Current Liabilities',
-  formula2: 'Operating Working Capital = (Current Assets − Cash) − (Current Liabilities − Debt)',
-  scenarios: [
-    {
-      title: 'Subscriptions / Deferred Revenue',
-      companies: 'Amazon, Netflix',
-      description: 'Sammeln Cash im Voraus, bevor Leistung erbracht wird. Negatives WC = Stärke.',
-      sentiment: 'positive',
-    },
-    {
-      title: 'Retail-Modell',
-      companies: 'Walmart, McDonald\'s',
-      description: 'Kunden zahlen sofort, Lieferanten werden später bezahlt. Zeichen von Verhandlungsmacht.',
-      sentiment: 'positive',
-    },
-    {
-      title: 'Finanzielle Notlage',
-      companies: 'Krisenunternehmen',
-      description: 'Hohe kurzfristige Schulden, kein Cash. Echtes Warnsignal.',
-      sentiment: 'negative',
-    },
-  ],
-}
-```
-
-Scenarios als aufklappbare Mini-Cards. `sentiment: 'positive'` → `border-success/40`, `sentiment: 'negative'` → `border-error/40`.
-
-Marcus-Note: `'Negatives Working Capital ist eine der häufigsten Trick-Fragen. Standardantwort: "Kommt drauf an." Dann die drei Szenarien nennen. Wer einfach sagt "ist schlecht", fliegt raus.'`
-
-### Slide 09 – Pro-Tipps
-
-Identische Carousel-Mechanik wie Lektion 01 Slide 07. Drei Cards:
-
-```ts
-export const proTips = [
-  {
-    tag: 'STRATEGIE',
-    tagColor: 'text-accent',
-    body: 'Wenn ein MD die Bilanz zeigt und fragt "Was fällt dir auf?", geh immer in dieser Reihenfolge: Cash und Debt zuerst (Liquidität), dann Working Capital (Kurzzeit-Gesundheit), dann Retained Earnings (historische Profitabilität).',
-  },
-  {
-    tag: 'WARNUNG',
-    tagColor: 'text-gold',
-    body: 'Verwechsle nie Shareholders\' Equity mit Equity Value. Shareholders\' Equity ist der Buchwert aus der Bilanz. Equity Value ist der Marktwert. Bei gesunden Firmen ist Equity Value fast immer deutlich höher.',
-  },
-  {
-    tag: 'REGEL',
-    tagColor: 'text-success',
-    body: 'Die Bilanz balanciert immer. Wenn dein Modell nicht balanciert, hast du einen Fehler – keine Ausnahme, kein "fast richtig". Das ist die eine absolute Regel in Accounting.',
-  },
-]
-```
-
-### Slide 10 – Quiz Frage 1
-
-```ts
-export const quiz1 = {
-  header: 'Frage 1 / 2 · +10 XP',
-  question: 'Was gehört zu den Current Assets (Umlaufvermögen)?',
-  options: [
-    { id: 'A', label: 'Long-Term Debt', correct: false },
-    { id: 'B', label: 'Accounts Receivable', correct: true },
-    { id: 'C', label: 'Goodwill', correct: false },
-    { id: 'D', label: 'PP&E', correct: false },
-  ],
-  feedback: {
-    correct: {
-      gentle: 'Richtig. Accounts Receivable ist ein Current Asset – wird innerhalb von 12 Monaten zu Cash. Long-Term Debt ist eine Liability, Goodwill und PP&E sind Non-Current Assets.',
-      sharp: 'Korrekt. AR = Current Asset. Goodwill und PP&E = Non-Current. Diese Klassifikation musst du blind abrufen können.',
-    },
-    wrong: 'Nicht ganz. Long-Term Debt ist eine Liability. Goodwill und PP&E sind Assets, aber Non-Current. Accounts Receivable ist das einzige Current Asset hier.',
-    hint: 'Current = innerhalb von 12 Monaten zu Cash konvertierbar oder fällig.',
-  },
-}
-```
-
-### Slide 11 – Quiz Frage 2
-
-```ts
-export const quiz2 = {
-  header: 'Frage 2 / 2 · +10 XP',
-  question: 'TechCo hat Total Assets von €150M und Total Liabilities von €70M. Wie hoch ist das Shareholders\' Equity?',
-  options: [
-    { id: 'A', label: '€220M', correct: false },
-    { id: 'B', label: '€70M', correct: false },
-    { id: 'C', label: '€80M', correct: true },
-    { id: 'D', label: '€150M', correct: false },
-  ],
-  workingOut: 'Assets = Liabilities + Equity → €150M = €70M + Equity → Equity = €80M',
-  feedback: {
-    correct: 'Genau. Assets = Liabilities + Equity, umgeformt: Equity = Assets − Liabilities = €150M − €70M = €80M.',
-    wrong: 'Denk an die Gleichung: Assets = Liabilities + Equity → Equity = Assets − Liabilities = €150M − €70M = €80M.',
-  },
-}
-```
-
-### Slide 12 – Cliffhanger (Track A only, andere Tracks überspringen)
-
-Titel: `'Da war noch etwas: PP&E und Depreciation.'`
-Subline: `'Den hast du in der Bilanz gesehen. Hier ein Vorgeschmack.'`
-
-Erklärungs-Card:
-> PP&E sinkt jedes Jahr durch Abschreibungen (Depreciation). Das erscheint nicht nur in der Bilanz, sondern auch in der GuV als Aufwand und im Cash Flow Statement als non-cash Add-back. Das ist der erste direkte Link zwischen den drei Berichten.
-
-Marcus: `'PP&E und Depreciation sind der Dreh- und Angelpunkt zwischen Bilanz, GuV und Cash Flow. Wenn du das einmal wirklich verstehst, macht alles andere Sinn. Lektion 3 und 4 widmen sich genau diesem Link.'`
-
-### Slide 13 – Retention Hub
-
-Identische Struktur wie Lektion 01. Quiz-Ergebnis: 2/2.
-
-Marcus-Email Body:
-```ts
-const marcusEmail = {
-  subject: 'Re: Lektion 2 abgeschlossen',
-  gentle: 'Gut gemacht. Du verstehst jetzt den Aufbau der Bilanz – Assets, Liabilities, Equity – und weißt, warum sie immer balancieren muss. In Lektion 3 schauen wir uns das Cash Flow Statement an – den einzigen Bericht, den du auf einer einsamen Insel bräuchtest.',
-  sharp: 'Bilanz sitzt. In Lektion 3 kommt das Cash Flow Statement – das ehrlichste der drei Statements. Die Desert-Island-Frage dazu lernst du dann.',
-}
-```
-
-Next Lesson: `{ title: 'Cash Flow Statement', duration: 8, xp: 30 }`
 
 ## ✅ AKZEPTANZKRITERIEN
 
-1. Route `/lesson/balance-sheet` lädt korrekt
-2. Track-Routing funktioniert: Track A sieht 9 Slides, B sieht 12, C sieht 11
-3. Slide 04 (Zwei-Spalten-Klickliste) öffnet Tooltips korrekt per Tap/Click
-4. Quiz 1 + 2 funktionieren mit Streak-Logik (nur First-Try)
-5. TechCo-Bilanz auf Slide 05 balanciert visuell (beide Seiten zeigen €150M)
-6. Lesson-Duration-Tracking läuft von Slide 1 bis Retention-Hub
-7. Alle Farben und Fonts aus dem Design-System, keine neuen Töne eingeführt
-8. Mobile (375px): alle Slides ohne horizontalen Scroll nutzbar
-9. Slide 04 auf Mobile: Zwei-Spalten-Grid wird zu einer Spalte (`grid-cols-1`)
+1. `/home` lädt mit korrekten User-State-Daten aus localStorage
+2. NextLessonCard zeigt die nächste nicht-abgeschlossene Lektion für den User-Track
+3. Marcus-Message ist situativ (verschieden bei Streak-Break vs. aktivem Streak vs. nahem Interview)
+4. StreakBar zeigt 30 Segmente, Farbe korrekt nach Status
+5. InterviewCountdown erscheint nur wenn Datum vorhanden, Farbe ändert sich bei < 14 Tage
+6. BottomNav ist fixed und überdeckt keinen Content (pb-24 auf main)
+7. Mobile (375px): alle Elemente korrekt dargestellt
+8. Root-Redirect führt nach Onboarding zu `/home`
 
 ## 🚀 REIHENFOLGE
 
-1. Branch erstellen
-2. `data.ts` mit allen obigen Daten anlegen
-3. `Slide01Briefing.tsx` (Copy von Lektion 01, neue Daten)
-4. `Slide02RecapTapReveal.tsx` (Copy von Lektion 01 Slide02, neue Karten)
-5. `Slide03ThreeSections.tsx`
-6. `Slide04Positions.tsx` (neuer Typ – hier Zeit lassen)
-7. `Slide05EquilibriumExample.tsx`
-8. `Slide06ShareholdersEquity.tsx`
-9. `Slide07NegativeEquity.tsx`
-10. `Slide08WorkingCapital.tsx`
-11. `Slide09ProTips.tsx` (Copy von Lektion 01 Slide07, neue Daten)
-12. `Slide10QuizAssets.tsx` + `Slide11QuizCalculation.tsx`
-13. `Slide12Cliffhanger.tsx`
-14. `Slide13Retention.tsx`
-15. `page.tsx` mit Track-Routing verdrahten
-16. Mobile testen, pushen
+1. Branch + `lib/home/` Dateien (user-state, lesson-registry, marcus-messages)
+2. `BottomNav.tsx` (zuerst, weil alle anderen Pages sie brauchen)
+3. `MarcusDailyMessage.tsx`
+4. `NextLessonCard.tsx`
+5. `StreakBar.tsx`
+6. `InterviewCountdown.tsx`
+7. `app/home/page.tsx` zusammenbauen
+8. Root-Redirect anpassen
+9. Mobile testen, pushen
 
-Frag mich nach jedem Slide, ob ich Änderungen will.
-
-Los geht's mit Schritt 1.
+Frag mich nach NextLessonCard und nach der Page-Komposition.

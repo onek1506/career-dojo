@@ -30,6 +30,9 @@ export interface UserProfile {
   skillProfile: SkillProfile | null;
   learningTime: LearningTime | null;
   streakStarted: string | null;
+  // ISO date set in the profile screen — drives the home-screen marcus
+  // message and the interview countdown.
+  interviewDate: string | null;
   onboardingCompletedAt: string | null;
 }
 
@@ -45,6 +48,7 @@ export function getEmptyProfile(): UserProfile {
     skillProfile: null,
     learningTime: null,
     streakStarted: null,
+    interviewDate: null,
     onboardingCompletedAt: null,
   };
 }

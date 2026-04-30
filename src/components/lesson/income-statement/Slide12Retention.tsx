@@ -2,13 +2,19 @@
 
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Download, Trophy } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ArrowRight, Download, Trophy, X } from 'lucide-react';
 import LessonLayout from '../LessonLayout';
 import MarcusNote from '../MarcusNote';
 import { playClickSound, playCompleteSound } from '@/lib/sounds';
 import { formatDuration } from '@/lib/lesson/format';
+import { trackQuizAnswer, trackXpEarned } from '@/lib/stats/stats-utils';
+import { generateTestimonialIfMilestone, saveTestimonial } from '@/lib/profile/testimonials';
+import { getUserState } from '@/lib/home/user-state';
 import { mockRetentionData } from './mockData';
 import type { SlideProps } from './types';
+
+const LESSON_TITLE = 'Income Statement';
 
 export default function Slide12Retention({
   currentStep,
@@ -33,14 +39,29 @@ export default function Slide12Retention({
   const xpToNext = Math.max(0, level.requiredXp - levelXp);
   const levelProgress = Math.min(100, (levelXp / level.requiredXp) * 100);
 
-  // Play complete sound once on mount
+  // Play complete sound + persist quiz/xp/testimonial stats once.
   useEffect(() => {
     playCompleteSound();
-  }, []);
+    if (!results) return;
+    Object.values(results.quizResults).forEach((r) => {
+      if (r) trackQuizAnswer(LESSON_TITLE, r.correct);
+    });
+    trackXpEarned(LESSON_TITLE, results.totalXp);
+    const state = getUserState();
+    const t = generateTestimonialIfMilestone(state.completedLessons.length, LESSON_TITLE);
+    if (t) saveTestimonial(t);
+  }, [results]);
+
+  const router = useRouter();
 
   const handleStartNext = () => {
     playClickSound();
     onNext();
+  };
+
+  const handleExit = () => {
+    playClickSound();
+    router.push('/skill-tree');
   };
 
   return (
@@ -125,8 +146,8 @@ export default function Slide12Retention({
           />
         </section>
 
-        {/* Section 4: Next Action */}
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {/* Section 4: Next Action — 4 cards (incl. Exit) */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <ActionCard
             tag="EMPFOHLEN"
             title={`Modul 02 — ${nextLesson.title}`}
@@ -151,6 +172,15 @@ export default function Slide12Retention({
             ctaLabel="Leaderboard ansehen"
             onClick={() => {}}
             icon={<Trophy size={14} />}
+          />
+          <ActionCard
+            tag="PAUSE"
+            title="Lektion beenden"
+            subtitle="Streak gesichert"
+            ctaLabel="Beenden"
+            onClick={handleExit}
+            icon={<X size={14} />}
+            dimmed
           />
         </section>
 
@@ -231,6 +261,7 @@ function ActionCard({
   subtitle,
   ctaLabel,
   primary,
+  dimmed,
   onClick,
   icon,
 }: {
@@ -239,14 +270,16 @@ function ActionCard({
   subtitle: string;
   ctaLabel: string;
   primary?: boolean;
+  dimmed?: boolean;
   onClick: () => void;
   icon?: React.ReactNode;
 }) {
   return (
     <div
       className={[
-        'flex flex-col gap-3 p-4 rounded-lg bg-is-bg-secondary border',
+        'flex flex-col gap-3 p-4 rounded-lg bg-is-bg-secondary border transition-opacity duration-200',
         primary ? 'border-is-accent' : 'border-is-bg-border',
+        dimmed ? 'opacity-80' : '',
       ].join(' ')}
     >
       {tag && (

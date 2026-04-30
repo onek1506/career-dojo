@@ -1,0 +1,340 @@
+# 👤 Profil-Screen: Identität, nicht Settings
+
+Du baust den Profil-Screen. Er ist kein Settings-Menü. Er ist der Ort, wo der User seine eigene Entwicklung als Karriere-Narrativ sieht. Drei Kernbereiche: Identität oben, Marcus-Zeugnisse mitte, Interview-Datum und Einstellungen unten.
+
+## 🌿 GIT-WORKFLOW
+
+```bash
+git checkout master
+git pull origin master
+git checkout -b feature/profile-screen
+```
+
+Commits:
+- `feat(profile): add profile screen layout and identity header`
+- `feat(profile): add marcus testimonials system`
+- `feat(profile): add interview date editor`
+- `feat(profile): add settings section`
+
+Push: `git push origin feature/profile-screen`
+
+## 📁 NEUE DATEIEN
+
+```
+app/
+  profile/
+    page.tsx
+components/
+  profile/
+    IdentityHeader.tsx
+    MarcusTestimonials.tsx
+    InterviewDateEditor.tsx
+    SettingsSection.tsx
+lib/
+  profile/
+    testimonials.ts
+```
+
+## 🗣️ MARCUS-ZEUGNISSE
+
+In `lib/profile/testimonials.ts`:
+
+```ts
+import { getUserState } from '@/lib/home/user-state'
+import { LESSON_REGISTRY } from '@/lib/home/lesson-registry'
+
+export interface MarcusTestimonial {
+  date: string
+  completedLesson: string
+  text: string
+  milestone: number  // nach wie vielen Lektionen
+}
+
+// Generiert automatisch nach Lektion X ein Zeugnis
+const TESTIMONIAL_TEMPLATES: Record<number, (lastLesson: string) => string> = {
+  1: (lesson) =>
+    `Erste Lektion durch: ${lesson}. Das war der härteste Schritt – anzufangen. Jetzt weißt du, wie diese App funktioniert. In 3 Lektionen sehen wir, ob du dabei bleibst.`,
+  3: (lesson) =>
+    `3 Lektionen abgeschlossen. ${lesson} war die letzte. Accounting-Basis ist da. Jetzt entscheidet sich, ob du die Disziplin hast, die Valuation-Lektionen durchzuziehen.`,
+  5: (lesson) =>
+    `5 Lektionen. Die meisten hören hier auf – zu viel Aufwand, zu wenig Fortschritt. Du nicht. Das wird sich auszahlen.`,
+  8: () =>
+    `Accounting-Block abgeschlossen. Das ist die Grundlage für alles andere. DCF, M&A, LBO – ohne das hier geht nichts. Ab jetzt wird es interessanter.`,
+  12: () =>
+    `Valuation-Block läuft. Du weißt jetzt, warum Precedent Transactions höher sind als Comps und wann man keinen DCF macht. 70% der Bewerber können das nicht erklären.`,
+  16: () =>
+    `M&A-Grundlagen sitzen. Accretion/Dilution, Synergien, Goodwill. Wenn jemand im Interview fragt "walk me through a merger model" – du kannst antworten. Die meisten können das nicht.`,
+  20: () =>
+    `LBO-Grundlagen dabei. Du bist jetzt in einem Bereich, den die meisten Spring-Week-Bewerber nie erreichen. Das ist dein Vorsprung.`,
+}
+
+export function generateTestimonialIfMilestone(
+  completedCount: number,
+  lastLessonTitle: string
+): MarcusTestimonial | null {
+  const template = TESTIMONIAL_TEMPLATES[completedCount]
+  if (!template) return null
+
+  return {
+    date: new Date().toISOString(),
+    completedLesson: lastLessonTitle,
+    text: template(lastLessonTitle),
+    milestone: completedCount,
+  }
+}
+
+export function getStoredTestimonials(): MarcusTestimonial[] {
+  if (typeof window === 'undefined') return []
+  const raw = localStorage.getItem('career_dojo_testimonials')
+  return raw ? JSON.parse(raw) : []
+}
+
+export function saveTestimonial(t: MarcusTestimonial): void {
+  const existing = getStoredTestimonials()
+  const updated = [...existing, t]
+  localStorage.setItem('career_dojo_testimonials', JSON.stringify(updated))
+}
+```
+
+**Integration:** Im Retention-Hub jeder Lektion nach `completeLesson()`-Aufruf:
+
+```ts
+import { generateTestimonialIfMilestone, saveTestimonial } from '@/lib/profile/testimonials'
+
+const newCount = completedLessons.length + 1
+const t = generateTestimonialIfMilestone(newCount, lessonTitle)
+if (t) saveTestimonial(t)
+```
+
+## 🖥️ PROFILE PAGE (`app/profile/page.tsx`)
+
+```tsx
+'use client'
+import { useEffect, useState } from 'react'
+import { getUserState } from '@/lib/home/user-state'
+import { getStoredTestimonials } from '@/lib/profile/testimonials'
+import { LEVEL_LABELS } from '@/lib/stats/stats-utils'
+import { IdentityHeader } from '@/components/profile/IdentityHeader'
+import { MarcusTestimonials } from '@/components/profile/MarcusTestimonials'
+import { InterviewDateEditor } from '@/components/profile/InterviewDateEditor'
+import { SettingsSection } from '@/components/profile/SettingsSection'
+import { BottomNav } from '@/components/home/BottomNav'
+
+export default function ProfilePage() {
+  const [state, setState] = useState<ReturnType<typeof getUserState> | null>(null)
+  const [testimonials, setTestimonials] = useState<ReturnType<typeof getStoredTestimonials>>([])
+
+  useEffect(() => {
+    setState(getUserState())
+    setTestimonials(getStoredTestimonials())
+  }, [])
+
+  if (!state) return <LoadingScreen />
+
+  const levelInfo = LEVEL_LABELS[state.currentLevel]
+
+  return (
+    <div className="min-h-screen bg-bg-primary flex flex-col">
+      <main className="flex-1 overflow-y-auto pb-24">
+        <div className="max-w-2xl mx-auto px-6 pt-10 space-y-8">
+
+          <IdentityHeader
+            statusTitle={levelInfo.title}
+            streakDays={state.streakDays}
+            totalXp={state.totalXp}
+            completedLessons={state.completedLessons.length}
+          />
+
+          <MarcusTestimonials testimonials={testimonials} />
+
+          <InterviewDateEditor
+            currentDate={state.interviewDate}
+            onSave={(date) => {
+              // Speichert in localStorage-Profil
+              const profile = getProfile()
+              saveProfile({ ...profile, interviewDate: date })
+              setState(prev => prev ? { ...prev, interviewDate: date } : prev)
+            }}
+          />
+
+          <SettingsSection />
+
+        </div>
+      </main>
+      <BottomNav activeTab="profile" />
+    </div>
+  )
+}
+```
+
+## 🃏 KOMPONENTEN
+
+### `IdentityHeader.tsx`
+
+```tsx
+// Container: kein Border, kein Background – direkt auf Page-Background
+
+// Status-Zeile oben:
+//   "ANALYST IN TRAINING · WOCHE X VON 12"
+//   font-mono text-xs text-text-muted uppercase tracking-wider
+//   Woche berechnen: Math.ceil(completedLessons / 3) (ca.)
+
+// Hauptstatus:
+//   font-serif text-5xl text-text-primary
+//   z.B. "Analyst in Training"
+
+// Drei Kern-Zahlen (grid grid-cols-3, mt-8):
+//   Jede Zelle:
+//     Wert: font-mono text-3xl text-text-primary
+//     Label: font-mono text-[10px] text-text-muted uppercase tracking-widest mt-1
+//
+//   Werte:
+//     - Streak: "{streakDays}" + label "STREAK"
+//     - XP: "{totalXp}" + label "GESAMT XP"
+//     - Lektionen: "{completedLessons}" + label "LEKTIONEN"
+//
+//   Streak-Wert in text-gold wenn >= 7 Tage
+//   Streak-Wert in text-error wenn 0
+
+// Dünne horizontale Linie (border-t border-bg-border) darunter
+```
+
+### `MarcusTestimonials.tsx`
+
+```tsx
+// Header-Row:
+//   Links: "MARCUS HART ÜBER DICH" font-mono text-xs text-text-muted uppercase
+//   Rechts: Anzahl in mono text-xs text-text-muted
+
+// Wenn keine Testimonials:
+//   Leerer Zustand in bg-bg-secondary rounded-xl p-5:
+//   "Schließe 1 Lektion ab. Marcus schreibt seine erste Einschätzung."
+//   font-sans text-sm text-text-muted italic
+
+// Wenn Testimonials vorhanden:
+//   Jedes Testimonial als Card:
+//     Container: bg-bg-secondary border-l-2 border-accent rounded-r-xl p-5 mb-4
+//     Datum + Milestone oben: font-mono text-xs text-text-muted
+//       z.B. "Nach Lektion 3 · 12. März 2025"
+//     Text: font-serif italic text-text-primary leading-relaxed
+//     Unten: "— Marcus Hart, Senior Coach" font-mono text-xs text-text-muted
+
+// Älteste Testimonials unten, neuestes oben (reverse chronological)
+// Maximal 5 anzeigen, Rest hinter "Alle anzeigen" (optional)
+```
+
+### `InterviewDateEditor.tsx`
+
+```tsx
+// Container: bg-bg-secondary border border-bg-border rounded-xl p-5
+
+// Wenn kein Datum gesetzt:
+//   Header: "INTERVIEW-DATUM" font-mono text-xs text-text-muted uppercase
+//   Subtext: "Setz ein Datum. Marcus passt seinen Ton an." font-sans text-sm text-text-secondary
+//   Button: "Datum setzen" bg-bg-tertiary border border-bg-border rounded-lg px-4 py-2
+//           font-mono text-sm text-text-primary
+
+// Wenn Datum gesetzt:
+//   Header: "INTERVIEW-DATUM" font-mono text-xs text-text-muted uppercase
+//   Datum groß: font-mono text-2xl text-text-primary z.B. "14. März 2025"
+//   Tage darunter: font-mono text-sm text-text-secondary "In X Tagen"
+//   Kleiner "Ändern"-Link rechts: font-mono text-xs text-text-muted underline
+
+// Edit-State: HTML date input (gut genug für v1)
+//   Stil: bg-bg-tertiary border border-bg-border rounded-lg px-3 py-2
+//         font-mono text-sm text-text-primary
+//         color-scheme: dark
+//   Speichern-Button: bg-accent text-bg-primary px-4 py-2 rounded-lg font-mono text-sm
+```
+
+### `SettingsSection.tsx`
+
+```tsx
+// Container: bg-bg-secondary border border-bg-border rounded-xl overflow-hidden
+// Header: "EINSTELLUNGEN" font-mono text-xs text-text-muted uppercase px-5 pt-4 pb-2
+
+// Jede Setting-Row:
+//   Container: flex items-center justify-between px-5 py-4 border-t border-bg-border
+//   Label: font-sans text-sm text-text-primary
+//   Rechts: Toggle oder Link
+
+const settings = [
+  {
+    id: 'notifications',
+    label: 'Push-Benachrichtigungen',
+    type: 'toggle',
+    description: 'Tägliche Erinnerung zur gewählten Lernzeit',
+  },
+  {
+    id: 'learning-time',
+    label: 'Lernzeit',
+    type: 'value',
+    getValue: () => {
+      // Aus Onboarding-Profil lesen
+      const profile = getProfile()
+      const map = {
+        morning: 'Morgens 7–9 Uhr',
+        lunch: 'Mittags 12–13 Uhr',
+        evening: 'Abends 20–22 Uhr',
+        flexible: 'Flexibel',
+      }
+      return map[profile.learningTime ?? 'flexible']
+    },
+  },
+  {
+    id: 'track',
+    label: 'Lern-Track',
+    type: 'value',
+    getValue: () => {
+      const profile = getProfile()
+      const map = { A: 'Entdecker', B: 'Einsteiger', C: 'Profi-Drill' }
+      return map[profile.skillProfile ?? 'A']
+    },
+  },
+  {
+    id: 'reset',
+    label: 'Fortschritt zurücksetzen',
+    type: 'danger-link',
+    description: 'Alle Lektionen und XP löschen',
+  },
+]
+
+// Toggle: ein einfacher HTML-Checkbox-ähnlicher Toggle
+//   Aktiv: bg-accent
+//   Inaktiv: bg-bg-border
+//   Kein komplexes Custom-Toggle nötig
+
+// Danger-Link:
+//   Text: text-error font-sans text-sm
+//   Klick: Confirm-Dialog ("Wirklich alles zurücksetzen?"), dann localStorage leeren
+```
+
+## 💾 PERSISTIERUNG
+
+Wenn der User das Interview-Datum ändert oder Einstellungen anpasst, wird das bestehende `career_dojo_profile`-Objekt in localStorage aktualisiert (via `saveProfile()`).
+
+Für Push-Notifications: Nutze `usePushPermission`-Hook aus Prompt Onboarding. Toggle schaltet Permission an/aus.
+
+## ✅ AKZEPTANZKRITERIEN
+
+1. `/profile` lädt mit korrekten User-Daten
+2. IdentityHeader zeigt IB-Sprach-Status (nicht "Level 1")
+3. MarcusTestimonials: leer wenn keine Meilensteine erreicht, gefüllt danach
+4. Testimoniale werden im Retention-Hub nach Meilensteinen generiert und gespeichert
+5. InterviewDateEditor: Datum setzbar und änderbar, Änderung persistiert in localStorage
+6. Lernzeit und Track aus Onboarding korrekt angezeigt
+7. Reset funktioniert mit Confirm-Dialog
+8. Mobile korrekt
+
+## 🚀 REIHENFOLGE
+
+1. Branch + `lib/profile/testimonials.ts`
+2. Testimonial-Generierung in Retention-Hub aller Lektionen (01–04) einbauen
+3. `IdentityHeader.tsx`
+4. `MarcusTestimonials.tsx`
+5. `InterviewDateEditor.tsx`
+6. `SettingsSection.tsx`
+7. `app/profile/page.tsx`
+8. Testen, pushen
+
+Frag mich nach MarcusTestimonials und nach InterviewDateEditor.

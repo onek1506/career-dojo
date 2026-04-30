@@ -93,6 +93,10 @@ export default function CashFlowLesson() {
   };
 
   const goBack = () => {
+    if (isLast) {
+      router.push('/skill-tree');
+      return;
+    }
     if (currentStep === 0) {
       router.back();
       return;

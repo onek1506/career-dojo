@@ -1,359 +1,226 @@
-# 📚 Lektion 03: Cash Flow Statement
+# 📚 Kurs-Screen: Der strukturierte Lernpfad
 
-Du baust die dritte Lektion der Career-Dojo Webapp. Alle Architektur, Design-System und Slide-Templates existieren. Du wiederverwendest konsequent.
+Du baust den Kurs-Screen. Er zeigt den gesamten Lernpfad als visuell ansprechende, nach Modulen geordnete Übersicht. Jede Lektion ist als Card dargestellt: abgeschlossen, aktiv oder gesperrt.
 
 ## 🌿 GIT-WORKFLOW
 
 ```bash
 git checkout master
 git pull origin master
-git checkout -b feature/lesson-03-cash-flow-statement
+git checkout -b feature/course-screen
 ```
 
-Commit-Messages:
-- `feat(lesson-03): add cash flow statement lesson data`
-- `feat(lesson-03): implement three-section CFS interactive slide`
-- `feat(lesson-03): implement desert island scenario slide`
-- `feat(lesson-03): add lesson route and register`
+Commits:
+- `feat(course): add course screen with module grouping`
+- `feat(course): implement lesson card states (done/active/locked)`
+- `feat(course): add module progress visualization`
 
-Push: `git push origin feature/lesson-03-cash-flow-statement`
+Push: `git push origin feature/course-screen`
 
-## 📁 DATEIEN
+## 📁 NEUE DATEIEN
 
 ```
 app/
-  lesson/
-    cash-flow-statement/
-      page.tsx
+  course/
+    page.tsx
 components/
-  lesson/
-    cash-flow-statement/
-      Slide01Briefing.tsx
-      Slide02WhatIsCFS.tsx
-      Slide03ThreeSections.tsx
-      Slide04DepreciationPuzzle.tsx
-      Slide05DesertIsland.tsx
-      Slide06NonCashItems.tsx            // Track B+C only
-      Slide07ProTips.tsx
-      Slide08QuizSection.tsx
-      Slide09QuizDepreciation.tsx
-      Slide10Cliffhanger.tsx
-      Slide11Retention.tsx
-      data.ts
+  course/
+    ModuleSection.tsx
+    LessonCard.tsx
+    ModuleProgressBar.tsx
 ```
 
-## 📊 LEKTIONS-META
+## 📊 DATEN
+
+Nutze `LESSON_REGISTRY` aus `lib/home/lesson-registry.ts` (Prompt 1). Grupiere Lektionen nach `module`-Feld:
 
 ```ts
-export const lessonMeta = {
-  id: 'acc-3-cash-flow-statement',
-  title: 'Cash Flow Statement',
-  titleDe: 'Kapitalflussrechnung',
-  module: 'MODUL 01 · ACCOUNTING',
-  duration: 8,
-  xp: 30,
-  difficulty: 2,
-  prerequisite: 'acc-2-balance-sheet',
-  trackConfig: {
-    A: { slidesToShow: [1,2,3,4,5,7,8,9,10,11], duration: 6 },
-    B: { slidesToShow: [1,2,3,4,5,6,7,8,9,11], duration: 8 },
-    C: { slidesToShow: [1,3,4,5,6,7,8,9,11], duration: 6 },
+// lib/course/course-utils.ts
+
+import { LESSON_REGISTRY, LessonEntry } from '@/lib/home/lesson-registry'
+
+export interface ModuleGroup {
+  moduleId: string
+  moduleLabel: string
+  lessons: LessonEntry[]
+  completedCount: number
+  totalCount: number
+}
+
+export function groupLessonsByModule(
+  completedIds: string[],
+  skillProfile: 'A' | 'B' | 'C' | null
+): ModuleGroup[] {
+  const profile = skillProfile ?? 'A'
+  const available = LESSON_REGISTRY.filter(l =>
+    l.trackAvailability.includes(profile)
+  )
+
+  const moduleMap = new Map<string, LessonEntry[]>()
+  for (const lesson of available) {
+    const existing = moduleMap.get(lesson.module) ?? []
+    moduleMap.set(lesson.module, [...existing, lesson])
   }
+
+  return Array.from(moduleMap.entries()).map(([moduleLabel, lessons]) => ({
+    moduleId: moduleLabel.toLowerCase().replace(/\s/g, '-'),
+    moduleLabel,
+    lessons,
+    completedCount: lessons.filter(l => completedIds.includes(l.id)).length,
+    totalCount: lessons.length,
+  }))
+}
+
+export type LessonState = 'completed' | 'active' | 'locked'
+
+export function getLessonState(
+  lessonId: string,
+  lessonIndex: number,
+  allLessonsInModule: LessonEntry[],
+  completedIds: string[]
+): LessonState {
+  if (completedIds.includes(lessonId)) return 'completed'
+
+  // Lektion ist aktiv wenn alle vorherigen abgeschlossen sind
+  const previousIds = allLessonsInModule
+    .slice(0, lessonIndex)
+    .map(l => l.id)
+  const allPreviousDone = previousIds.every(id => completedIds.includes(id))
+
+  if (allPreviousDone) return 'active'
+  return 'locked'
 }
 ```
 
-## 📋 SLIDE-INHALTE
+## 🖥️ COURSE PAGE (`app/course/page.tsx`)
 
-### Slide 01 – Briefing
+```tsx
+'use client'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { getUserState } from '@/lib/home/user-state'
+import { groupLessonsByModule } from '@/lib/course/course-utils'
+import { ModuleSection } from '@/components/course/ModuleSection'
+import { BottomNav } from '@/components/home/BottomNav'
 
-Marcus-Note Body:
-```ts
-const marcusBody = {
-  gentle: 'Das Cash Flow Statement ist der ehrlichste der drei Berichte. Die GuV kann durch Accounting-Tricks geschönt werden. Das CFS nicht – hier siehst du, was wirklich an Cash rein und raus geflossen ist. Heute lernst du, warum profitable Firmen trotzdem pleite gehen können.',
-  sharp: 'CFS: drei Sektionen, eine Wahrheit. Operations, Investing, Financing. Fang oben mit Net Income an, arbeitest dich durch. Die Desert-Island-Frage dazu kommt in Lektion 3.',
+export default function CoursePage() {
+  const router = useRouter()
+  const [modules, setModules] = useState<ReturnType<typeof groupLessonsByModule>>([])
+  const [completedIds, setCompletedIds] = useState<string[]>([])
+
+  useEffect(() => {
+    const state = getUserState()
+    setCompletedIds(state.completedLessons)
+    setModules(groupLessonsByModule(state.completedLessons, state.skillProfile))
+  }, [])
+
+  return (
+    <div className="min-h-screen bg-bg-primary flex flex-col">
+      <main className="flex-1 overflow-y-auto pb-24">
+        <div className="max-w-2xl mx-auto px-6 pt-10">
+
+          {/* Page Header */}
+          <div className="mb-8">
+            <p className="font-mono text-xs text-text-muted uppercase tracking-wider">
+              DEIN LERNPFAD
+            </p>
+            <h1 className="font-serif text-4xl text-text-primary mt-2">
+              Kurs
+            </h1>
+          </div>
+
+          {/* Module Sections */}
+          <div className="space-y-10">
+            {modules.map(module => (
+              <ModuleSection
+                key={module.moduleId}
+                module={module}
+                completedIds={completedIds}
+                onLessonClick={(route) => router.push(route)}
+              />
+            ))}
+          </div>
+
+        </div>
+      </main>
+      <BottomNav activeTab="course" />
+    </div>
+  )
 }
 ```
 
-Stat-Card: `DAUER 8 MIN · XP +30 · SCHWIERIG. ★★☆☆☆`
+## 🃏 KOMPONENTEN
 
-Learning Outcomes:
-- `→ Warum das CFS der ehrlichste Bericht ist`
-- `→ Die drei Sektionen und was sie zeigen`
-- `→ Warum Net Income ≠ Cash ist`
+### `ModuleSection.tsx`
 
-### Slide 02 – Was ist das CFS?
-
-Erklärungs-Text:
-> Die GuV sagt dir, was eine Firma "verdient" hat. Das Cash Flow Statement sagt dir, was wirklich auf dem Konto gelandet ist. Das ist ein riesiger Unterschied – wegen Accrual Accounting.
-
-Tap-to-reveal Beispiel (neu: drei Karten statt zwei):
-
-```ts
-const cards = [
-  {
-    id: 'guv',
-    icon: 'TrendingUp',
-    title: 'GuV: +€10M Net Income',
-    subtitle: 'Sieht gut aus',
-    reveal: 'Aber: Vielleicht wurde davon €8M noch nicht bezahlt (Accounts Receivable). Tatsächlicher Cash: nur €2M.',
-  },
-  {
-    id: 'cfs',
-    icon: 'DollarSign',
-    title: 'CFS: +€2M Cash from Ops',
-    subtitle: 'Die Wahrheit',
-    reveal: 'Das ist, was wirklich auf dem Konto gelandet ist. Profitable Firma, aber fast kein Cash. Gefährlich.',
-  },
-]
+```tsx
+// Header-Row: Modul-Label links (mono text-xs text-text-muted uppercase),
+//             "X / Y" rechts (mono text-sm text-text-secondary)
+// ModuleProgressBar direkt darunter
+// Lesson Cards als vertikale Liste mit space-y-3
 ```
 
-Aufgabe: `'Welcher Bericht zeigt den tatsächlichen Cash-Eingang?'`
+### `ModuleProgressBar.tsx`
 
-Korrekte Auswahl (rechts): Marcus: `'Genau. Das CFS zeigt was wirklich passiert ist. Viele große Firmen sind pleite gegangen, weil sie "profitabel" waren aber kein Cash hatten. Enron ist das bekannteste Beispiel.'`
-
-### Slide 03 – Die drei Sektionen
-
-```ts
-export const cfsSections = [
-  {
-    number: '01',
-    label: 'Cash Flow from Operations',
-    abbr: 'CFO',
-    labelDe: 'Operativer Cashflow',
-    description: 'Beginnt mit Net Income. Addiert nicht-cash Aufwendungen (D&A, SBC) zurück. Adjustiert für Working-Capital-Veränderungen.',
-    startsWith: 'Net Income',
-    examples: ['+ Depreciation & Amortization', '+ Stock-Based Compensation', '± Changes in Working Capital'],
-    color: 'border-accent',
-    insight: 'Das Wichtigste. Zeigt, ob das Kerngeschäft Cash generiert.',
-  },
-  {
-    number: '02',
-    label: 'Cash Flow from Investing',
-    abbr: 'CFI',
-    labelDe: 'Investitions-Cashflow',
-    description: 'Zeigt Käufe und Verkäufe von langfristigen Assets.',
-    examples: ['− Capital Expenditures (CapEx)', '+ Verkauf von Assets', '− Akquisitionen'],
-    color: 'border-gold',
-    insight: 'Meist negativ – Firmen investieren mehr als sie durch Asset-Verkäufe einnehmen. Das ist normal.',
-  },
-  {
-    number: '03',
-    label: 'Cash Flow from Financing',
-    abbr: 'CFF',
-    labelDe: 'Finanzierungs-Cashflow',
-    description: 'Zeigt Transaktionen mit Kapitalgebern – Aktionären und Gläubigern.',
-    examples: ['+ Neue Schulden aufgenommen', '− Schulden zurückgezahlt', '− Dividenden gezahlt', '+ Aktien ausgegeben'],
-    color: 'border-success',
-    insight: 'Positiv = Firma nimmt Geld auf. Negativ = Firma zahlt zurück oder kauft Aktien zurück.',
-  },
-]
+```tsx
+// Container: h-1 bg-bg-border rounded-full mt-2 mb-5
+// Fill: bg-accent h-full rounded-full transition-all duration-700
+//       Breite: (completedCount / totalCount * 100)%
+// Kein Label, kein Prozent – nur der Bar.
 ```
 
-Jede Sektion als aufklappbare Card. Darunter die Zusammenfassung:
-```
-Net Change in Cash = CFO + CFI + CFF
-```
-In monospace. Hinweis: "Dieser Wert = Veränderung der Cash-Position in der Bilanz."
+### `LessonCard.tsx`
 
-Marcus-Note: `'Reihenfolge beim Memorieren: Operations (Kerngeschäft), Investing (Wachstum), Financing (Kapitalstruktur). In dieser Reihenfolge gehen auch die meisten Analysten vor.'`
+Drei Varianten abhängig von `LessonState`:
 
-### Slide 04 – Das Depreciation-Puzzle
-
-**Das ist der didaktisch wichtigste Slide der ganzen Lektion.** Die Frage "Why does Depreciation affect cash if it's non-cash?" ist Pflicht in jedem Interview.
-
-Layout: Zwei-Schritt-Logik als visueller Flow.
-
-**Schritt 1 – Die Frage:**
-> D&A ist eine non-cash Ausgabe. Trotzdem beeinflusst sie den Cash-Bestand. Wie kann das sein?
-
-Tap-to-reveal: User klickt auf "Erklärung zeigen"
-
-**Schritt 2 – Die Antwort (erscheint nach Klick):**
-Drei Boxen als Flow (`→`):
-
-```
-[D&A senkt Pre-Tax Income]  →  [Niedrigeres Taxable Income]  →  [Weniger Steuern gezahlt]
+**State: `completed`**
+```tsx
+// bg-bg-secondary border border-bg-border rounded-xl p-4
+// Linkes Icon: CheckCircle2 (lucide) 20px text-success
+// Titel: font-serif text-lg text-text-secondary (leicht gedimmt)
+// Rechts: "+XX XP" font-mono text-xs text-text-muted
+// Cursor: default (nicht klickbar – abgeschlossen ist abgeschlossen)
 ```
 
-Darunter der Kernsatz:
-> D&A selbst ist non-cash – aber Steuern sind cash. Weil D&A die Steuerlast senkt, bleibt mehr Cash. Das ist der Mechanismus.
-
-**Zahlenbeispiel:**
-```
-Ohne D&A:  Pre-Tax Income €100M × 40% Steuer = €40M Steuern → €60M Cash bleibt
-Mit D&A:   Pre-Tax Income €90M × 40% Steuer  = €36M Steuern → €54M Cash bleibt
-
-Differenz: €4M mehr Cash durch €10M D&A
-```
-
-Dazu die Walk-Through Regel aus der PDF prominent:
-> "Mit dieser Art von Fragen immer in dieser Reihenfolge: 1. Income Statement → 2. Cash Flow Statement → 3. Balance Sheet"
-
-Marcus-Note: `'Diese Frage kommt in fast jedem Interview. Wer sagt "D&A ist non-cash, also kein Effekt auf Cash" hat nicht verstanden, dass Steuern cash sind. Merkregel: Non-cash ≠ kein Steuereffekt.'`
-
-### Slide 05 – Desert Island Frage
-
-**Format: Multiple Choice Tap-to-reveal** mit besonderer Dramatik.
-
-Header: `'Die berühmteste Accounting-Frage im Interview.'`
-
-Frage (groß, serif): `'Du bist auf einer einsamen Insel gestrandet. Du hast nur ein Dokument dabei. Welches der drei Statements nimmst du, um die finanzielle Gesundheit einer Firma zu beurteilen?'`
-
-Drei Optionen als Cards:
-- A) Income Statement
-- B) Balance Sheet
-- C) Cash Flow Statement *(richtig)*
-
-Bei C:
-Marcus-Note: `'Korrekt. Das CFS zeigt, wie viel Cash die Firma wirklich generiert – unabhängig von allen non-cash Aufwendungen. Das ist das #1 Kriterium für finanzielle Gesundheit. Wer das CFS auf der Insel hat, kann die anderen beiden rekonstruieren.'`
-
-Bei A oder B:
-Marcus-Note: `'Nicht optimal. GuV und Bilanz können durch Accounting-Methoden beeinflusst werden. Das CFS nicht – hier zählt nur, was wirklich bezahlt wurde und was wirklich eingegangen ist. Das ist die ehrlichste Quelle.'`
-
-Bonus-Info nach Auflösung:
-> Direkt danach: "Wenn ich 2 Statements hätte?" → Income Statement + Balance Sheet, weil man daraus das CFS rekonstruieren kann.
-
-### Slide 06 – Non-Cash Items + CapEx (Track B + C only)
-
-```ts
-export const nonCashItems = [
-  {
-    label: 'Depreciation & Amortization',
-    section: 'CFO',
-    direction: '+',
-    reason: 'Non-cash Aufwand – kein Cash abgeflossen, deshalb zurückaddiert.',
-  },
-  {
-    label: 'Stock-Based Compensation',
-    section: 'CFO',
-    direction: '+',
-    reason: 'Non-cash – Mitarbeiter bekommen Aktien statt Cash. Trotzdem Aufwand in der GuV.',
-  },
-  {
-    label: 'Capital Expenditures (CapEx)',
-    section: 'CFI',
-    direction: '−',
-    reason: 'Kauf von PP&E – echter Cash-Abfluss, erscheint aber nicht in der GuV (wird kapitalisiert).',
-  },
-  {
-    label: 'Changes in Working Capital',
-    section: 'CFO',
-    direction: '±',
-    reason: 'Asset steigt → Cash sinkt. Liability steigt → Cash steigt. Gegenläufige Logik.',
-  },
-]
+**State: `active`**
+```tsx
+// bg-bg-secondary border border-accent rounded-xl p-4
+//   + subtiler accent-glow: shadow-[0_0_16px_rgba(255,107,0,0.15)]
+// Linkes Icon: Play (lucide) 20px text-accent
+// Titel: font-serif text-lg text-text-primary
+// Untertitel: font-mono text-xs text-text-muted "X Min · +XX XP"
+// Rechts: Kleiner Accent-Pfeil
+// Cursor: pointer, hover: border-accent/80
+// Diese Card ist die einzige mit visuellem Gewicht – alles andere tritt zurück
 ```
 
-Dargestellt als zweispaltige Tabelle: `POSITION | SECTION | RICHTUNG | WARUM`. Jede Zeile klickbar für Tooltip.
-
-Marcus-Note: `'Merke: Asset going up = Cash down. Liability going up = Cash up. Diese Gegenläufigkeit ist die häufigste Fehlerquelle im Interview.'`
-
-### Slide 07 – Pro-Tipps
-
-```ts
-export const proTips = [
-  {
-    tag: 'INTERVIEW-MOVE',
-    tagColor: 'text-accent',
-    body: '"Walk me through the Cash Flow Statement" – fang IMMER mit Net Income an. Dann: Add back non-cash items (D&A, SBC), adjust for Working Capital changes, dann CFI und CFF. Diese Reihenfolge zeigt strukturiertes Denken.',
-  },
-  {
-    tag: 'WARNUNG',
-    tagColor: 'text-gold',
-    body: 'Sage nie "CapEx erscheint auf dem Income Statement" – CapEx wird kapitalisiert und erscheint als PP&E in der Bilanz, dann als D&A in der GuV. Direkt auf dem IS steht es nicht. Klassischer Fehler.',
-  },
-  {
-    tag: 'MERKE',
-    tagColor: 'text-success',
-    body: 'Free Cash Flow = CFO − CapEx. Das ist die meistgenutzte Zahl in Valuation. Wenn jemand "FCF" sagt, meint er das. Du brauchst CFO und CapEx aus dem CFS, um es zu berechnen.',
-  },
-]
+**State: `locked`**
+```tsx
+// bg-bg-secondary border border-bg-border/50 rounded-xl p-4 opacity-40
+// Linkes Icon: Lock (lucide) 20px text-text-muted
+// Titel: font-sans text-base text-text-muted
+// Kein CTA, kein Hover-Effekt, kein Klick
 ```
 
-### Slide 08 – Quiz Frage 1
-
-```ts
-export const quiz1 = {
-  header: 'Frage 1 / 2 · +10 XP',
-  question: 'In welcher Sektion des Cash Flow Statements erscheint der Kauf einer neuen Fabrik (CapEx)?',
-  options: [
-    { id: 'A', label: 'Cash Flow from Operations', correct: false },
-    { id: 'B', label: 'Cash Flow from Investing', correct: true },
-    { id: 'C', label: 'Cash Flow from Financing', correct: false },
-    { id: 'D', label: 'Direkt im Income Statement', correct: false },
-  ],
-  feedback: {
-    correct: {
-      gentle: 'Richtig. CapEx ist eine Investition in langfristige Assets und erscheint deshalb im CFI. In der GuV erscheint nur die jährliche Abschreibung (D&A), nicht der volle Kaufpreis.',
-      sharp: 'Korrekt. CapEx = CFI. D&A davon = IS und CFO (add-back). Sauber auseinanderhalten.',
-    },
-    wrong: 'CapEx ist kein Aufwand im IS (wird kapitalisiert) und keine Finanzierungstransaktion. Es ist eine Investition → Cash Flow from Investing.',
-    hint: 'CapEx = Kauf von langfristigen Assets. Investitionen = CFI.',
-  },
-}
-```
-
-### Slide 09 – Quiz Frage 2
-
-```ts
-export const quiz2 = {
-  header: 'Frage 2 / 2 · +10 XP',
-  question: 'Depreciation steigt um €10M. Angenommen 40% Steuerrate. Was passiert mit dem Cash?',
-  options: [
-    { id: 'A', label: 'Cash sinkt um €10M', correct: false },
-    { id: 'B', label: 'Cash steigt um €4M', correct: true },
-    { id: 'C', label: 'Kein Effekt auf Cash', correct: false },
-    { id: 'D', label: 'Cash steigt um €10M', correct: false },
-  ],
-  workingOut: 'IS: Operating Income −€10M → Net Income −€6M (nach 40% Steuer). CFS: Net Income −€6M, +D&A €10M add-back → CFO +€4M → Cash +€4M.',
-  feedback: {
-    correct: 'Genau. D&A senkt Net Income um €6M (nach Steuern), wird aber im CFS zurückaddiert (+€10M). Netto: +€4M Cash. Der Trick: Steuereinsparung.',
-    wrong: 'Denk zweistufig: 1) D&A senkt Pre-Tax Income um €10M → Net Income sinkt um €6M (×0.6). 2) Im CFS: D&A wird zurückaddiert (+€10M). Net Change: −€6M + €10M = +€4M.',
-  },
-}
-```
-
-### Slide 10 – Cliffhanger (Track A + B)
-
-Titel: `'Da war noch was: Die drei Statements sind verbunden.'`
-
-Erklärungs-Card:
-> Net Income aus der GuV → fließt in den CFS (oben) UND in Retained Earnings der Bilanz. Das Final-Cash aus dem CFS → entspricht der Cash-Veränderung in der Bilanz. Diese drei Links verstehen = Lektion 4.
-
-Marcus: `'Du hast jetzt alle drei Statements einzeln. In Lektion 4 schauen wir, wie sie zusammenspielen. Das ist die häufigste und wichtigste Frage in IB-Interviews. Mach Lektion 4 direkt danach.'`
-
-CTA: `'Lektion abschließen →'`
-
-### Slide 11 – Retention Hub
-
-Marcus-Email:
-```ts
-const marcusEmail = {
-  subject: 'Re: Lektion 3 – CFS verstanden',
-  gentle: 'Gut gemacht. Du weißt jetzt, dass das CFS bei Net Income startet, non-cash Items zurückaddiert und Working-Capital-Veränderungen berücksichtigt. Und du weißt, warum D&A trotz non-cash den Cash beeinflusst. In Lektion 4 verbinden wir alle drei Statements.',
-  sharp: 'CFS sitzt. Lektion 4 ist die wichtigste des ganzen Accounting-Blocks: wie alle drei Statements zusammenhängen. Dort scheitern 70% der Bewerber.',
-}
-```
-
-Next Lesson: `{ title: 'Die drei Statements verlinkt', duration: 10, xp: 40 }`
+**Wichtig:** Nur die `active`-Card hat visuelles Gewicht. `completed` ist dezent und `locked` ist fast unsichtbar. Das lenkt den Fokus automatisch auf das, was als nächstes zu tun ist.
 
 ## ✅ AKZEPTANZKRITERIEN
 
-1. Route `/lesson/cash-flow-statement` lädt
-2. Track-Routing korrekt
-3. Slide 04 (Depreciation Puzzle) zeigt Flow-Visualisierung korrekt
-4. Desert-Island-Frage auf Slide 05 gibt differenziertes Feedback (richtig/falsch)
-5. Quiz-Frage 2 zeigt immer den Rechenweg nach Submission
-6. Mobile nutzbar
+1. `/course` zeigt alle Lektionen gruppiert nach Modulen
+2. Genau eine Lektion ist `active` (die nächste nicht-abgeschlossene)
+3. Alle vorherigen sind `completed`, alle späteren `locked`
+4. Fortschrittsbalken pro Modul zeigt korrekten Prozentwert
+5. Klick auf `active`-Card navigiert zur Lektion
+6. Klick auf `locked`-Card tut nichts
+7. Mobile korrekt
 
 ## 🚀 REIHENFOLGE
 
-1. Branch, dann `data.ts`
-2. Slides 01–05 in Reihenfolge
-3. Slide 06 (Non-Cash, Track B+C)
-4. Slides 07–09
-5. Slide 10 Cliffhanger + Slide 11 Retention
-6. `page.tsx` verdrahten
-7. Testen, pushen
+1. Branch + `lib/course/course-utils.ts`
+2. `ModuleProgressBar.tsx`
+3. `LessonCard.tsx` (alle drei States)
+4. `ModuleSection.tsx`
+5. `app/course/page.tsx`
+6. Testen, pushen
 
-Frag mich nach jedem Slide.
+Frag mich nach LessonCard.
