@@ -69,7 +69,8 @@ export default function IncomeStatementLesson() {
 
   const goNext = () => {
     if (currentStep >= SLIDES.length - 1) {
-      router.push('/skill-tree');
+      // From the retention hub's "Jetzt starten" CTA: jump to lesson 02.
+      router.push('/lesson/balance-sheet');
       return;
     }
     const enteringRetention = currentStep === SLIDES.length - 2;
