@@ -56,7 +56,7 @@ export default function ProfilePage() {
           <SettingsSection />
         </div>
       </main>
-      <BottomNav activeTab="profile" />
+      <BottomNav />
     </div>
   );
 }

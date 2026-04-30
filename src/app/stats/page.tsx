@@ -75,7 +75,7 @@ export default function StatsPage() {
           <XpProgressCard history={xpHistory} />
         </div>
       </main>
-      <BottomNav activeTab="stats" />
+      <BottomNav />
     </div>
   );
 }

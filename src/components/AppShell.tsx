@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useStore } from '@/lib/store';
 import { isOnboardingComplete } from '@/lib/onboarding/profile';
 import TopBar from './TopBar';
-import BottomNav from './BottomNav';
+import BottomNav from './home/BottomNav';
 import StreakReminder from './StreakReminder';
 import { setupGlobalAudioUnlock } from '@/lib/sounds';
 import { X, Bell } from 'lucide-react';
@@ -143,7 +143,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </main>
-      <BottomNav lang={progress.language} selectedTrack={progress.selectedTrack} />
+      <BottomNav />
     </>
   );
 }

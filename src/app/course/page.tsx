@@ -59,7 +59,7 @@ export default function CoursePage() {
           </div>
         </div>
       </main>
-      <BottomNav activeTab="course" />
+      <BottomNav />
     </div>
   );
 }
