@@ -1,0 +1,72 @@
+'use client';
+
+export interface LessonSidePanelProps {
+  moduleLabel: string;
+  lessonTitle: string;
+  slideLabels: string[];
+  currentStep: number;
+  totalSteps: number;
+}
+
+export default function LessonSidePanel({
+  moduleLabel,
+  lessonTitle,
+  slideLabels,
+  currentStep,
+  totalSteps,
+}: LessonSidePanelProps) {
+  const labels =
+    slideLabels.length === totalSteps
+      ? slideLabels
+      : Array.from({ length: totalSteps }, (_, i) => String(i + 1).padStart(2, '0'));
+
+  return (
+    <div className="flex flex-col h-full p-5 gap-5">
+      <div className="flex flex-col gap-1">
+        <span className="font-[family-name:var(--font-is-mono)] text-[10px] text-is-text-muted uppercase tracking-wider">
+          {moduleLabel}
+        </span>
+        <span className="font-[family-name:var(--font-is-serif)] text-lg text-is-text-primary leading-tight">
+          {lessonTitle}
+        </span>
+      </div>
+
+      <div className="flex flex-col gap-2 flex-1 min-h-0">
+        <span className="font-[family-name:var(--font-is-mono)] text-[10px] text-is-text-muted uppercase tracking-wider">
+          Lesson-Map
+        </span>
+        <ol className="flex flex-col gap-1 overflow-y-auto">
+          {labels.map((label, i) => {
+            const status: 'done' | 'current' | 'upcoming' =
+              i + 1 < currentStep ? 'done' : i + 1 === currentStep ? 'current' : 'upcoming';
+            return (
+              <li
+                key={i}
+                className={[
+                  'flex items-center gap-2 px-2 py-1.5 rounded-md font-[family-name:var(--font-is-mono)] text-xs',
+                  status === 'current'
+                    ? 'bg-is-bg-secondary border border-is-accent text-is-text-primary'
+                    : status === 'done'
+                      ? 'text-is-text-secondary'
+                      : 'text-is-text-muted',
+                ].join(' ')}
+              >
+                <span
+                  className={[
+                    'inline-block w-1.5 h-1.5 rounded-full shrink-0',
+                    status === 'current'
+                      ? 'bg-is-accent'
+                      : status === 'done'
+                        ? 'bg-is-text-secondary'
+                        : 'bg-is-bg-border',
+                  ].join(' ')}
+                />
+                <span className="truncate">{label}</span>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    </div>
+  );
+}

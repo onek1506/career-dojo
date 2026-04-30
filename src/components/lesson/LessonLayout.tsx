@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
+import { useLessonSidePanel } from './LessonSidePanelContext';
 
 export interface LessonLayoutProps {
   currentStep: number;
@@ -22,6 +23,11 @@ export default function LessonLayout({
   children,
 }: LessonLayoutProps) {
   const router = useRouter();
+  // Slides may pass `sidePanel` as a prop (income-statement legacy path)
+  // or rely on the LessonSidePanelProvider mounted by the lesson root
+  // (balance-sheet, cash-flow, three-statements). Prop wins when both exist.
+  const contextSidePanel = useLessonSidePanel();
+  const effectiveSidePanel = sidePanel ?? contextSidePanel;
   const progress = Math.min(100, Math.max(0, (currentStep / totalSteps) * 100));
   const stepCounter = `${String(currentStep).padStart(2, '0')} / ${String(totalSteps).padStart(2, '0')}`;
 
@@ -76,7 +82,7 @@ export default function LessonLayout({
           centered content sits in the true viewport center, matching the
           header's progress bar and the footer CTA. */}
       <div className="flex-1 flex overflow-hidden">
-        {sidePanel && (
+        {effectiveSidePanel && (
           <div className="hidden lg:block w-72 flex-shrink-0" aria-hidden="true" />
         )}
         <main className="flex-1 overflow-y-auto">
@@ -85,12 +91,12 @@ export default function LessonLayout({
           </div>
         </main>
 
-        {sidePanel && (
+        {effectiveSidePanel && (
           <aside
             className="hidden lg:flex w-72 flex-shrink-0 border-l border-is-bg-border flex-col overflow-y-auto"
             style={{ background: 'var(--is-bg-primary)' }}
           >
-            {sidePanel}
+            {effectiveSidePanel}
           </aside>
         )}
       </div>

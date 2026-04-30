@@ -17,6 +17,8 @@ import Slide08QuizWhichStatement from './Slide08QuizWhichStatement';
 import Slide09QuizWalkThrough from './Slide09QuizWalkThrough';
 import Slide10QuizScenario from './Slide10QuizScenario';
 import Slide11Retention from './Slide11Retention';
+import LessonSidePanel from '../LessonSidePanel';
+import { LessonSidePanelProvider } from '../LessonSidePanelContext';
 import { lessonMeta } from './data';
 import type { QuizResult, QuizResults, QuizSlideKey, RetentionResults, SlideProps } from './types';
 
@@ -32,6 +34,20 @@ const ALL_SLIDES: ComponentType<SlideProps>[] = [
   Slide09QuizWalkThrough,
   Slide10QuizScenario,
   Slide11Retention,
+];
+
+const ALL_SLIDE_LABELS: string[] = [
+  '01 Briefing',
+  '02 Drei Links',
+  '03 Link-Diagramm',
+  '04 Abschreibung',
+  '05 Walk-Through-Regel',
+  '06 Inventar-Szenario',
+  '07 Pro-Tipps',
+  '08 Quiz Statement',
+  '09 Quiz Walk-Through',
+  '10 Quiz Szenario',
+  '11 Zusammenfassung',
 ];
 
 const NEXT_LESSON_PATH = '/course';
@@ -57,6 +73,11 @@ export default function ThreeStatementsLinkedLesson() {
   const visibleSlides = useMemo(() => {
     const cfg = lessonMeta.trackConfig[skillProfile];
     return cfg.slidesToShow.map((n) => ALL_SLIDES[n - 1]).filter(Boolean);
+  }, [skillProfile]);
+
+  const visibleSlideLabels = useMemo(() => {
+    const cfg = lessonMeta.trackConfig[skillProfile];
+    return cfg.slidesToShow.map((n) => ALL_SLIDE_LABELS[n - 1]).filter(Boolean);
   }, [skillProfile]);
 
   const tone: MarcusTone = skillProfile === 'C' ? 'sharp' : 'gentle';
@@ -104,17 +125,29 @@ export default function ThreeStatementsLinkedLesson() {
     setCurrentStep((s) => s - 1);
   };
 
-  return (
-    <Slide
-      key={currentStep}
+  const sidePanel = (
+    <LessonSidePanel
+      moduleLabel={lessonMeta.module}
+      lessonTitle={lessonMeta.title}
+      slideLabels={visibleSlideLabels}
       currentStep={currentStep + 1}
       totalSteps={visibleSlides.length}
-      onBack={goBack}
-      onNext={goNext}
-      tone={tone}
-      onAnswer={handleAnswer}
-      quizResults={quizResults}
-      results={retentionResults}
     />
+  );
+
+  return (
+    <LessonSidePanelProvider value={sidePanel}>
+      <Slide
+        key={currentStep}
+        currentStep={currentStep + 1}
+        totalSteps={visibleSlides.length}
+        onBack={goBack}
+        onNext={goNext}
+        tone={tone}
+        onAnswer={handleAnswer}
+        quizResults={quizResults}
+        results={retentionResults}
+      />
+    </LessonSidePanelProvider>
   );
 }

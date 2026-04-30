@@ -19,6 +19,8 @@ import Slide10QuizAssets from './Slide10QuizAssets';
 import Slide11QuizCalculation from './Slide11QuizCalculation';
 import Slide12Cliffhanger from './Slide12Cliffhanger';
 import Slide13Retention from './Slide13Retention';
+import LessonSidePanel from '../LessonSidePanel';
+import { LessonSidePanelProvider } from '../LessonSidePanelContext';
 import { lessonMeta } from './data';
 import type { QuizResult, QuizResults, QuizSlideKey, RetentionResults, SlideProps } from './types';
 
@@ -37,6 +39,22 @@ const ALL_SLIDES: ComponentType<SlideProps>[] = [
   Slide11QuizCalculation,
   Slide12Cliffhanger,
   Slide13Retention,
+];
+
+const ALL_SLIDE_LABELS: string[] = [
+  '01 Briefing',
+  '02 Recap',
+  '03 Drei Sektionen',
+  '04 Positionen',
+  '05 Gleichgewicht',
+  '06 Eigenkapital',
+  '07 Negatives EK',
+  '08 Working Capital',
+  '09 Pro-Tipps',
+  '10 Quiz Assets',
+  '11 Quiz Calc',
+  '12 Cliffhanger',
+  '13 Zusammenfassung',
 ];
 
 const NEXT_LESSON_PATH = '/lesson/cash-flow-statement';
@@ -62,6 +80,11 @@ export default function BalanceSheetLesson() {
   const visibleSlides = useMemo(() => {
     const cfg = lessonMeta.trackConfig[skillProfile];
     return cfg.slidesToShow.map((n) => ALL_SLIDES[n - 1]).filter(Boolean);
+  }, [skillProfile]);
+
+  const visibleSlideLabels = useMemo(() => {
+    const cfg = lessonMeta.trackConfig[skillProfile];
+    return cfg.slidesToShow.map((n) => ALL_SLIDE_LABELS[n - 1]).filter(Boolean);
   }, [skillProfile]);
 
   const tone: MarcusTone = skillProfile === 'C' ? 'sharp' : 'gentle';
@@ -109,17 +132,29 @@ export default function BalanceSheetLesson() {
     setCurrentStep((s) => s - 1);
   };
 
-  return (
-    <Slide
-      key={currentStep}
+  const sidePanel = (
+    <LessonSidePanel
+      moduleLabel={lessonMeta.module}
+      lessonTitle={lessonMeta.titleDe}
+      slideLabels={visibleSlideLabels}
       currentStep={currentStep + 1}
       totalSteps={visibleSlides.length}
-      onBack={goBack}
-      onNext={goNext}
-      tone={tone}
-      onAnswer={handleAnswer}
-      quizResults={quizResults}
-      results={retentionResults}
     />
+  );
+
+  return (
+    <LessonSidePanelProvider value={sidePanel}>
+      <Slide
+        key={currentStep}
+        currentStep={currentStep + 1}
+        totalSteps={visibleSlides.length}
+        onBack={goBack}
+        onNext={goNext}
+        tone={tone}
+        onAnswer={handleAnswer}
+        quizResults={quizResults}
+        results={retentionResults}
+      />
+    </LessonSidePanelProvider>
   );
 }
