@@ -45,7 +45,7 @@ export const whatIsCards: WhatIsCard[] = [
     id: 'guv',
     iconName: 'TrendingUp',
     title: 'GuV: +€10M Net Income',
-    subtitle: 'Sieht gut aus',
+    subtitle: 'Income Statement',
     reveal:
       'Aber: Vielleicht wurde davon €8M noch nicht bezahlt (Accounts Receivable). Tatsächlicher Cash: nur €2M.',
     isCorrect: false,
@@ -54,7 +54,7 @@ export const whatIsCards: WhatIsCard[] = [
     id: 'cfs',
     iconName: 'DollarSign',
     title: 'CFS: +€2M Cash from Ops',
-    subtitle: 'Die Wahrheit',
+    subtitle: 'Statement of Cash Flows',
     reveal:
       'Das ist, was wirklich auf dem Konto gelandet ist. Profitable Firma, aber fast kein Cash. Gefährlich.',
     isCorrect: true,

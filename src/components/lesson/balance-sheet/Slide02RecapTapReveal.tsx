@@ -59,14 +59,14 @@ export default function Slide02RecapTapReveal({ currentStep, totalSteps, onBack,
           <Card
             icon={<Film size={28} aria-hidden />}
             title="GuV"
-            subtitle="Zeitraum · Q1–Q4 2024"
+            subtitle="Gewinn- und Verlustrechnung · Q1–Q4 2024"
             onClick={() => onPick('guv')}
             state={!showFeedback ? 'idle' : state === 'wrong' ? 'wrong' : 'neutral-wrong'}
           />
           <Card
             icon={<Camera size={28} aria-hidden />}
             title="Bilanz"
-            subtitle="Stichtag · 31.12.2024"
+            subtitle="Vermögensübersicht · 31.12.2024"
             onClick={() => onPick('bilanz')}
             state={!showFeedback ? 'idle' : 'correct'}
           />

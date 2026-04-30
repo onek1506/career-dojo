@@ -7,10 +7,12 @@ import LessonLayout from '../LessonLayout';
 import MarcusNote from '../MarcusNote';
 import { playClickSound, playCorrectSound, playWrongSound, playStreakSound } from '@/lib/sounds';
 import { calculateQuizXp } from '@/lib/lesson/xp';
+import { shuffle } from '@/lib/utils/shuffle';
 import { quiz1 } from './data';
 import { priorStreakFor, type SlideProps } from './types';
 
 const BASE_XP = 10;
+const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'] as const;
 
 type State = 'idle' | 'submitted-wrong-1' | 'submitted-wrong-2' | 'submitted-correct';
 
@@ -27,17 +29,22 @@ export default function Slide10QuizAssets({
   const [state, setState] = useState<State>('idle');
   const [solvedOnAttempt, setSolvedOnAttempt] = useState<1 | 2 | null>(null);
   const [showHint, setShowHint] = useState(false);
+  // Shuffle once per mount, then re-assign A/B/C… IDs so labels stay
+  // alphabetical even though answer order changes between sessions.
+  const [OPTIONS] = useState(() =>
+    shuffle(quiz1.options).map((opt, i) => ({ ...opt, id: LETTERS[i] }))
+  );
 
   const isCorrect = state === 'submitted-correct';
   const isWrongFirst = state === 'submitted-wrong-1';
   const isWrongFinal = state === 'submitted-wrong-2';
   const isResolved = isCorrect || isWrongFinal;
   const priorStreak = priorStreakFor('q1', quizResults);
-  const correctOption = quiz1.options.find((o) => o.correct)!;
+  const correctOption = OPTIONS.find((o) => o.correct)!;
 
   const handleSubmit = () => {
     if (!selected) return;
-    const correct = quiz1.options.find((o) => o.id === selected)?.correct === true;
+    const correct = OPTIONS.find((o) => o.id === selected)?.correct === true;
     if (correct) {
       const attempts: 1 | 2 = state === 'submitted-wrong-1' ? 2 : 1;
       const xpInfo = calculateQuizXp(true, attempts, BASE_XP);
@@ -114,7 +121,7 @@ export default function Slide10QuizAssets({
         </h2>
 
         <div className="flex flex-col gap-2">
-          {quiz1.options.map((opt) => {
+          {OPTIONS.map((opt) => {
             const isSelected = selected === opt.id;
             const wasSubmittedWrong = (isWrongFirst || isWrongFinal) && isSelected;
             let stateClass = 'border-is-bg-border hover:bg-is-bg-tertiary';

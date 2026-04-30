@@ -7,10 +7,12 @@ import LessonLayout from '../LessonLayout';
 import MarcusNote from '../MarcusNote';
 import { playClickSound, playCorrectSound, playWrongSound, playStreakSound } from '@/lib/sounds';
 import { calculateQuizXp } from '@/lib/lesson/xp';
+import { shuffle } from '@/lib/utils/shuffle';
 import { quiz1 } from './data';
 import { priorStreakFor, type SlideProps } from './types';
 
 const BASE_XP = 15;
+const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'] as const;
 
 type State = 'idle' | 'submitted-wrong-1' | 'submitted-wrong-2' | 'submitted-correct';
 
@@ -26,6 +28,9 @@ export default function Slide08QuizWhichStatement({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [state, setState] = useState<State>('idle');
   const [solvedOnAttempt, setSolvedOnAttempt] = useState<1 | 2 | null>(null);
+  const [OPTIONS] = useState(() =>
+    shuffle(quiz1.options).map((opt, i) => ({ ...opt, id: LETTERS[i] }))
+  );
 
   const isCorrect = state === 'submitted-correct';
   const isWrongFirst = state === 'submitted-wrong-1';
@@ -33,7 +38,7 @@ export default function Slide08QuizWhichStatement({
   const isResolved = isCorrect || isWrongFinal;
   const priorStreak = priorStreakFor('q1', quizResults);
 
-  const correctIds = new Set(quiz1.options.filter((o) => o.correct).map((o) => o.id));
+  const correctIds = new Set(OPTIONS.filter((o) => o.correct).map((o) => o.id));
 
   const evaluate = () => {
     const allCorrectSelected = [...correctIds].every((id) => selected.has(id));
@@ -74,7 +79,8 @@ export default function Slide08QuizWhichStatement({
   };
 
   const handleRetry = () => {
-    setState('idle');
+    // Keep state as 'submitted-wrong-1' so the next submit lands in the
+    // wrong-2 branch instead of looping back to wrong-1.
     setSelected(new Set());
   };
 
@@ -93,8 +99,14 @@ export default function Slide08QuizWhichStatement({
     ctaLabel = 'Nächste Frage';
     ctaAction = handleNext;
   } else if (isWrongFirst) {
-    ctaLabel = 'Nochmal versuchen';
-    ctaAction = handleRetry;
+    if (selected.size > 0) {
+      ctaLabel = 'Antwort prüfen';
+      ctaAction = handleSubmit;
+    } else {
+      ctaLabel = 'Nochmal versuchen';
+      ctaAction = handleRetry;
+      ctaDisabled = true;
+    }
   } else {
     ctaLabel = 'Antwort prüfen';
     ctaAction = handleSubmit;
@@ -135,7 +147,7 @@ export default function Slide08QuizWhichStatement({
         </span>
 
         <div className="flex flex-col gap-2">
-          {quiz1.options.map((opt) => {
+          {OPTIONS.map((opt) => {
             const isSelected = selected.has(opt.id);
             const isCorrectOpt = opt.correct;
             let stateClass: string;
