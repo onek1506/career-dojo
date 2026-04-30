@@ -13,7 +13,12 @@ interface LessonCardProps {
 export default function LessonCard({ lesson, state, onClick }: LessonCardProps) {
   if (state === 'completed') {
     return (
-      <div className="flex items-center gap-3 bg-is-bg-secondary border border-is-bg-border rounded-xl p-4">
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={`Lektion „${lesson.title}" wiederholen`}
+        className="w-full flex items-center gap-3 bg-is-bg-secondary border border-is-bg-border rounded-xl p-4 text-left transition-colors duration-200 hover:border-is-bg-border/80 hover:bg-is-bg-secondary/80 cursor-pointer min-h-[44px]"
+      >
         <CheckCircle2 size={20} className="text-is-success shrink-0" aria-hidden />
         <span className="font-[family-name:var(--font-is-serif)] text-base sm:text-lg text-is-text-secondary flex-1">
           {lesson.title}
@@ -21,7 +26,7 @@ export default function LessonCard({ lesson, state, onClick }: LessonCardProps) 
         <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted">
           +{lesson.xp} XP
         </span>
-      </div>
+      </button>
     );
   }
 

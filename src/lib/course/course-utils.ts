@@ -1,5 +1,6 @@
 import { LESSON_REGISTRY, type LessonEntry } from '@/lib/home/lesson-registry';
 import type { SkillProfile } from '@/lib/onboarding/profile';
+import { DEV_UNLOCK_ALL } from '@/lib/dev-flags';
 
 export interface ModuleGroup {
   moduleId: string;
@@ -40,6 +41,7 @@ export function getLessonState(
   completedIds: string[]
 ): LessonState {
   if (completedIds.includes(lessonId)) return 'completed';
+  if (DEV_UNLOCK_ALL) return 'active';
   const previousIds = allLessonsInModule.slice(0, lessonIndex).map((l) => l.id);
   const allPreviousDone = previousIds.every((id) => completedIds.includes(id));
   if (allPreviousDone) return 'active';

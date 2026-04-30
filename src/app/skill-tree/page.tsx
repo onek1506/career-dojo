@@ -6,13 +6,9 @@ import ComingSoonModal from '@/components/ComingSoonModal';
 import { useStore } from '@/lib/store';
 import { getTrackData } from '@/data/content';
 import { TRACKS } from '@/data/tracks';
+import { DEV_UNLOCK_ALL } from '@/lib/dev-flags';
 import Link from 'next/link';
 import { Lock, Check, Star } from 'lucide-react';
-
-// Dev-mode override: every lesson visible and clickable, regardless of XP
-// thresholds or prerequisite completion. Flip to false before shipping
-// real progression to users.
-const DEV_UNLOCK_ALL = true;
 
 export default function SkillTreePage() {
   const { progress, t } = useStore();
