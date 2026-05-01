@@ -24,6 +24,24 @@ export default function Slide02ProblemDiagnosis({
       onBack={onBack}
       footer={<LessonFooterCTA onClick={onNext} label="Das passiert mir nicht" icon={<ArrowRight size={16} />} />}
     >
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-9 h-9 rounded-full border border-is-accent bg-transparent flex items-center justify-center">
+          <span className="font-[family-name:var(--font-is-mono)] text-xs font-bold text-is-accent">MH</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="font-[family-name:var(--font-is-mono)] text-xs font-medium text-is-text-primary">
+            Marcus Hart
+          </span>
+          <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted">
+            Ex-MD · Goldman Sachs · 11 Jahre
+          </span>
+        </div>
+      </div>
+      <p className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-secondary mt-1 mb-4">
+        Re: Warum die meisten Bewerber scheitern
+      </p>
+      <hr className="border-t border-is-bg-border mb-6" />
+
       <div className="flex flex-col gap-6 sm:gap-8">
         <div className="flex flex-col gap-1">
           <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted tracking-wider uppercase">
