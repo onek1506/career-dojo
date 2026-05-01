@@ -10,25 +10,34 @@ export interface OnboardingLayoutProps {
   totalSteps: number;
   onBack?: () => void;
   showProgress?: boolean;
+  /** Override skip-link visibility. Defaults to true on intermediate slides
+   *  (currentStep > 2 and not the last slide), false on the hook (1), the
+   *  Marcus quote (2), and the final slide. */
+  showSkip?: boolean;
   footer: ReactNode;
   children: ReactNode;
 }
+
+const FIRST_LESSON_PATH = '/lesson/acc-1-income-statement';
 
 export default function OnboardingLayout({
   currentStep,
   totalSteps,
   onBack,
   showProgress = true,
+  showSkip,
   footer,
   children,
 }: OnboardingLayoutProps) {
   const router = useRouter();
 
+  const skipVisible = showSkip ?? (currentStep > 2 && currentStep < totalSteps);
+
   const handleSkip = () => {
-    // Stamp completion so AppShell's redirect-on-incomplete guard lets
-    // the user actually reach the course instead of bouncing back here.
+    // Stamp completion so the home redirect-on-incomplete guard lets the
+    // user actually reach the lesson instead of bouncing back here.
     saveProfile({ onboardingCompletedAt: new Date().toISOString() });
-    router.push('/course');
+    router.push(FIRST_LESSON_PATH);
   };
 
   return (
@@ -59,13 +68,17 @@ export default function OnboardingLayout({
           </div>
         )}
 
-        <button
-          type="button"
-          onClick={handleSkip}
-          className="ml-auto font-[family-name:var(--font-is-mono)] text-[11px] sm:text-xs text-is-text-muted hover:text-is-text-primary transition-colors duration-200 px-2 -mr-2 min-h-[44px] flex items-center"
-        >
-          Überspringen
-        </button>
+        <div className="ml-auto flex items-center min-h-[44px]">
+          {skipVisible && (
+            <button
+              type="button"
+              onClick={handleSkip}
+              className="text-gray-500 text-xs font-mono hover:text-gray-300 transition-colors duration-150"
+            >
+              Direkt starten
+            </button>
+          )}
+        </div>
       </header>
 
       <main className="flex-1 overflow-y-auto">
