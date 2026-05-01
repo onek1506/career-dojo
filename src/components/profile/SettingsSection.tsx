@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { getProfile, type LearningTime, type SkillProfile } from '@/lib/onboarding/profile';
 import { useStore } from '@/lib/store';
 
@@ -20,6 +21,7 @@ const TRACK_LABELS: Record<SkillProfile, string> = {
 const NOTIFICATION_KEY = 'career_dojo_notifications_enabled';
 
 export default function SettingsSection() {
+  const router = useRouter();
   const { progress, update } = useStore();
   const [learningTime, setLearningTime] = useState<string>('—');
   const [track, setTrack] = useState<string>('—');
@@ -77,6 +79,7 @@ export default function SettingsSection() {
     if (!ok) return;
     [
       'career_dojo_profile',
+      'careerdojo_onboarding',
       'career-dojo-progress',
       'career_dojo_quiz_performance',
       'career_dojo_xp_history',
@@ -89,7 +92,7 @@ export default function SettingsSection() {
         /* ignore */
       }
     });
-    window.location.href = '/';
+    router.replace('/onboarding');
   };
 
   return (

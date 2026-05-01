@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-const STORAGE_KEY = 'career_dojo_profile';
+const ONBOARDING_STATE_KEY = 'careerdojo_onboarding';
 const ONBOARDING_PATH = '/onboarding';
 const HOME_PATH = '/home';
 
@@ -12,17 +12,15 @@ export default function HomePage() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    let target = ONBOARDING_PATH;
+    let completed = false;
     try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const profile = JSON.parse(raw) as { onboardingCompletedAt?: string };
-        if (profile?.onboardingCompletedAt) target = HOME_PATH;
-      }
+      const raw = window.localStorage.getItem(ONBOARDING_STATE_KEY);
+      const state = raw ? (JSON.parse(raw) as { completed?: boolean }) : null;
+      completed = Boolean(state?.completed);
     } catch {
-      // Corrupt or unavailable localStorage → fall through to onboarding.
+      // Corrupt or unavailable localStorage → treat as not completed.
     }
-    router.replace(target);
+    router.replace(completed ? HOME_PATH : ONBOARDING_PATH);
   }, [router]);
 
   return (
