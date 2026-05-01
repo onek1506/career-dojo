@@ -286,3 +286,18 @@ body {
   animation: flame-flicker 0.5s ease-in-out infinite;
   display: inline-block;
 }
+
+/* Onboarding diagnosis-card row stagger */
+@keyframes onboarding-fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.onboarding-row {
+  opacity: 0;
+  animation: onboarding-fade-up 350ms ease forwards;
+}
+
+/* Onboarding streak flame glow (Screen 10) */
+.onboarding-flame-glow {
+  filter: drop-shadow(0 0 12px rgba(255, 107, 53, 0.6));
+}

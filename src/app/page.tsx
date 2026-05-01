@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 const STORAGE_KEY = 'career_dojo_profile';
-const ONBOARDING_PATH = '/onboarding/start';
+const ONBOARDING_PATH = '/onboarding';
 const HOME_PATH = '/home';
 
 export default function HomePage() {
