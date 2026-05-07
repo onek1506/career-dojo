@@ -6,21 +6,20 @@ import LessonLayout from '../LessonLayout';
 import { playClickSound, playRevealSound } from '@/lib/sounds';
 import type { SlideProps } from './types';
 
-const CHEAT_SHEET_TEXT = `GUV CHEAT SHEET                      [1/2]
+const CHEAT_SHEET_TEXT = `MARGEN CHEAT SHEET                    [2/2]
 ──────────────────────────────────────────
-DIE 5 STATIONEN
-1. Umsatz             (Top Line)
-2. Bruttoergebnis     − Herstellungskosten
-3. EBITDA             − Vertrieb & Verwaltung
-4. EBIT               − Abschreibungen
-5. Jahresüberschuss   (Bottom Line)
+DIE 2 MARGEN
+Bruttomarge = (Umsatz − COGS) / Umsatz
+Nettomarge  = Jahresüberschuss / Umsatz
 
 REGEL
-Eine GuV zeigt einen ZEITRAUM.
-Die Bilanz zeigt einen STICHTAG.
+Marge in % zeigt, wie effizient eine
+Firma Geld verdient.
 
-NÄCHSTE LEKTION
-Margen lesen — Brutto- und Nettomarge.
+BENCHMARKS
+Apple    ~40% brutto / ~25% netto
+Netflix  ~40% brutto / ~15% netto
+Walmart  ~25% brutto /  ~3% netto
 ──────────────────────────────────────────`;
 
 export default function Slide06CheatSheet({
@@ -48,7 +47,7 @@ export default function Slide06CheatSheet({
         backgroundColor: getComputedStyle(node).getPropertyValue('background-color') || undefined,
       });
       const link = document.createElement('a');
-      link.download = 'guv-cheat-sheet.png';
+      link.download = 'margen-cheat-sheet.png';
       link.href = dataUrl;
       link.click();
       playRevealSound();
@@ -101,36 +100,55 @@ export default function Slide06CheatSheet({
             Cheat Sheet
           </h2>
           <p className="font-[family-name:var(--font-is-sans)] italic text-is-text-secondary">
-            Screenshot-tauglich.
+            Margen für unterwegs.
           </p>
         </div>
 
         {/* Mobile/tablet card */}
-        <div ref={mobileRef} className="lg:hidden bg-is-bg-secondary border border-is-bg-border rounded-xl p-5 flex flex-col gap-4">
+        <div
+          ref={mobileRef}
+          className="lg:hidden bg-is-bg-secondary border border-is-bg-border rounded-xl p-5 flex flex-col gap-4"
+        >
           <h3 className="font-[family-name:var(--font-is-serif)] text-2xl text-is-text-primary text-center">
-            GuV-Cheat-Sheet
+            Margen-Cheat-Sheet
           </h3>
           <div className="border-t border-is-bg-border pt-4 flex flex-col gap-2">
             <span className="font-[family-name:var(--font-is-mono)] text-[10px] text-is-text-muted uppercase tracking-wider">
-              Die 5 Stationen
+              Die 2 Margen
             </span>
-            <ol className="flex flex-col gap-1.5 text-sm font-[family-name:var(--font-is-mono)] text-is-text-primary">
-              <li>1. Umsatz <span className="text-is-text-muted">(Top Line)</span></li>
-              <li>2. Bruttoergebnis</li>
-              <li>3. EBITDA</li>
-              <li>4. EBIT</li>
-              <li>5. Jahresüberschuss <span className="text-is-text-muted">(Bottom Line)</span></li>
-            </ol>
+            <div className="flex flex-col gap-2 text-sm font-[family-name:var(--font-is-mono)] text-is-text-primary">
+              <div>
+                <div>Bruttomarge</div>
+                <div className="text-is-text-secondary">= (Umsatz − COGS) / Umsatz</div>
+              </div>
+              <div>
+                <div>Nettomarge</div>
+                <div className="text-is-text-secondary">= Jahresüberschuss / Umsatz</div>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-is-bg-border pt-4 flex flex-col gap-2">
+            <span className="font-[family-name:var(--font-is-mono)] text-[10px] text-is-text-muted uppercase tracking-wider">
+              Benchmarks
+            </span>
+            <ul className="flex flex-col gap-1 text-sm font-[family-name:var(--font-is-mono)] text-is-text-primary">
+              <li>Apple <span className="text-is-text-secondary">~40% brutto / ~25% netto</span></li>
+              <li>Netflix <span className="text-is-text-secondary">~40% brutto / ~15% netto</span></li>
+              <li>Walmart <span className="text-is-text-secondary">~25% brutto / ~3% netto</span></li>
+            </ul>
           </div>
           <div className="border-t border-is-bg-border pt-4">
             <p className="font-[family-name:var(--font-is-sans)] italic text-sm text-is-text-secondary leading-relaxed">
-              Die GuV zeigt einen <strong className="not-italic">Zeitraum</strong>. Die Bilanz zeigt einen <strong className="not-italic">Stichtag</strong>.
+              Marge in % zeigt, wie effizient eine Firma Geld verdient.
             </p>
           </div>
         </div>
 
         {/* Desktop terminal card */}
-        <div ref={desktopRef} className="hidden lg:block bg-is-bg-secondary border border-is-bg-border rounded-xl p-6 overflow-hidden">
+        <div
+          ref={desktopRef}
+          className="hidden lg:block bg-is-bg-secondary border border-is-bg-border rounded-xl p-6 overflow-hidden"
+        >
           <pre
             className="font-[family-name:var(--font-is-mono)] text-sm leading-relaxed text-is-text-primary whitespace-pre overflow-x-auto"
             style={{ tabSize: 4 }}

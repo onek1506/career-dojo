@@ -1,13 +1,14 @@
-// Re-export the shared QuizResult shape so existing imports still work.
+// Re-export the shared QuizResult shape so each lesson can import a single
+// canonical type while still owning its own QuizResults shape.
 export type { QuizResult } from '@/lib/lesson/xp';
 import type { QuizResult } from '@/lib/lesson/xp';
 
-// Lesson 1a (Income-Statement basics) has three quiz slides:
-// q1 = waterfall sort drill, q2 = term-match drill, q3 = balance-vs-IS MC.
+// Lesson 1b (Margins) has two graded quizzes: q1 = gross-margin calc,
+// q2 = net-margin calc. The formula drill is a guided exercise (always
+// resolves correctly) and is intentionally not part of QuizResults.
 export type QuizResults = {
   q1: QuizResult | null;
   q2: QuizResult | null;
-  q3: QuizResult | null;
 };
 
 export type QuizSlideKey = keyof QuizResults;
@@ -30,11 +31,7 @@ export interface SlideProps {
   results?: RetentionResults;
 }
 
-// Order of quiz keys as they appear in the lesson — used by quiz slides to
-// compute "consecutive first-try correct" streaks based on prior results.
-// A wrong answer OR a correct answer that needed multiple attempts both
-// reset the streak — only flawless first-try answers extend it.
-export const QUIZ_ORDER: QuizSlideKey[] = ['q1', 'q2', 'q3'];
+export const QUIZ_ORDER: QuizSlideKey[] = ['q1', 'q2'];
 
 export function priorStreakFor(self: QuizSlideKey, results: QuizResults | undefined): number {
   if (!results) return 0;

@@ -14,9 +14,9 @@ import { getUserState } from '@/lib/home/user-state';
 import { mockRetentionData } from './mockData';
 import type { SlideProps } from './types';
 
-const LESSON_TITLE = 'GuV verstehen';
+const LESSON_TITLE = 'Margen lesen';
 
-export default function Slide12Retention({
+export default function Slide07Retention({
   currentStep,
   totalSteps,
   onBack,
@@ -39,7 +39,6 @@ export default function Slide12Retention({
   const xpToNext = Math.max(0, level.requiredXp - levelXp);
   const levelProgress = Math.min(100, (levelXp / level.requiredXp) * 100);
 
-  // Play complete sound + persist quiz/xp/testimonial stats once.
   useEffect(() => {
     playCompleteSound();
     if (!results) return;
@@ -73,11 +72,10 @@ export default function Slide12Retention({
       footer={null}
     >
       <div className="flex flex-col gap-6 sm:gap-8">
-        {/* Section 1: Result Header */}
         <section className="flex flex-col items-center gap-4 text-center">
-          <ResultCircle correctCount={correctCount} totalCount={Math.max(totalQuestions, 3)} />
+          <ResultCircle correctCount={correctCount} totalCount={Math.max(totalQuestions, 2)} />
           <h2 className="font-[family-name:var(--font-is-serif)] text-2xl sm:text-3xl text-is-text-primary mt-2">
-            Lektion 1 abgeschlossen.
+            Lektion 2 abgeschlossen.
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full bg-is-bg-secondary border border-is-bg-border rounded-lg p-4">
@@ -87,7 +85,6 @@ export default function Slide12Retention({
           </div>
         </section>
 
-        {/* Section 2: Streak & Level */}
         <section className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="bg-is-bg-secondary border border-is-bg-border rounded-lg p-4 flex flex-col gap-3">
             <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-gold uppercase tracking-wider flex items-center gap-1.5">
@@ -133,24 +130,22 @@ export default function Slide12Retention({
           </div>
         </section>
 
-        {/* Section 3: Marcus Feedback */}
         <section>
           <MarcusNote
             tone="gentle"
-            subject="Re: Erste Lektion geschafft"
+            subject="Re: Modul 01 fast komplett"
             body={
               <>
-                Gut gemacht. Du verstehst jetzt, was eine GuV ist und kennst die fünf Stationen vom Umsatz bis zum Jahresüberschuss. In Lektion 2 schauen wir uns Margen an — wie man aus den Zahlen ablesen kann, wie effizient eine Firma wirtschaftet. Bis dann.
+                Stark — du kannst jetzt eine GuV lesen und Margen einordnen. Das ist mehr, als die meisten in der ersten Stunde mitnehmen. Im nächsten Modul kommt die Bilanz dran. Anderer Bericht, gleiches Prinzip: Schritt für Schritt.
               </>
             }
           />
         </section>
 
-        {/* Section 4: Next Action — 4 cards (incl. Exit) */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <ActionCard
             tag="EMPFOHLEN"
-            title={`Lektion 2 — ${nextLesson.title}`}
+            title={`Nächste Lektion — ${nextLesson.title}`}
             subtitle={`${nextLesson.duration} · +${nextLesson.xp} XP`}
             ctaLabel="Jetzt starten"
             primary
@@ -184,7 +179,6 @@ export default function Slide12Retention({
           />
         </section>
 
-        {/* Footer banner: PWA install hint */}
         <div className="bg-is-bg-secondary border border-is-bg-border rounded-md p-3 flex items-center justify-between gap-3">
           <p className="font-[family-name:var(--font-is-sans)] text-sm text-is-text-secondary flex items-center gap-2">
             <span aria-hidden>💡</span>
@@ -202,8 +196,14 @@ export default function Slide12Retention({
   );
 }
 
-function ResultCircle({ correctCount, totalCount }: { correctCount: number; totalCount: number }) {
-  const radius = 38; // 80px diameter on mobile
+function ResultCircle({
+  correctCount,
+  totalCount,
+}: {
+  correctCount: number;
+  totalCount: number;
+}) {
+  const radius = 38;
   const stroke = 4;
   const circumference = 2 * Math.PI * radius;
   const dash = (correctCount / totalCount) * circumference;
@@ -312,4 +312,3 @@ function ActionCard({
     </div>
   );
 }
-

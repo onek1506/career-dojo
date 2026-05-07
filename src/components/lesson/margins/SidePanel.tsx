@@ -7,26 +7,28 @@ export interface SidePanelProps {
 
 const SLIDE_LABELS = [
   '01 Briefing',
-  '02 Bilanz vs. GuV',
-  '03 Wasserfall',
-  '04 Reihenfolge-Drill',
-  '05 Begriffe-Match',
+  '02 Margen',
+  '03 Formel',
+  '04 Quiz Bruttomarge',
+  '05 Quiz Nettomarge',
   '06 Cheat Sheet',
-  '07 Quiz',
-  '08 Zusammenfassung',
+  '07 Zusammenfassung',
 ];
 
 export default function SidePanel({ currentStep, totalSteps }: SidePanelProps) {
-  const labels = SLIDE_LABELS.length === totalSteps ? SLIDE_LABELS : Array.from({ length: totalSteps }, (_, i) => `${String(i + 1).padStart(2, '0')}`);
+  const labels =
+    SLIDE_LABELS.length === totalSteps
+      ? SLIDE_LABELS
+      : Array.from({ length: totalSteps }, (_, i) => `${String(i + 1).padStart(2, '0')}`);
 
   return (
     <div className="flex flex-col h-full p-5 gap-5">
       <div className="flex flex-col gap-1">
         <span className="font-[family-name:var(--font-is-mono)] text-[10px] text-is-text-muted uppercase tracking-wider">
-          Modul 01 · Lektion 1
+          Modul 01 · Lektion 2
         </span>
         <span className="font-[family-name:var(--font-is-serif)] text-lg text-is-text-primary leading-tight">
-          Was ist die GuV?
+          Margen lesen
         </span>
       </div>
 

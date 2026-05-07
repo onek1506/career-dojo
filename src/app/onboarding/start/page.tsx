@@ -31,7 +31,7 @@ const SLIDES: ComponentType<OnboardingSlideProps>[] = [
   Slide09FirstLessonHook,
 ];
 
-const FIRST_LESSON_PATH = '/lesson/acc-1-income-statement';
+const FIRST_LESSON_PATH = '/lesson/acc-1a-income-statement';
 
 export default function OnboardingStartPage() {
   const router = useRouter();

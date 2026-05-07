@@ -17,7 +17,7 @@ export const lessonMeta = {
   duration: 8,
   xp: 30,
   difficulty: 1,
-  prerequisite: 'acc-1-income-statement',
+  prerequisite: 'acc-1b-margins',
   trackConfig: {
     A: { slidesToShow: [1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13], duration: 6 },
     B: { slidesToShow: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13], duration: 8 },

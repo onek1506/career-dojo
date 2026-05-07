@@ -52,6 +52,7 @@ import GlossaryTooltip from '@/components/GlossaryTooltip';
 import Markdown from '@/components/Markdown';
 import { GLOSSARY, type GlossaryTerm } from '@/data/glossary';
 import IncomeStatementLesson from '@/components/lesson/income-statement/IncomeStatementLesson';
+import MarginsLesson from '@/components/lesson/margins/MarginsLesson';
 
 const MAX_TIMES_SHOWN = 3; // show each question at most 3 times in a row
 
@@ -344,9 +345,14 @@ export default function LessonPage() {
   const params = useParams();
   const lessonId = params.id as string;
 
-  // Income-Statement gets a redesigned, slide-based experience.
-  if (lessonId === 'acc-1-income-statement') {
+  // Lesson 1 was split into 1a (Income-Statement basics) and 1b (Margins),
+  // each with its own slide deck. Old `acc-1-income-statement` URLs still
+  // resolve to lesson 1a so deep links keep working.
+  if (lessonId === 'acc-1a-income-statement' || lessonId === 'acc-1-income-statement') {
     return <IncomeStatementLesson />;
+  }
+  if (lessonId === 'acc-1b-margins') {
+    return <MarginsLesson />;
   }
 
   return <LegacyLessonPage />;

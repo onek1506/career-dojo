@@ -3,13 +3,12 @@
 import { useMemo, useState, type ComponentType } from 'react';
 import { useRouter } from 'next/navigation';
 import Slide01Briefing from './Slide01Briefing';
-import Slide02BalanceVsIS from './Slide02BalanceVsIS';
-import Slide03Waterfall from './Slide03Waterfall';
-import Slide04WaterfallSort from './Slide04WaterfallSort';
-import Slide05TermMatch from './Slide05TermMatch';
+import Slide02Margins from './Slide02Margins';
+import Slide03FormulaDrill from './Slide03FormulaDrill';
+import Slide04QuizGross from './Slide04QuizGross';
+import Slide05QuizNet from './Slide05QuizNet';
 import Slide06CheatSheet from './Slide06CheatSheet';
-import Slide08QuizSort from './Slide08QuizSort';
-import Slide12Retention from './Slide12Retention';
+import Slide07Retention from './Slide07Retention';
 import SidePanel from './SidePanel';
 import { useStore } from '@/lib/store';
 import { calculateAccuracy, calculateTotalXp } from '@/lib/lesson/xp';
@@ -23,18 +22,17 @@ import type {
 
 const SLIDES: ComponentType<SlideProps>[] = [
   Slide01Briefing,
-  Slide02BalanceVsIS,
-  Slide03Waterfall,
-  Slide04WaterfallSort,
-  Slide05TermMatch,
+  Slide02Margins,
+  Slide03FormulaDrill,
+  Slide04QuizGross,
+  Slide05QuizNet,
   Slide06CheatSheet,
-  Slide08QuizSort,
-  Slide12Retention,
+  Slide07Retention,
 ];
 
-const LESSON_ID = 'acc-1a-income-statement';
+const LESSON_ID = 'acc-1b-margins';
 
-export default function IncomeStatementLesson() {
+export default function MarginsLesson() {
   const router = useRouter();
   const { completeLesson } = useStore();
 
@@ -42,7 +40,6 @@ export default function IncomeStatementLesson() {
   const [quizResults, setQuizResults] = useState<QuizResults>({
     q1: null,
     q2: null,
-    q3: null,
   });
   const [startTime] = useState<number>(() => Date.now());
   const [finalElapsed, setFinalElapsed] = useState<number | null>(null);
@@ -65,8 +62,8 @@ export default function IncomeStatementLesson() {
 
   const goNext = () => {
     if (currentStep >= SLIDES.length - 1) {
-      // From the retention hub's "Jetzt starten" CTA: jump to lesson 1b (Margins).
-      router.push('/lesson/acc-1b-margins');
+      // From the retention hub's "Jetzt starten" CTA: jump to lesson 02 (Balance Sheet).
+      router.push('/lesson/balance-sheet');
       return;
     }
     const enteringRetention = currentStep === SLIDES.length - 2;
@@ -79,7 +76,6 @@ export default function IncomeStatementLesson() {
   };
 
   const goBack = () => {
-    // From the retention hub the lesson is done — exit to the course view.
     if (isRetention) {
       router.push('/course');
       return;

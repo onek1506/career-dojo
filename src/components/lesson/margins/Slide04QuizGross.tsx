@@ -10,23 +10,15 @@ import { calculateQuizXp } from '@/lib/lesson/xp';
 import { shuffle } from '@/lib/utils/shuffle';
 import { priorStreakFor, type SlideProps } from './types';
 
-// Slide 08 in the beginner variant: a single multiple-choice question that
-// asks the most important conceptual takeaway from slide 02. The original
-// drag-and-sort with 6 statements proved too hard for fresh beginners
-// who had only seen the order once on slide 03.
-const ANSWER_VALUES = [
-  'Bilanz',
-  'Gewinn- und Verlustrechnung',
-  'Eigenkapitalveränderungsrechnung',
-  'Kapitalflussrechnung',
-] as const;
-const CORRECT_VALUE = 'Gewinn- und Verlustrechnung';
-const LETTERS = ['A', 'B', 'C', 'D'] as const;
 const BASE_XP = 10;
+
+const ANSWER_VALUES = ['60%', '40%', '80%', '20%'] as const;
+const CORRECT_VALUE = '40%';
+const LETTERS = ['A', 'B', 'C', 'D'] as const;
 
 type State = 'idle' | 'submitted-wrong-1' | 'submitted-wrong-2' | 'submitted-correct';
 
-export default function Slide08QuizSort({
+export default function Slide04QuizGross({
   currentStep,
   totalSteps,
   onBack,
@@ -38,9 +30,6 @@ export default function Slide08QuizSort({
   const [selected, setSelected] = useState<string | null>(null);
   const [state, setState] = useState<State>('idle');
   const [solvedOnAttempt, setSolvedOnAttempt] = useState<1 | 2 | null>(null);
-  // Shuffle answer values once per mount, then assign letters A–D.
-  // The correct letter is whatever position the correct value lands in,
-  // so users can't memorise "the answer is always B".
   const [{ options: OPTIONS, correctLetter: CORRECT_LETTER }] = useState(() => {
     const shuffled = shuffle(ANSWER_VALUES);
     const options = shuffled.map((value, i) => ({ letter: LETTERS[i], value }));
@@ -52,7 +41,8 @@ export default function Slide08QuizSort({
   const isWrongFirst = state === 'submitted-wrong-1';
   const isWrongFinal = state === 'submitted-wrong-2';
   const isResolved = isCorrect || isWrongFinal;
-  const priorStreak = priorStreakFor('q3', quizResults);
+  const showHint = isResolved || isWrongFirst;
+  const priorStreak = priorStreakFor('q1', quizResults);
 
   const handleSubmit = () => {
     if (!selected) return;
@@ -64,7 +54,7 @@ export default function Slide08QuizSort({
       if (xpInfo.countsForStreak) window.setTimeout(() => playStreakSound(), 250);
       setSolvedOnAttempt(attempts);
       setState('submitted-correct');
-      onAnswer?.('q3', { correct: true, attempts, ...xpInfo });
+      onAnswer?.('q1', { correct: true, attempts, ...xpInfo });
     } else if (state === 'idle') {
       playWrongSound();
       setState('submitted-wrong-1');
@@ -72,7 +62,7 @@ export default function Slide08QuizSort({
       const xpInfo = calculateQuizXp(false, 2, BASE_XP);
       playWrongSound();
       setState('submitted-wrong-2');
-      onAnswer?.('q3', { correct: false, attempts: 2, ...xpInfo });
+      onAnswer?.('q1', { correct: false, attempts: 2, ...xpInfo });
     }
   };
 
@@ -127,14 +117,21 @@ export default function Slide08QuizSort({
   );
 
   return (
-    <LessonLayout currentStep={currentStep} totalSteps={totalSteps} onBack={onBack} sidePanel={sidePanel} footer={footer}>
+    <LessonLayout
+      currentStep={currentStep}
+      totalSteps={totalSteps}
+      onBack={onBack}
+      sidePanel={sidePanel}
+      footer={footer}
+    >
       <div className="flex flex-col gap-5">
         <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted tracking-wider uppercase">
-          Übung 3 / 3 · {state === 'submitted-correct' ? '' : '+10 XP'}
+          Frage 1 / 2 · +
+          {state === 'submitted-wrong-1' || state === 'submitted-wrong-2' ? 5 : 10} XP
         </span>
 
         <h2 className="font-[family-name:var(--font-is-serif)] text-xl sm:text-3xl font-medium text-is-text-primary leading-tight">
-          Welcher Bericht zeigt einen Zeitraum (z.B. das ganze Jahr 2024)?
+          TechCo · Umsatz €200M, COGS €120M. Wie hoch ist die Bruttomarge?
         </h2>
 
         <div className="flex flex-col gap-2">
@@ -176,7 +173,7 @@ export default function Slide08QuizSort({
                 <span className="font-[family-name:var(--font-is-mono)] text-sm text-is-text-muted w-4 shrink-0">
                   {opt.letter}
                 </span>
-                <span className="font-[family-name:var(--font-is-sans)] text-base text-is-text-primary">
+                <span className="font-[family-name:var(--font-is-sans)] text-base text-is-text-primary tabular-nums">
                   {opt.value}
                 </span>
               </button>
@@ -185,96 +182,79 @@ export default function Slide08QuizSort({
         </div>
 
         <AnimatePresence>
-          {isCorrect && (
+          {showHint && (
             <motion.div
-              key="ok"
+              key="hint"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               className="flex flex-col gap-3"
             >
-              <MarcusNote
-                tone="gentle"
-                body={<>Genau das. Diese Unterscheidung ist der wichtigste Punkt aus Lektion 1.</>}
-              />
-              <StreakReadout
-                priorStreak={priorStreak}
-                outcome={solvedOnAttempt === 1 ? 'first-try' : 'second-try'}
-              />
-            </motion.div>
-          )}
-          {isWrongFirst && (
-            <motion.div
-              key="wrong1"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              <MarcusNote
-                tone="gentle"
-                subject="Re: Kein Stress"
-                body={
-                  <>
-                    Das verwechselt fast jeder am Anfang. Die Bilanz zeigt einen einzigen <strong className="not-italic">Stichtag</strong>. Die GuV zeigt einen <strong className="not-italic">Zeitraum</strong>. Versuch&apos;s nochmal.
-                  </>
-                }
-              />
-            </motion.div>
-          )}
-          {isWrongFinal && (
-            <motion.div
-              key="wrong2"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="flex flex-col gap-3"
-            >
-              <MarcusNote
-                tone="gentle"
-                body={<>Kein Problem, das verstehst du jetzt für nächstes Mal. Weiter geht&apos;s.</>}
-              />
-              <StreakReadout outcome="broken" priorStreak={priorStreak} />
+              <div className="bg-is-bg-secondary border border-is-bg-border rounded-md p-3">
+                <p className="font-[family-name:var(--font-is-mono)] text-xs sm:text-sm text-is-text-secondary leading-relaxed">
+                  Rechenweg{' '}
+                  <span className="text-is-text-primary">
+                    (Umsatz − COGS) / Umsatz = (200 − 120) / 200 = 80 / 200 = 40%
+                  </span>
+                </p>
+              </div>
+
+              {isCorrect && (
+                <>
+                  <MarcusNote
+                    tone="gentle"
+                    body={
+                      <>
+                        Sehr gut. Du hast gerade deine erste Margen-Berechnung gemacht — genau so läuft das in echten Pitchbooks.
+                      </>
+                    }
+                  />
+                  {solvedOnAttempt === 1 ? (
+                    <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-bg-border">
+                      <span aria-hidden className="text-is-accent">🔥</span>
+                      <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-secondary">
+                        {priorStreak + 1} in Folge richtig
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted">
+                      Beim zweiten Versuch geschafft · +5 XP
+                    </span>
+                  )}
+                </>
+              )}
+
+              {isWrongFirst && (
+                <MarcusNote
+                  tone="gentle"
+                  subject="Re: Beim zweiten Mal"
+                  body={
+                    <>
+                      Schau dir den Rechenweg oben an, dann probier&apos;s nochmal. Beim zweiten Versuch gibt&apos;s noch +5 XP.
+                    </>
+                  }
+                />
+              )}
+
+              {isWrongFinal && (
+                <>
+                  <MarcusNote
+                    tone="gentle"
+                    body={<>Kein Problem, das verstehst du jetzt für nächstes Mal. Weiter geht&apos;s.</>}
+                  />
+                  <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-error">
+                    <span aria-hidden className="text-is-error">🔥</span>
+                    <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-error">
+                      0 · Streak unterbrochen
+                    </span>
+                  </div>
+                </>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
     </LessonLayout>
-  );
-}
-
-function StreakReadout({
-  outcome,
-  priorStreak,
-}: {
-  outcome: 'first-try' | 'second-try' | 'broken';
-  priorStreak: number;
-}) {
-  if (outcome === 'first-try') {
-    return (
-      <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-bg-border">
-        <span aria-hidden className="text-is-accent">🔥</span>
-        <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-secondary">
-          {priorStreak + 1} in Folge richtig
-        </span>
-      </div>
-    );
-  }
-  if (outcome === 'second-try') {
-    return (
-      <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted">
-        Beim zweiten Versuch geschafft · +5 XP
-      </span>
-    );
-  }
-  return (
-    <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-error">
-      <span aria-hidden className="text-is-error">🔥</span>
-      <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-error">
-        0 · Streak unterbrochen
-      </span>
-    </div>
   );
 }

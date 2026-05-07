@@ -13,12 +13,22 @@ export interface LessonEntry {
 
 export const LESSON_REGISTRY: LessonEntry[] = [
   {
-    id: 'acc-1-income-statement',
+    id: 'acc-1a-income-statement',
     title: 'Income Statement',
-    titleDe: 'Gewinn- und Verlustrechnung',
-    route: '/lesson/acc-1-income-statement',
+    titleDe: 'Was ist die GuV?',
+    route: '/lesson/acc-1a-income-statement',
     duration: 6,
-    xp: 25,
+    xp: 30,
+    module: 'MODUL 01 · ACCOUNTING',
+    trackAvailability: ['A', 'B', 'C'],
+  },
+  {
+    id: 'acc-1b-margins',
+    title: 'Margins',
+    titleDe: 'Margen lesen',
+    route: '/lesson/acc-1b-margins',
+    duration: 6,
+    xp: 35,
     module: 'MODUL 01 · ACCOUNTING',
     trackAvailability: ['A', 'B', 'C'],
   },
