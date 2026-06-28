@@ -51,7 +51,8 @@ import Link from 'next/link';
 import GlossaryTooltip from '@/components/GlossaryTooltip';
 import Markdown from '@/components/Markdown';
 import { GLOSSARY, type GlossaryTerm } from '@/data/glossary';
-import IncomeStatementLesson from '@/components/lesson/income-statement/IncomeStatementLesson';
+import MicroLesson from '@/components/lesson/micro/MicroLesson';
+import { getMicroLesson } from '@/components/lesson/micro/registry';
 
 const MAX_TIMES_SHOWN = 3; // show each question at most 3 times in a row
 
@@ -344,9 +345,10 @@ export default function LessonPage() {
   const params = useParams();
   const lessonId = params.id as string;
 
-  // Income-Statement gets a redesigned, slide-based experience.
-  if (lessonId === 'acc-1-income-statement') {
-    return <IncomeStatementLesson />;
+  // Micro-lessons (data-driven slide engine) take over by id.
+  const micro = getMicroLesson(lessonId);
+  if (micro) {
+    return <MicroLesson data={micro} />;
   }
 
   return <LegacyLessonPage />;
