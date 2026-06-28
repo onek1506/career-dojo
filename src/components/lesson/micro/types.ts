@@ -25,8 +25,6 @@ export interface HookSlide {
   title: string; // serif headline
   subtitle?: string;
   marcus: MarcusBlock;
-  stats: { duration: string; xp: string; difficulty: string };
-  outcomes: string[];
 }
 
 export interface ConceptSlide {
@@ -38,15 +36,28 @@ export interface ConceptSlide {
   marcus?: MarcusBlock;
 }
 
-export interface MiniCheckSlide {
-  kind: 'minicheck';
-  id: string; // unique quiz key within the lesson
+export interface MiniCheckContent {
   prompt: string; // question (serif)
   options: string[];
   correctIndex: number;
   solution: string; // shown after submitting (the "Rechenweg")
-  marcusCorrect: string;
-  marcusWrong: string; // hint shown after the first wrong attempt
+}
+
+export interface MiniCheckSlide {
+  kind: 'minicheck';
+  id: string; // unique quiz key within the lesson
+  // Static question…
+  prompt?: string;
+  options?: string[];
+  correctIndex?: number;
+  solution?: string;
+  // …or a generator for randomized, transfer-style questions (new numbers
+  // each mount, computed answer + distractors). Wins over the static fields.
+  generate?: () => MiniCheckContent;
+  // Optional coaching note. Omitted for transfer questions, where the
+  // learner is expected to reason without a hand-hold.
+  marcusCorrect?: string;
+  marcusWrong?: string;
   baseXp?: number; // default 10
 }
 

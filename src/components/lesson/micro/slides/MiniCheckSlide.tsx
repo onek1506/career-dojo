@@ -13,7 +13,7 @@ import {
 } from '@/lib/sounds';
 import { shuffle } from '@/lib/utils/shuffle';
 import { calculateQuizXp } from '../xp';
-import type { MiniCheckSlide as MiniCheckSlideData, QuizResult } from '../types';
+import type { MiniCheckContent, MiniCheckSlide as MiniCheckSlideData, QuizResult } from '../types';
 
 interface Props {
   slide: MiniCheckSlideData;
@@ -31,6 +31,16 @@ const LETTERS = ['A', 'B', 'C', 'D', 'E'] as const;
 
 type State = 'idle' | 'wrong-1' | 'wrong-final' | 'correct';
 
+function resolveContent(slide: MiniCheckSlideData): MiniCheckContent {
+  if (slide.generate) return slide.generate();
+  return {
+    prompt: slide.prompt ?? '',
+    options: slide.options ?? [],
+    correctIndex: slide.correctIndex ?? 0,
+    solution: slide.solution ?? '',
+  };
+}
+
 export default function MiniCheckSlide({
   slide,
   currentStep,
@@ -43,13 +53,16 @@ export default function MiniCheckSlide({
   quizTotal,
 }: Props) {
   const baseXp = slide.baseXp ?? 10;
+  const hasMarcus = Boolean(slide.marcusCorrect || slide.marcusWrong);
 
-  // Shuffle answers once per mount; track which shuffled index is correct.
-  const [{ options, correctPos }] = useState(() => {
-    const indexed = slide.options.map((text, originalIndex) => ({ text, originalIndex }));
+  // Resolve the question once per mount (randomized generators stay stable
+  // for the lifetime of the slide), then shuffle answer positions.
+  const [{ content, options, correctPos }] = useState(() => {
+    const c = resolveContent(slide);
+    const indexed = c.options.map((text, originalIndex) => ({ text, originalIndex }));
     const shuffled = shuffle(indexed);
-    const correctPos = shuffled.findIndex((o) => o.originalIndex === slide.correctIndex);
-    return { options: shuffled, correctPos };
+    const correctPos = shuffled.findIndex((o) => o.originalIndex === c.correctIndex);
+    return { content: c, options: shuffled, correctPos };
   });
 
   const [selected, setSelected] = useState<number | null>(null);
@@ -142,7 +155,7 @@ export default function MiniCheckSlide({
         </span>
 
         <h2 className="font-[family-name:var(--font-is-serif)] text-xl sm:text-3xl font-medium text-is-text-primary leading-tight">
-          {slide.prompt}
+          {content.prompt}
         </h2>
 
         <div className="flex flex-col gap-2">
@@ -202,13 +215,13 @@ export default function MiniCheckSlide({
             >
               <div className="bg-is-bg-secondary border border-is-bg-border rounded-md p-3">
                 <p className="font-[family-name:var(--font-is-mono)] text-xs sm:text-sm text-is-text-secondary leading-relaxed">
-                  {slide.solution}
+                  {content.solution}
                 </p>
               </div>
 
               {isCorrect && (
                 <>
-                  <MarcusNote tone="gentle" body={slide.marcusCorrect} />
+                  {slide.marcusCorrect && <MarcusNote tone="gentle" body={slide.marcusCorrect} />}
                   {solvedOnAttempt === 1 ? (
                     <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-bg-border">
                       <span aria-hidden className="text-is-accent">🔥</span>
@@ -224,16 +237,23 @@ export default function MiniCheckSlide({
                 </>
               )}
 
-              {isWrongFirst && (
-                <MarcusNote tone="gentle" subject="Re: Beim zweiten Mal" body={slide.marcusWrong} />
-              )}
+              {isWrongFirst &&
+                (slide.marcusWrong ? (
+                  <MarcusNote tone="gentle" subject="Re: Beim zweiten Mal" body={slide.marcusWrong} />
+                ) : (
+                  <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted">
+                    Schau dir den Rechenweg an und probier es nochmal.
+                  </span>
+                ))}
 
               {isWrongFinal && (
                 <>
-                  <MarcusNote
-                    tone="gentle"
-                    body="Kein Problem, das verstehst du jetzt fürs nächste Mal. Weiter geht's."
-                  />
+                  {hasMarcus && (
+                    <MarcusNote
+                      tone="gentle"
+                      body="Kein Problem, das verstehst du jetzt fürs nächste Mal. Weiter geht's."
+                    />
+                  )}
                   <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-error">
                     <span aria-hidden className="text-is-error">🔥</span>
                     <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-error">

@@ -44,43 +44,7 @@ export default function HookSlide({ slide, currentStep, totalSteps, onBack, onNe
         )}
 
         <MarcusNote tone="gentle" subject={slide.marcus.subject} body={slide.marcus.body} />
-
-        <div className="grid grid-cols-3 gap-3 bg-is-bg-secondary border border-is-bg-border rounded-lg p-3 max-w-md">
-          <Stat label="DAUER" value={slide.stats.duration} />
-          <Stat label="XP" value={slide.stats.xp} />
-          <Stat label="SCHWIERIG." value={slide.stats.difficulty} />
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <p className="font-[family-name:var(--font-is-sans)] text-sm text-is-text-secondary">
-            Was du nach dieser Lektion verstehst:
-          </p>
-          <ul className="flex flex-col gap-2">
-            {slide.outcomes.map((outcome) => (
-              <li
-                key={outcome}
-                className="flex items-baseline gap-3 font-[family-name:var(--font-is-sans)] text-is-text-primary"
-              >
-                <ArrowRight size={14} className="text-is-accent shrink-0 translate-y-[2px]" aria-hidden />
-                <span>{outcome}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
     </LessonLayout>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className="font-[family-name:var(--font-is-mono)] text-[10px] text-is-text-muted uppercase tracking-widest">
-        {label}
-      </span>
-      <span className="font-[family-name:var(--font-is-mono)] text-xl text-is-text-primary tabular-nums">
-        {value}
-      </span>
-    </div>
   );
 }
