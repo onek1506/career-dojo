@@ -1,9 +1,10 @@
 // ============================================================
-// Income Statement, split into four micro-lessons (one concept at a time).
+// Income Statement, taught as two micro-lessons (one concept at a time).
 // German-only, matching the existing bespoke accounting lessons.
-// The coffee-shop narrative carries one consistent example across all four:
+// The coffee-shop narrative carries one consistent example across both:
 //   Revenue 100 -> COGS 40 -> Gross Profit 60 -> OpEx 25 -> EBIT 35
 //   -> Interest 5 -> Taxes 10 -> Net Income 20
+//   Lesson 1: Revenue -> OpEx.   Lesson 2: EBIT -> Net Income.
 // Transfer mini-checks use randomized numbers so the answer cannot be memorized.
 // ============================================================
 
@@ -35,7 +36,7 @@ function buildOptions(correct: number, tempting: number[]): { options: string[];
   return { options: nums.map((n) => `${n} €`), correctIndex: 0 };
 }
 
-// Lektion 1 transfer: reverse the Gross-Profit relationship to find COGS.
+// Transfer: reverse the Gross-Profit relationship to find COGS.
 function genReverseCogs(): MiniCheckContent {
   const revenue = pick(150, 400);
   const cogs = pick(50, revenue - 50);
@@ -47,7 +48,7 @@ function genReverseCogs(): MiniCheckContent {
   };
 }
 
-// Lektion 2 transfer: two-step from the top line down past OpEx.
+// Transfer: two-step from the top line down past OpEx.
 function genAfterOpex(): MiniCheckContent {
   const revenue = pick(250, 450);
   const cogs = pick(60, 120);
@@ -60,7 +61,7 @@ function genAfterOpex(): MiniCheckContent {
   };
 }
 
-// Lektion 3 transfer: reverse the EBIT relationship to find OpEx.
+// Transfer: reverse the EBIT relationship to find OpEx.
 function genReverseOpex(): MiniCheckContent {
   const gross = pick(120, 300);
   const opex = pick(40, gross - 40);
@@ -72,22 +73,22 @@ function genReverseOpex(): MiniCheckContent {
   };
 }
 
-// --- Lektion 01 — Umsatz & Bruttogewinn ---------------------------------
+// --- Lektion 01 — Umsatz bis OpEx ---------------------------------------
 
-export const lesson01Revenue: MicroLessonData = {
+export const lessonRevenueToOpex: MicroLessonData = {
   id: 'acc-1-income-statement',
   module: MODULE,
-  titleDe: 'Umsatz & Bruttogewinn',
-  nextPath: '/lesson/acc-1b-opex',
+  titleDe: 'GuV: Umsatz bis OpEx',
+  nextPath: '/lesson/acc-1c-ebit',
   slides: [
     {
       kind: 'hook',
       module: MODULE,
-      title: 'Umsatz & Bruttogewinn',
+      title: 'Umsatz bis Betriebskosten',
       subtitle: 'Die Gewinn- und Verlustrechnung (GuV), Teil 1',
       marcus: {
         subject: 'Re: Willkommen',
-        body: 'Stell dir vor, du verkaufst Kaffee. Du nimmst 100 € ein. Heißt das, du hast 100 € verdient? Nein. Genau dieser Unterschied ist der Anfang von allem. Wir gehen das ruhig durch, Schritt für Schritt. Keine Vorkenntnisse nötig.',
+        body: 'Stell dir vor, du verkaufst Kaffee. Du nimmst 100 € ein. Heißt das, du hast 100 € verdient? Nein. Genau dieser Unterschied ist der Anfang von allem. Wir gehen die GuV von oben durch: vom Umsatz über die Produktkosten bis zu den Betriebskosten. Schritt für Schritt, keine Vorkenntnisse nötig.',
       },
     },
     {
@@ -120,36 +121,6 @@ Gross Profit (Brutto)    60`,
       kind: 'minicheck',
       id: 'l1-gross-profit',
       generate: genReverseCogs,
-    },
-    {
-      kind: 'retention',
-      doneLabel: 'Lektion 01 abgeschlossen.',
-      marcus: {
-        subject: 'Re: Erste Stufe geschafft',
-        body: 'Stark. Du liest jetzt die obere Stufe jeder GuV. Als Nächstes kommen die Kosten, die nicht direkt am Produkt hängen: Miete, Marketing, Gehälter. Bis gleich.',
-      },
-      next: { title: 'Lektion 02: Betriebskosten (OpEx)', meta: '5 Min · +20 XP' },
-    },
-  ],
-};
-
-// --- Lektion 02 — Betriebskosten (OpEx) ---------------------------------
-
-export const lesson02Opex: MicroLessonData = {
-  id: 'acc-1b-opex',
-  module: MODULE,
-  titleDe: 'Betriebskosten (OpEx)',
-  nextPath: '/lesson/acc-1c-ebit',
-  slides: [
-    {
-      kind: 'hook',
-      module: MODULE,
-      title: 'Betriebskosten (OpEx)',
-      subtitle: 'Die GuV, Teil 2',
-      marcus: {
-        subject: "Re: Weiter geht's",
-        body: 'Letztes Mal hattest du 60 € Bruttogewinn übrig. Fühlt sich an wie Gewinn, oder? Ist es aber noch nicht. Eine Sorte Kosten haben wir bisher komplett ignoriert.',
-      },
     },
     {
       kind: 'concept',
@@ -205,32 +176,32 @@ export const lesson02Opex: MicroLessonData = {
     },
     {
       kind: 'retention',
-      doneLabel: 'Lektion 02 abgeschlossen.',
+      doneLabel: 'Lektion 01 abgeschlossen.',
       marcus: {
-        subject: 'Re: Zwei Sorten Kosten',
-        body: 'Geschafft. Du kennst jetzt zwei Sorten Kosten: Produktkosten (COGS) und Betriebskosten (OpEx). Das Ergebnis nach den OpEx hat übrigens einen eigenen Namen. Den lernst du als Nächstes.',
+        subject: 'Re: Obere Hälfte sitzt',
+        body: 'Stark. Du liest jetzt die obere Hälfte der GuV: Umsatz, Bruttogewinn und das Ergebnis nach den Betriebskosten. In der nächsten Lektion bekommt diese Zahl einen Namen, und wir gehen bis zum echten Gewinn ganz unten.',
       },
-      next: { title: 'Lektion 03: EBIT', meta: '4 Min · +20 XP' },
+      next: { title: 'Lektion 02: EBIT bis Net Income', meta: '9 Min · +40 XP' },
     },
   ],
 };
 
-// --- Lektion 03 — EBIT ---------------------------------------------------
+// --- Lektion 02 — EBIT bis Net Income -----------------------------------
 
-export const lesson03Ebit: MicroLessonData = {
+export const lessonEbitToNetIncome: MicroLessonData = {
   id: 'acc-1c-ebit',
   module: MODULE,
-  titleDe: 'EBIT',
-  nextPath: '/lesson/acc-1d-net-income',
+  titleDe: 'GuV: EBIT bis Net Income',
+  nextPath: '/lesson/balance-sheet',
   slides: [
     {
       kind: 'hook',
       module: MODULE,
-      title: 'EBIT, der Gewinn aus dem Geschäft',
-      subtitle: 'Die GuV, Teil 3',
+      title: 'EBIT bis Net Income',
+      subtitle: 'Die GuV, Teil 2',
       marcus: {
-        subject: 'Re: Ein Name für deine 35 €',
-        body: 'Letztes Mal sind wir bei 35 € gelandet, nach Zutaten, nach Miete und Marketing. Diese 35 € sind so wichtig, dass sie einen eigenen Namen haben. Den lernst du heute. Sonst nichts Neues.',
+        subject: 'Re: Bis zum echten Gewinn',
+        body: 'Letztes Mal sind wir bis 35 € gekommen, nach Zutaten, Miete und Marketing. Diese 35 € haben einen eigenen Namen, und danach fehlen nur noch zwei Stufen bis zum echten Gewinn. Den ganzen Rest der GuV machen wir jetzt.',
       },
     },
     {
@@ -238,7 +209,7 @@ export const lesson03Ebit: MicroLessonData = {
       eyebrow: 'DER BEGRIFF',
       heading: 'Deine 35 € heißen EBIT',
       paragraphs: [
-        'Das ist dein **EBIT**, der Gewinn aus deinem reinen Geschäft.',
+        'Diese **35 €** sind dein **EBIT**, der Gewinn aus deinem reinen Geschäft.',
         'EBIT steht für **E**arnings **B**efore **I**nterest and **T**axes: das Ergebnis, nachdem alle laufenden Kosten weg sind, aber bevor Zinsen und Steuern reinreden.',
         'Anders gesagt: Wie gut läuft dein Kaffeeladen **als Geschäft**, ganz unabhängig von Krediten oder dem Finanzamt?',
       ],
@@ -265,36 +236,6 @@ export const lesson03Ebit: MicroLessonData = {
         'Kleiner Ausblick, ganz ohne Druck: EBIT ist einer der Begriffe, die in Interviews **garantiert** fallen.',
         'Banken lieben EBIT, weil er zeigt, wie gut das Geschäft selbst läuft, unabhängig davon, wie es finanziert ist.',
       ],
-    },
-    {
-      kind: 'retention',
-      doneLabel: 'Lektion 03 abgeschlossen.',
-      marcus: {
-        subject: 'Re: Drei Stufen sitzen',
-        body: 'Echter Meilenstein. Du liest jetzt die obere Hälfte einer GuV: Revenue, Gross Profit, EBIT. In der letzten Lektion gehen wir bis ganz nach unten, zu dem, was wirklich übrig bleibt.',
-      },
-      next: { title: 'Lektion 04: Zinsen, Steuern & Net Income', meta: '5 Min · +25 XP' },
-    },
-  ],
-};
-
-// --- Lektion 04 — Zinsen, Steuern & Net Income --------------------------
-
-export const lesson04NetIncome: MicroLessonData = {
-  id: 'acc-1d-net-income',
-  module: MODULE,
-  titleDe: 'Zinsen, Steuern & Net Income',
-  nextPath: '/lesson/balance-sheet',
-  slides: [
-    {
-      kind: 'hook',
-      module: MODULE,
-      title: 'Zinsen, Steuern & Net Income',
-      subtitle: 'Die GuV, Teil 4',
-      marcus: {
-        subject: 'Re: Bis zum echten Gewinn',
-        body: 'Du bist bei deinem EBIT, sagen wir 35 €. Fast am Ziel. Zwei letzte Stufen, dann hast du den echten Gewinn.',
-      },
     },
     {
       kind: 'concept',
@@ -359,7 +300,7 @@ Net Income (Überschuss)     20`,
     },
     {
       kind: 'retention',
-      doneLabel: 'Lektion 04 abgeschlossen.',
+      doneLabel: 'Lektion 02 abgeschlossen.',
       marcus: {
         subject: 'Re: GuV komplett',
         body: 'Die GuV ist durch. Das war das erste große Kapitel, und du hast es Stufe für Stufe selbst aufgebaut. Als Nächstes wartet ein neues Dokument: die Bilanz.',
@@ -370,8 +311,6 @@ Net Income (Überschuss)     20`,
 };
 
 export const incomeStatementMicroLessons: MicroLessonData[] = [
-  lesson01Revenue,
-  lesson02Opex,
-  lesson03Ebit,
-  lesson04NetIncome,
+  lessonRevenueToOpex,
+  lessonEbitToNetIncome,
 ];

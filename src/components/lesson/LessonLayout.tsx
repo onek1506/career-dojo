@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, PanelRightClose, PanelRightOpen } from 'lucide-react';
-import { useLessonSidePanel } from './LessonSidePanelContext';
+import { useLessonSidePanel, useLessonSidePanelCollapse } from './LessonSidePanelContext';
 
 export interface LessonLayoutProps {
   currentStep: number;
@@ -29,7 +29,12 @@ export default function LessonLayout({
   const contextSidePanel = useLessonSidePanel();
   const effectiveSidePanel = sidePanel ?? contextSidePanel;
   // Collapsible Lesson-Map (desktop only — the panel is hidden below lg).
-  const [panelCollapsed, setPanelCollapsed] = useState(false);
+  // Prefer the provider-backed state so the collapse persists across slide
+  // navigation within a lesson; fall back to local state when no provider.
+  const collapseCtx = useLessonSidePanelCollapse();
+  const [localCollapsed, setLocalCollapsed] = useState(false);
+  const panelCollapsed = collapseCtx ? collapseCtx.collapsed : localCollapsed;
+  const setPanelCollapsed = collapseCtx ? collapseCtx.setCollapsed : setLocalCollapsed;
   const showPanel = Boolean(effectiveSidePanel) && !panelCollapsed;
   const progress = Math.min(100, Math.max(0, (currentStep / totalSteps) * 100));
   const stepCounter = `${String(currentStep).padStart(2, '0')} / ${String(totalSteps).padStart(2, '0')}`;
@@ -73,7 +78,7 @@ export default function LessonLayout({
           {effectiveSidePanel && (
             <button
               type="button"
-              onClick={() => setPanelCollapsed((v) => !v)}
+              onClick={() => setPanelCollapsed(!panelCollapsed)}
               aria-label={panelCollapsed ? 'Lesson-Map einblenden' : 'Lesson-Map ausblenden'}
               aria-pressed={!panelCollapsed}
               className="hidden lg:flex text-is-text-muted hover:text-is-text-primary transition-colors duration-200 min-h-[44px] min-w-[44px] items-center justify-center"
