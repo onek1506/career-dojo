@@ -1,9 +1,9 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
-import { useLessonSidePanel } from './LessonSidePanelContext';
+import { ArrowLeft, PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { useLessonSidePanel, useLessonSidePanelCollapse } from './LessonSidePanelContext';
 
 export interface LessonLayoutProps {
   currentStep: number;
@@ -28,6 +28,14 @@ export default function LessonLayout({
   // (balance-sheet, cash-flow, three-statements). Prop wins when both exist.
   const contextSidePanel = useLessonSidePanel();
   const effectiveSidePanel = sidePanel ?? contextSidePanel;
+  // Collapsible Lesson-Map (desktop only — the panel is hidden below lg).
+  // Prefer the provider-backed state so the collapse persists across slide
+  // navigation within a lesson; fall back to local state when no provider.
+  const collapseCtx = useLessonSidePanelCollapse();
+  const [localCollapsed, setLocalCollapsed] = useState(false);
+  const panelCollapsed = collapseCtx ? collapseCtx.collapsed : localCollapsed;
+  const setPanelCollapsed = collapseCtx ? collapseCtx.setCollapsed : setLocalCollapsed;
+  const showPanel = Boolean(effectiveSidePanel) && !panelCollapsed;
   const progress = Math.min(100, Math.max(0, (currentStep / totalSteps) * 100));
   const stepCounter = `${String(currentStep).padStart(2, '0')} / ${String(totalSteps).padStart(2, '0')}`;
 
@@ -67,6 +75,17 @@ export default function LessonLayout({
           <span className="font-[family-name:var(--font-is-mono)] text-[11px] sm:text-xs text-is-text-muted tabular-nums">
             {stepCounter}
           </span>
+          {effectiveSidePanel && (
+            <button
+              type="button"
+              onClick={() => setPanelCollapsed(!panelCollapsed)}
+              aria-label={panelCollapsed ? 'Lesson-Map einblenden' : 'Lesson-Map ausblenden'}
+              aria-pressed={!panelCollapsed}
+              className="hidden lg:flex text-is-text-muted hover:text-is-text-primary transition-colors duration-200 min-h-[44px] min-w-[44px] items-center justify-center"
+            >
+              {panelCollapsed ? <PanelRightOpen size={18} /> : <PanelRightClose size={18} />}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => router.push('/course')}
@@ -82,7 +101,7 @@ export default function LessonLayout({
           centered content sits in the true viewport center, matching the
           header's progress bar and the footer CTA. */}
       <div className="flex-1 flex overflow-hidden">
-        {effectiveSidePanel && (
+        {showPanel && (
           <div className="hidden lg:block w-72 flex-shrink-0" aria-hidden="true" />
         )}
         <main className="flex-1 overflow-y-auto">
@@ -91,7 +110,7 @@ export default function LessonLayout({
           </div>
         </main>
 
-        {effectiveSidePanel && (
+        {showPanel && (
           <aside
             className="hidden lg:flex w-72 flex-shrink-0 border-l border-is-bg-border flex-col overflow-y-auto"
             style={{ background: 'var(--is-bg-primary)' }}
