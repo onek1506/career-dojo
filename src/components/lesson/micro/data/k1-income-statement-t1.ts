@@ -15,9 +15,7 @@ export const k1IncomeStatementT1: MicroLessonData = {
   id: 'k1-acc-1-income-statement',
   module: MODULE,
   titleDe: 'Income Statement, Teil 1',
-  // L3 (Teil 2) is built in a later batch; point the CTA at the course
-  // overview until then so the retention hub never dead-ends.
-  nextPath: '/course',
+  nextPath: '/lesson/k1-acc-2-income-statement',
   slides: [
     {
       kind: 'hook',

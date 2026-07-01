@@ -9,8 +9,8 @@ import type { MicroLessonData } from '../types';
 
 const MODULE = 'MODUL 00 · ORIENTIERUNG';
 
-export const k1IntroSpielfeld: MicroLessonData = {
-  id: 'k1-intro-spielfeld',
+export const k1OrientSpielfeld: MicroLessonData = {
+  id: 'k1-orient-1-spielfeld',
   module: MODULE,
   titleDe: 'Das Spielfeld',
   nextPath: '/lesson/k1-acc-1-income-statement',
