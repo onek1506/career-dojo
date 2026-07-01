@@ -110,8 +110,10 @@ Hooks und Retention sind als **Mail vom Mentor** gebaut (`subject: 'Re: …'`).
 - **`solution`**: der Rechenweg in einer Zeile („Bruttogewinn = Umsatz − COGS = 100 − 40 = 60 €.").
 - **`marcusCorrect`**: warme Bestätigung + Mechanik nochmal benennen
   („Genau. 100 rein, 40 weg, 60 bleibt.").
-- **`marcusWrong`**: sanft, ohne Schuld („Kein Stress.") + Methode wiederholen + zum erneuten
-  Versuch einladen („Schau nochmal."). Zwei-Versuch-Logik und Streak-Chip macht die Engine.
+- **`marcusWrong`** (VERBINDLICH für jedes Quiz, L1–L15): ermutigend, ohne Tadel, kurz die
+  richtige Denkweise zeigen, zum erneuten Versuch einladen. Stil: „Fast — wir ziehen ab, nicht
+  dazu. Schau nochmal, du hast es gleich." Steht im Konzept ein Falsch-Feedback, wörtlich nehmen;
+  steht keins, in genau diesem Ton ergänzen. Zwei-Versuch-Logik und Streak-Chip macht die Engine.
 - Transfer-/Zufallsfragen (`generate`) sind für K1 **nicht** der Default — K1-Quizzes bleiben leicht.
 
 ---

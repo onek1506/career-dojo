@@ -13,6 +13,7 @@ import {
 } from '@/lib/sounds';
 import { shuffle } from '@/lib/utils/shuffle';
 import { calculateQuizXp } from '../xp';
+import { rich } from '../rich';
 import type { MiniCheckContent, MiniCheckSlide as MiniCheckSlideData, QuizResult } from '../types';
 
 interface Props {
@@ -221,7 +222,7 @@ export default function MiniCheckSlide({
 
               {isCorrect && (
                 <>
-                  {slide.marcusCorrect && <MarcusNote tone="gentle" body={slide.marcusCorrect} />}
+                  {slide.marcusCorrect && <MarcusNote tone="gentle" body={rich(slide.marcusCorrect)} />}
                   {solvedOnAttempt === 1 ? (
                     <div className="self-start flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-is-bg-secondary border border-is-bg-border">
                       <span aria-hidden className="text-is-accent">🔥</span>
@@ -239,7 +240,7 @@ export default function MiniCheckSlide({
 
               {isWrongFirst &&
                 (slide.marcusWrong ? (
-                  <MarcusNote tone="gentle" subject="Re: Beim zweiten Mal" body={slide.marcusWrong} />
+                  <MarcusNote tone="gentle" subject="Re: Beim zweiten Mal" body={rich(slide.marcusWrong)} />
                 ) : (
                   <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted">
                     Schau dir den Rechenweg an und probier es nochmal.

@@ -58,7 +58,7 @@ export default function ConceptSlide({ slide, currentStep, totalSteps, onBack, o
         )}
 
         {slide.marcus && (
-          <MarcusNote tone="gentle" subject={slide.marcus.subject} body={slide.marcus.body} />
+          <MarcusNote tone="gentle" subject={slide.marcus.subject} body={rich(slide.marcus.body)} />
         )}
       </div>
     </LessonLayout>
