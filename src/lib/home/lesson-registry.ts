@@ -62,6 +62,28 @@ export const LESSON_REGISTRY: LessonEntry[] = [
     module: 'MODUL 01 · ACCOUNTING',
     trackAvailability: ['A', 'B', 'C'],
   },
+  // --- Kategorie 1 tree (standalone, k1- prefix). Appended so it does not
+  // reorder the existing home "next lesson" flow while under review. ---
+  {
+    id: 'k1-intro-spielfeld',
+    title: 'The Playing Field',
+    titleDe: 'Das Spielfeld',
+    route: '/lesson/k1-intro-spielfeld',
+    duration: 7,
+    xp: 20,
+    module: 'MODUL 00 · ORIENTIERUNG',
+    trackAvailability: ['A', 'B', 'C'],
+  },
+  {
+    id: 'k1-acc-1-income-statement',
+    title: 'Income Statement, Part 1',
+    titleDe: 'Income Statement, Teil 1',
+    route: '/lesson/k1-acc-1-income-statement',
+    duration: 9,
+    xp: 35,
+    module: 'MODUL 01 · ACCOUNTING',
+    trackAvailability: ['A', 'B', 'C'],
+  },
 ];
 
 export function getNextLesson(
