@@ -4,7 +4,8 @@
 // Marcus teaching text, quiz questions/options, and "Feedback richtig"
 // (marcusCorrect) are verbatim. Headings, eyebrows, `solution`, retention
 // marcus body, and next.meta are format scaffolding to match L1/L2.
-// No marcusWrong is authored in the source, so none is invented.
+// marcusWrong (wrong-answer feedback) is added in the encouraging K1 Marcus
+// tone per the ratified convention (every quiz gets right AND wrong feedback).
 // ============================================================
 
 import type { MicroLessonData } from '../types';
@@ -52,6 +53,7 @@ export const k1BalanceSheetT1: MicroLessonData = {
       correctIndex: 0,
       solution: 'Ein Asset ist etwas mit Wert, das dein Laden besitzt. Die Espressomaschine gehört dir.',
       marcusCorrect: 'Genau. Sie gehört dir und hat einen Wert — ein klares Asset.',
+      marcusWrong: 'Fast — ein Asset ist etwas, das dein Laden besitzt und das einen Wert hat. Kaffeegeruch und gute Laune gehören nicht dazu. Schau nochmal, du hast es gleich.',
     },
     {
       kind: 'concept',
@@ -70,6 +72,7 @@ export const k1BalanceSheetT1: MicroLessonData = {
       correctIndex: 0,
       solution: 'Bargeld kannst du sofort ausgeben. Die Maschine ist wertvoll, aber nicht sofort verfügbar.',
       marcusCorrect: 'Richtig. Die Maschine ist wertvoll, aber du kannst sie nicht einfach ausgeben.',
+      marcusWrong: 'Fast — Bargeld kannst du sofort ausgeben, die Maschine nicht. Schau nochmal, du hast es gleich.',
     },
     {
       kind: 'concept',

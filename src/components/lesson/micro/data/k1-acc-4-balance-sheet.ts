@@ -4,7 +4,8 @@
 // Marcus teaching text, quiz questions/options, and "Feedback richtig"
 // (marcusCorrect) are verbatim. Headings, eyebrows, `solution`, retention
 // marcus body, and next.meta are format scaffolding to match L1/L2.
-// No marcusWrong is authored in the source, so none is invented.
+// marcusWrong (wrong-answer feedback) is added in the encouraging K1 Marcus
+// tone per the ratified convention (every quiz gets right AND wrong feedback).
 // Coffee canon: Maschine 50 + Kasse 20 = Assets 70; Liabilities 30; Equity 40.
 // ============================================================
 
@@ -54,6 +55,7 @@ export const k1BalanceSheetT2: MicroLessonData = {
       correctIndex: 0,
       solution: 'Eine Liability ist geliehenes Geld, das du zurückzahlen musst. Der Bankkredit gehört dazu.',
       marcusCorrect: 'Genau. Ein Kredit muss zurück — das macht ihn zur Schuld.',
+      marcusWrong: 'Fast — eine Liability ist geliehenes Geld, das zurück muss. Maschine und Bargeld gehören dir, der Kredit nicht. Schau nochmal, du hast es gleich.',
     },
     {
       kind: 'concept',
@@ -79,6 +81,7 @@ export const k1BalanceSheetT2: MicroLessonData = {
       correctIndex: 0,
       solution: 'Equity ist dein eigenes Geld und bleibt deins. Liabilities sind Schulden und gehen zurück.',
       marcusCorrect: 'Richtig. Equity ist dein eigenes Geld. Schulden gehen zurück, dein Anteil bleibt.',
+      marcusWrong: 'Fast — Schulden (Liabilities) gehen zurück, dein eigenes Geld (Equity) bleibt deins. Schau nochmal, du hast es gleich.',
     },
     {
       kind: 'concept',
@@ -106,6 +109,7 @@ export const k1BalanceSheetT2: MicroLessonData = {
       correctIndex: 0,
       solution: 'Equity = Assets − Liabilities = 70 − 30 = 40.',
       marcusCorrect: 'Sauber. Was übrig bleibt nach den Schulden, gehört dir.',
+      marcusWrong: 'Fast — was dir gehört, ist Assets minus Schulden: 70 − 30. Schau nochmal, du hast es gleich.',
     },
     {
       kind: 'concept',
