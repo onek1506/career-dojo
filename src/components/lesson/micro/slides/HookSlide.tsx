@@ -5,6 +5,7 @@ import LessonLayout from '../../LessonLayout';
 import LessonFooterCTA from '../../LessonFooterCTA';
 import MarcusNote from '../../MarcusNote';
 import { playClickSound } from '@/lib/sounds';
+import { rich } from '../rich';
 import type { HookSlide as HookSlideData } from '../types';
 
 interface Props {
@@ -43,7 +44,7 @@ export default function HookSlide({ slide, currentStep, totalSteps, onBack, onNe
           </p>
         )}
 
-        <MarcusNote tone="gentle" subject={slide.marcus.subject} body={slide.marcus.body} />
+        <MarcusNote tone="gentle" subject={slide.marcus.subject} body={rich(slide.marcus.body)} />
       </div>
     </LessonLayout>
   );

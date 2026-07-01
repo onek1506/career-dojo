@@ -8,6 +8,7 @@ import LessonLayout from '../../LessonLayout';
 import MarcusNote from '../../MarcusNote';
 import { playClickSound, playCompleteSound } from '@/lib/sounds';
 import { formatDuration } from '@/lib/lesson/format';
+import { rich } from '../rich';
 import type { MicroRetentionResults, RetentionSlide as RetentionSlideData } from '../types';
 
 interface Props {
@@ -61,7 +62,7 @@ export default function RetentionSlide({ slide, currentStep, totalSteps, onBack,
 
         {/* Marcus feedback */}
         <section>
-          <MarcusNote tone="gentle" subject={slide.marcus.subject} body={slide.marcus.body} />
+          <MarcusNote tone="gentle" subject={slide.marcus.subject} body={rich(slide.marcus.body)} />
         </section>
 
         {/* Next action + exit */}
