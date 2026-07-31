@@ -1,7 +1,41 @@
 // CareerDojo — Investment Banking track data
 // Extracted from content.ts so consumers can code-split track data.
 
-import type { Track } from './content-core';
+import type { Lesson, Track } from './content-core';
+
+// K1 beginner-path entries surface the standalone Kategorie-1 tree in the
+// skill tree. The actual lesson experience is the micro-lesson slide engine
+// (components/lesson/micro/registry.ts), which intercepts /lesson/<id> —
+// these stubs only provide metadata for the tree UI.
+function k1Lesson(
+  id: string,
+  title: string,
+  titleDe: string,
+  xpReward: number,
+  estimatedMinutes: number,
+): Lesson {
+  return {
+    id,
+    unitId: 'k1-beginner-path',
+    title,
+    titleDe,
+    type: 'lesson',
+    difficulty: 'beginner',
+    xpReward,
+    estimatedMinutes,
+    content: {
+      sections: [
+        {
+          heading: title,
+          headingDe: titleDe,
+          body: 'This lesson opens in the guided slide experience.',
+          bodyDe: 'Diese Lektion öffnet im geführten Slide-Format.',
+        },
+      ],
+    },
+    quiz: [],
+  };
+}
 
 export const ibTrack: Track = {
   id: 'ib',
@@ -10,6 +44,37 @@ export const ibTrack: Track = {
   description: 'Master IB interviews from basics to advanced technicals',
   descriptionDe: 'Meistere IB-Interviews von den Grundlagen bis zu fortgeschrittenen Technicals',
   units: [
+    // ========== UNIT 0: K1 BEGINNER PATH (micro-lesson engine) ==========
+    {
+      id: 'k1-beginner-path',
+      title: 'Beginner Path',
+      titleDe: 'Einsteiger-Pfad',
+      description: 'From zero to interview-ready: accounting, valuation, and the interview itself',
+      descriptionDe: 'Von null bis interviewbereit: Buchhaltung, Bewertung und das Interview selbst',
+      icon: '🧭',
+      difficulty: 'beginner',
+      order: 0,
+      requiredXp: 0,
+      color: '#FF6B00',
+      lessons: [
+        k1Lesson('k1-orient-1-spielfeld', 'The Playing Field', 'Das Spielfeld', 20, 7),
+        k1Lesson('k1-acc-1-income-statement', 'Income Statement, Part 1', 'Income Statement, Teil 1', 35, 9),
+        k1Lesson('k1-acc-2-income-statement', 'Income Statement, Part 2', 'Income Statement, Teil 2', 40, 9),
+        k1Lesson('k1-acc-3-balance-sheet', 'What the Shop Owns', 'Was der Laden besitzt', 30, 8),
+        k1Lesson('k1-acc-4-balance-sheet', 'Where the Money Came From', 'Woher das Geld kam', 35, 8),
+        k1Lesson('k1-acc-5-cash-flow', 'Profit Is Not Cash', 'Gewinn ist nicht Geld', 25, 7),
+        k1Lesson('k1-acc-6-cash-flow', 'The Three Drawers', 'Die drei Schubladen', 30, 8),
+        k1Lesson('k1-acc-7-three-statements', 'The Penny Drops', 'Der Groschen fällt', 40, 9),
+        k1Lesson('k1-acc-8-working-capital', 'Money Stuck in the Shop', 'Geld, das im Laden feststeckt', 25, 6),
+        k1Lesson('k1-val-1-was-ist-wert', 'What Is a Company Worth?', 'Was ist ein Unternehmen wert?', 25, 6),
+        k1Lesson('k1-val-2-ev-equity', 'One Shop, Two Price Tags', 'Ein Laden, zwei Preisschilder', 30, 7),
+        k1Lesson('k1-val-3-ev-equity', 'The Bridge', 'Die Brücke', 35, 8),
+        k1Lesson('k1-val-4-methoden', 'Three Ways to a Value', 'Drei Wege zum Wert', 30, 7),
+        k1Lesson('k1-soft-1-why-ib', 'Why Investment Banking?', 'Warum Investment Banking?', 25, 6),
+        k1Lesson('k1-soft-2-why-bank-why-you', 'Why This Bank, Why You?', 'Warum diese Bank, warum du?', 25, 6),
+        k1Lesson('k1-soft-3-spring-week', 'How a Spring Week Really Works', 'Wie eine Spring Week wirklich abläuft', 20, 5),
+      ],
+    },
     // ========== UNIT 1: ACCOUNTING FUNDAMENTALS ==========
     {
       id: 'accounting-basics',

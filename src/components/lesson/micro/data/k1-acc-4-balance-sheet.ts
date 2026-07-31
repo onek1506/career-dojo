@@ -17,9 +17,7 @@ export const k1BalanceSheetT2: MicroLessonData = {
   id: 'k1-acc-4-balance-sheet',
   module: MODULE,
   titleDe: 'Woher das Geld kam',
-  // L5 (Cash Flow Teil 1) is built in a later batch; point at the course
-  // overview until then so the retention hub never dead-ends.
-  nextPath: '/course',
+  nextPath: '/lesson/k1-acc-5-cash-flow',
   slides: [
     {
       kind: 'hook',
