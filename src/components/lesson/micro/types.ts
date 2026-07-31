@@ -91,6 +91,9 @@ export interface MicroLessonData {
   module: string; // side-panel module label
   titleDe: string; // side-panel lesson title
   nextPath: string; // route pushed from the retention hub's "next" CTA
+  // Weak-area topic tag (K2+): quiz results are recorded per topic in a
+  // category-independent store so later categories can read the profile.
+  topicTag?: string;
   slides: MicroSlide[];
 }
 

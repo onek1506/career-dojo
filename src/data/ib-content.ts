@@ -3,11 +3,12 @@
 
 import type { Lesson, Track } from './content-core';
 
-// K1 beginner-path entries surface the standalone Kategorie-1 tree in the
-// skill tree. The actual lesson experience is the micro-lesson slide engine
+// Engine-path entries surface the standalone K1/K2 trees in the skill tree.
+// The actual lesson experience is the micro-lesson slide engine
 // (components/lesson/micro/registry.ts), which intercepts /lesson/<id> —
 // these stubs only provide metadata for the tree UI.
-function k1Lesson(
+function engineLesson(
+  unitId: string,
   id: string,
   title: string,
   titleDe: string,
@@ -16,7 +17,7 @@ function k1Lesson(
 ): Lesson {
   return {
     id,
-    unitId: 'k1-beginner-path',
+    unitId,
     title,
     titleDe,
     type: 'lesson',
@@ -57,22 +58,54 @@ export const ibTrack: Track = {
       requiredXp: 0,
       color: '#FF6B00',
       lessons: [
-        k1Lesson('k1-orient-1-spielfeld', 'The Playing Field', 'Das Spielfeld', 20, 7),
-        k1Lesson('k1-acc-1-income-statement', 'Income Statement, Part 1', 'Income Statement, Teil 1', 35, 9),
-        k1Lesson('k1-acc-2-income-statement', 'Income Statement, Part 2', 'Income Statement, Teil 2', 40, 9),
-        k1Lesson('k1-acc-3-balance-sheet', 'What the Shop Owns', 'Was der Laden besitzt', 30, 8),
-        k1Lesson('k1-acc-4-balance-sheet', 'Where the Money Came From', 'Woher das Geld kam', 35, 8),
-        k1Lesson('k1-acc-5-cash-flow', 'Profit Is Not Cash', 'Gewinn ist nicht Geld', 25, 7),
-        k1Lesson('k1-acc-6-cash-flow', 'The Three Drawers', 'Die drei Schubladen', 30, 8),
-        k1Lesson('k1-acc-7-three-statements', 'The Penny Drops', 'Der Groschen fällt', 40, 9),
-        k1Lesson('k1-acc-8-working-capital', 'Money Stuck in the Shop', 'Geld, das im Laden feststeckt', 25, 6),
-        k1Lesson('k1-val-1-was-ist-wert', 'What Is a Company Worth?', 'Was ist ein Unternehmen wert?', 25, 6),
-        k1Lesson('k1-val-2-ev-equity', 'One Shop, Two Price Tags', 'Ein Laden, zwei Preisschilder', 30, 7),
-        k1Lesson('k1-val-3-ev-equity', 'The Bridge', 'Die Brücke', 35, 8),
-        k1Lesson('k1-val-4-methoden', 'Three Ways to a Value', 'Drei Wege zum Wert', 30, 7),
-        k1Lesson('k1-soft-1-why-ib', 'Why Investment Banking?', 'Warum Investment Banking?', 25, 6),
-        k1Lesson('k1-soft-2-why-bank-why-you', 'Why This Bank, Why You?', 'Warum diese Bank, warum du?', 25, 6),
-        k1Lesson('k1-soft-3-spring-week', 'How a Spring Week Really Works', 'Wie eine Spring Week wirklich abläuft', 20, 5),
+        engineLesson('k1-beginner-path', 'k1-orient-1-spielfeld', 'The Playing Field', 'Das Spielfeld', 20, 7),
+        engineLesson('k1-beginner-path', 'k1-acc-1-income-statement', 'Income Statement, Part 1', 'Income Statement, Teil 1', 35, 9),
+        engineLesson('k1-beginner-path', 'k1-acc-2-income-statement', 'Income Statement, Part 2', 'Income Statement, Teil 2', 40, 9),
+        engineLesson('k1-beginner-path', 'k1-acc-3-balance-sheet', 'What the Shop Owns', 'Was der Laden besitzt', 30, 8),
+        engineLesson('k1-beginner-path', 'k1-acc-4-balance-sheet', 'Where the Money Came From', 'Woher das Geld kam', 35, 8),
+        engineLesson('k1-beginner-path', 'k1-acc-5-cash-flow', 'Profit Is Not Cash', 'Gewinn ist nicht Geld', 25, 7),
+        engineLesson('k1-beginner-path', 'k1-acc-6-cash-flow', 'The Three Drawers', 'Die drei Schubladen', 30, 8),
+        engineLesson('k1-beginner-path', 'k1-acc-7-three-statements', 'The Penny Drops', 'Der Groschen fällt', 40, 9),
+        engineLesson('k1-beginner-path', 'k1-acc-8-working-capital', 'Money Stuck in the Shop', 'Geld, das im Laden feststeckt', 25, 6),
+        engineLesson('k1-beginner-path', 'k1-val-1-was-ist-wert', 'What Is a Company Worth?', 'Was ist ein Unternehmen wert?', 25, 6),
+        engineLesson('k1-beginner-path', 'k1-val-2-ev-equity', 'One Shop, Two Price Tags', 'Ein Laden, zwei Preisschilder', 30, 7),
+        engineLesson('k1-beginner-path', 'k1-val-3-ev-equity', 'The Bridge', 'Die Brücke', 35, 8),
+        engineLesson('k1-beginner-path', 'k1-val-4-methoden', 'Three Ways to a Value', 'Drei Wege zum Wert', 30, 7),
+        engineLesson('k1-beginner-path', 'k1-soft-1-why-ib', 'Why Investment Banking?', 'Warum Investment Banking?', 25, 6),
+        engineLesson('k1-beginner-path', 'k1-soft-2-why-bank-why-you', 'Why This Bank, Why You?', 'Warum diese Bank, warum du?', 25, 6),
+        engineLesson('k1-beginner-path', 'k1-soft-3-spring-week', 'How a Spring Week Really Works', 'Wie eine Spring Week wirklich abläuft', 20, 5),
+        engineLesson('k1-beginner-path', 'k1-bridge-16-ausblick', 'Recap & Outlook', 'Rückblick & Ausblick', 15, 3),
+      ],
+    },
+    // ========== UNIT 0b: K2 INTERVIEW TRAINING (micro-lesson engine) ==========
+    {
+      id: 'k2-interview-training',
+      title: 'Interview Training',
+      titleDe: 'Interview-Training',
+      description: 'Real interview questions, drilled: accounting, EV, DCF, M&A, LBO, fit',
+      descriptionDe: 'Echte Interviewfragen im Drill: Accounting, EV, DCF, M&A, LBO, Fit',
+      icon: '🎯',
+      difficulty: 'intermediate',
+      order: 1,
+      requiredXp: 0,
+      color: '#D4AF37',
+      lessons: [
+        engineLesson('k2-interview-training', 'k2-acc-1-bridge', 'The First Real Question', 'Die erste echte Frage', 40, 8),
+        engineLesson('k2-interview-training', 'k2-acc-2-three-statements-drill', 'Linkage Questions Drill', 'Verknüpfungsfragen im Drill', 40, 8),
+        engineLesson('k2-interview-training', 'k2-acc-3-edge-cases', 'The Nasty Variants', 'Die fiesen Varianten', 45, 8),
+        engineLesson('k2-interview-training', 'k2-ev-1-drill', 'EV and Equity Drill', 'EV und Equity im Drill', 35, 7),
+        engineLesson('k2-interview-training', 'k2-ev-2-multiples', 'EV/EBITDA vs. P/E', 'EV/EBITDA vs. P/E', 35, 7),
+        engineLesson('k2-interview-training', 'k2-val-1-dcf-mechanik', 'DCF: The Engine Room', 'DCF: der Maschinenraum', 40, 8),
+        engineLesson('k2-interview-training', 'k2-val-2-wacc', 'WACC', 'WACC', 45, 8),
+        engineLesson('k2-interview-training', 'k2-val-3-terminal-value', 'Terminal Value', 'Terminal Value', 40, 7),
+        engineLesson('k2-interview-training', 'k2-val-4-dcf-interview', 'Walk me through a DCF', 'Walk me through a DCF', 50, 8),
+        engineLesson('k2-interview-training', 'k2-ma-1-accretion-dilution', 'Accretion / Dilution', 'Accretion / Dilution', 45, 8),
+        engineLesson('k2-interview-training', 'k2-ma-2-drill', 'Cash, Stock, Debt Drill', 'Cash, Stock, Debt im Drill', 40, 7),
+        engineLesson('k2-interview-training', 'k2-lbo-1-was-ist-lbo', 'What an LBO Is', 'Was ein LBO ist', 35, 7),
+        engineLesson('k2-interview-training', 'k2-lbo-2-mechanik', 'LBO Mechanics', 'LBO-Mechanik', 50, 8),
+        engineLesson('k2-interview-training', 'k2-fit-1-story', 'Walk me through your CV', 'Walk me through your CV', 35, 7),
+        engineLesson('k2-interview-training', 'k2-fit-2-why-und-tough', 'Why IB and the Tough Ones', 'Why IB und die unangenehmen Fragen', 35, 7),
+        engineLesson('k2-interview-training', 'k2-mock-1-mixed', 'The Mixed Mock', 'Der Mixed Mock', 50, 8),
       ],
     },
     // ========== UNIT 1: ACCOUNTING FUNDAMENTALS ==========
