@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
+import { recordWeakAreaAnswer } from '@/lib/weak-areas';
 import LessonSidePanel from '../LessonSidePanel';
 import { LessonSidePanelProvider } from '../LessonSidePanelContext';
 import MicroSlideView from './MicroSlideView';
@@ -82,6 +83,7 @@ export default function MicroLesson({ data }: { data: MicroLessonData }) {
   const quizIndex = slide.kind === 'minicheck' ? quizOrder.indexOf(slide.id) + 1 : 0;
 
   const handleAnswer = (key: string, result: QuizResult) => {
+    if (data.topicTag) recordWeakAreaAnswer(data.topicTag, result.correct);
     setQuizResults((prev) => ({ ...prev, [key]: result }));
   };
 

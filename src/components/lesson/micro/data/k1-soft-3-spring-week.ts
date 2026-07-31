@@ -17,7 +17,7 @@ export const k1SoftSpringWeek: MicroLessonData = {
   id: 'k1-soft-3-spring-week',
   module: MODULE,
   titleDe: 'Wie eine Spring Week wirklich abläuft',
-  nextPath: '/lesson/k1-orient-1-spielfeld',
+  nextPath: '/lesson/k1-bridge-16-ausblick',
   slides: [
     {
       kind: 'hook',
@@ -78,7 +78,7 @@ export const k1SoftSpringWeek: MicroLessonData = {
         subject: 'Re: Der Abschluss',
         body: 'Damit ist der Pfad abgeschlossen. Du weißt jetzt, was in einer Spring Week wirklich passiert und was dort zählt. Wenn du magst, wiederhole die Lektionen jederzeit von vorn, ganz ohne Eile.',
       },
-      next: { title: 'Von vorn wiederholen', meta: 'Wissen festigen' },
+      next: { title: 'Rückblick & Ausblick', meta: '3 Min · +15 XP' },
     },
   ],
 };

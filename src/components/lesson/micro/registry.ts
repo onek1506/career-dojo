@@ -20,8 +20,25 @@ import { k1ValMethoden } from './data/k1-val-4-methoden';
 import { k1SoftWhyIb } from './data/k1-soft-1-why-ib';
 import { k1SoftWhyBankWhyYou } from './data/k1-soft-2-why-bank-why-you';
 import { k1SoftSpringWeek } from './data/k1-soft-3-spring-week';
+import { k1Bridge16 } from './data/k1-bridge-16-ausblick';
+import { k2AccBridge } from './data/k2-acc-1-bridge';
+import { k2AccDrill } from './data/k2-acc-2-three-statements-drill';
+import { k2AccEdgeCases } from './data/k2-acc-3-edge-cases';
+import { k2EvDrill } from './data/k2-ev-1-drill';
+import { k2EvMultiples } from './data/k2-ev-2-multiples';
+import { k2ValDcfMechanik } from './data/k2-val-1-dcf-mechanik';
+import { k2ValWacc } from './data/k2-val-2-wacc';
+import { k2ValTerminalValue } from './data/k2-val-3-terminal-value';
+import { k2ValDcfInterview } from './data/k2-val-4-dcf-interview';
+import { k2MaAccretionDilution } from './data/k2-ma-1-accretion-dilution';
+import { k2MaDrill } from './data/k2-ma-2-drill';
+import { k2LboWasIst } from './data/k2-lbo-1-was-ist-lbo';
+import { k2LboMechanik } from './data/k2-lbo-2-mechanik';
+import { k2FitStory } from './data/k2-fit-1-story';
+import { k2FitWhyTough } from './data/k2-fit-2-why-und-tough';
+import { k2MockMixed } from './data/k2-mock-1-mixed';
 
-// Standalone Kategorie-1 tree (k1- prefixed ids). K2/K3 trees come later.
+// Standalone Kategorie-1 tree (k1- prefixed ids) + its closing bridge.
 const k1Lessons: MicroLessonData[] = [
   k1OrientSpielfeld,
   k1IncomeStatementT1,
@@ -39,9 +56,30 @@ const k1Lessons: MicroLessonData[] = [
   k1SoftWhyIb,
   k1SoftWhyBankWhyYou,
   k1SoftSpringWeek,
+  k1Bridge16,
 ];
 
-const ALL: MicroLessonData[] = [...incomeStatementMicroLessons, ...k1Lessons];
+// Kategorie-2 tree (k2- prefixed ids): interview training for intermediates.
+const k2Lessons: MicroLessonData[] = [
+  k2AccBridge,
+  k2AccDrill,
+  k2AccEdgeCases,
+  k2EvDrill,
+  k2EvMultiples,
+  k2ValDcfMechanik,
+  k2ValWacc,
+  k2ValTerminalValue,
+  k2ValDcfInterview,
+  k2MaAccretionDilution,
+  k2MaDrill,
+  k2LboWasIst,
+  k2LboMechanik,
+  k2FitStory,
+  k2FitWhyTough,
+  k2MockMixed,
+];
+
+const ALL: MicroLessonData[] = [...incomeStatementMicroLessons, ...k1Lessons, ...k2Lessons];
 
 export const MICRO_LESSONS: Record<string, MicroLessonData> = Object.fromEntries(
   ALL.map((lesson) => [lesson.id, lesson]),
