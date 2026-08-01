@@ -92,13 +92,22 @@ export default function MicroLesson({ data }: { data: MicroLessonData }) {
       router.push(data.nextPath);
       return;
     }
-    const enteringRetention = currentStep === totalSteps - 2;
+    // Speed-run diagnosis (K3+): a first-try-correct answer on a diagnostic
+    // minicheck jumps past the refresher straight to its skip target.
+    let nextStep = currentStep + 1;
+    if (slide.kind === 'minicheck' && slide.skipIfCorrectToIndex !== undefined) {
+      const result = quizResults[slide.id];
+      if (result?.correct && result.attempts === 1) {
+        nextStep = Math.min(slide.skipIfCorrectToIndex, totalSteps - 1);
+      }
+    }
+    const enteringRetention = nextStep === totalSteps - 1;
     if (enteringRetention && !completionFinalized) {
       setFinalElapsed(Math.floor((Date.now() - startTime) / 1000));
       completeLesson(data.id, microTotalXp(quizResults));
       setCompletionFinalized(true);
     }
-    setCurrentStep((s) => s + 1);
+    setCurrentStep(nextStep);
   };
 
   const goBack = () => {

@@ -1,0 +1,150 @@
+// K3 Lektion 16 — Superday Mixed Mock: reuses exact numbers/concepts from
+// lessons 1, 2, 4, 6, 7, 9, 10, 13, 14 across the whole K3 arc. No new
+// content, pure integration + speed drill. No skip logic (flat mock quiz).
+
+import type { MicroLessonData } from '../types';
+
+const MODULE = 'K3 · BLOCK F · FIT & SUPERDAY';
+
+export const k3MockSuperday: MicroLessonData = {
+  id: 'k3-mock-1-superday',
+  module: MODULE,
+  titleDe: 'Der Mixed Mock',
+  topicTag: 'mixed',
+  nextPath: '/course',
+  slides: [
+    {
+      kind: 'hook',
+      module: MODULE,
+      title: 'Der Mixed Mock',
+      subtitle: 'Block F · Fit & Superday',
+      marcus: {
+        subject: 'Re: Kein Themenblock, keine Vorwarnung',
+        body: 'Ein Superday springt zwischen Themen, ohne Rücksicht auf Reihenfolge. Neun Fragen, quer durch Accounting, Valuation, M&A, LBO, Markt und Fit. Kein neuer Stoff — nur Tempo.',
+      },
+    },
+    {
+      kind: 'minicheck',
+      id: 'k3-l16-q1',
+      prompt: 'CapEx und Abschreibung sind beide 15, Steuersatz 20 %. Netto-Cash-Effekt?',
+      options: ['−12', '0', '−15', '+3'],
+      correctIndex: 0,
+      solution: 'D×t − C = 15×0,2 − 15 = 3 − 15 = −12.',
+      marcusCorrect: 'Korrekt. Die Gleichheits-Falle aus Lektion 1 — nicht neutral.',
+      marcusWrong: 'D×t − C = 15×0,2 − 15 = −12. Gleiche Höhe heißt nicht neutral — die Formel aus Lektion 1.',
+    },
+    {
+      kind: 'minicheck',
+      id: 'k3-l16-q2',
+      prompt: 'Eine 60 %-Tochter wird voll konsolidiert. Wie wirkt sich der 40 %-Minderheitsanteil auf EV/EBITDA aus?',
+      options: [
+        'Zum Enterprise Value addieren',
+        'Vom Enterprise Value abziehen',
+        'Ignorieren',
+        'Vom EBITDA abziehen',
+      ],
+      correctIndex: 0,
+      solution: 'Volle Konsolidierung: EBITDA enthält 100 %, EV muss folgen — addieren.',
+      marcusCorrect: 'Richtig. Die Richtung aus Lektion 2.',
+      marcusWrong: 'Bei voller Konsolidierung steckt 100 % der Tochter im EBITDA — der Marktwert des Minderheitsanteils wird zum EV addiert, damit Zähler und Nenner zusammenpassen.',
+    },
+    {
+      kind: 'minicheck',
+      id: 'k3-l16-q3',
+      prompt: 'Comp: Levered Beta 2,0, D/E 1,5, Steuersatz 33,3 %. Unlevered Beta?',
+      options: ['1,0', '1,5', '2,0', '1,33'],
+      correctIndex: 0,
+      solution: 'βu = 2,0 / [1 + 0,667×1,5] = 2,0 / 2,0 = 1,0.',
+      marcusCorrect: 'Ja. Die Hamada-Rechnung aus Lektion 4.',
+      marcusWrong: 'βu = βL / [1 + (1−t)×D/E] = 2,0 / [1 + 0,667×1,5] = 2,0 / 2,0 = 1,0.',
+    },
+    {
+      kind: 'minicheck',
+      id: 'k3-l16-q4',
+      prompt: 'EV 1.000, LTM-EBITDA 100 (10,0x). EBITDA wächst 20 %. Ungefähres NTM-Multiple?',
+      options: ['≈8,3x', '10,0x', '≈12,0x', '≈9,0x'],
+      correctIndex: 0,
+      solution: 'NTM-EBITDA = 100×1,2 = 120. NTM-Multiple = 1.000/120 ≈ 8,3x.',
+      marcusCorrect: 'Korrekt. Wachstum drückt das Multiple, wie in Lektion 6.',
+      marcusWrong: 'NTM-EBITDA = 100×1,2 = 120. NTM-Multiple = 1.000/120 ≈ 8,3x — niedriger als das LTM-Multiple.',
+    },
+    {
+      kind: 'minicheck',
+      id: 'k3-l16-q5',
+      prompt: 'Kaufpreis 500, Target-Buchwert 200 (darin 30 alter Goodwill), Write-Up 50. Neuer Goodwill?',
+      options: ['280', '250', '300', '220'],
+      correctIndex: 0,
+      solution: 'Goodwill = 500 − (200−30) − 50 = 500 − 170 − 50 = 280.',
+      marcusCorrect: 'Ja. Alten Goodwill zuerst rausrechnen — Lektion 7.',
+      marcusWrong: 'Goodwill = Kaufpreis − (Buchwert − alter Goodwill) − Write-Up = 500 − (200−30) − 50 = 280.',
+    },
+    {
+      kind: 'minicheck',
+      id: 'k3-l16-q6',
+      prompt: 'Anfangsschuld 300, Cash verfügbar für Tilgung nach Zinsen/Steuern ist 20. Schuldenstand am Jahresende?',
+      options: ['280', '300', '320', '260'],
+      correctIndex: 0,
+      solution: 'Endstand = 300 − 20 = 280.',
+      marcusCorrect: 'Richtig. Der Cash-Sweep-Kern aus Lektion 9.',
+      marcusWrong: 'Endstand = Anfangsschuld − verfügbarer Cash = 300 − 20 = 280.',
+    },
+    {
+      kind: 'minicheck',
+      id: 'k3-l16-q7',
+      prompt: 'Entry-Schuld 240, Exit-Schuld 100. Beitrag der Schuldentilgung zur Wertschöpfung?',
+      options: ['140', '100', '240', '160'],
+      correctIndex: 0,
+      solution: 'Schuldentilgungs-Beitrag = 240 − 100 = 140.',
+      marcusCorrect: 'Ja. Ein Baustein der Value Creation Bridge aus Lektion 10.',
+      marcusWrong: 'Beitrag aus Schuldentilgung = Anfangsschuld − Endschuld = 240 − 100 = 140.',
+    },
+    {
+      kind: 'minicheck',
+      id: 'k3-l16-q8',
+      prompt: "'Pitch me a stock.' Was zuerst?",
+      options: [
+        'Empfehlung (Buy/Sell) und Zeithorizont',
+        'Der exakte aktuelle Kurs',
+        'Ein vollständiges DCF',
+        'Die komplette Unternehmensgeschichte',
+      ],
+      correctIndex: 0,
+      solution: 'Empfehlung und Horizont geben allem Folgenden einen Rahmen.',
+      marcusCorrect: 'Korrekt. Die Struktur aus Lektion 13.',
+      marcusWrong: 'Position zuerst, Begründung danach — sonst weiß der Zuhörer nicht, worauf die Details hinauslaufen.',
+    },
+    {
+      kind: 'minicheck',
+      id: 'k3-l16-q9',
+      prompt: "Welche Eröffnung ist ein echtes Versagen, keine verkleidete Stärke?",
+      options: [
+        "'Ich habe eine wichtige Interessengruppe übersehen und musste die Planung kurzfristig überarbeiten.'",
+        "'Ich bin manchmal zu perfektionistisch.'",
+        'Beide gleich stark',
+        'Keine von beiden ist geeignet',
+      ],
+      correctIndex: 0,
+      solution: 'Konkrete Konsequenz statt getarntes Kompliment — die Fake-Failure-Falle aus Lektion 14.',
+      marcusCorrect: 'Richtig. Die Fake-Failure-Falle erkannt.',
+      marcusWrong: "'Zu perfektionistisch' ist die klassische Fake-Failure-Falle. Die erste Formulierung hat eine reale, konkrete Konsequenz.",
+    },
+    {
+      kind: 'concept',
+      eyebrow: 'NACH DEM MOCK',
+      heading: 'Wie man aus einem Mock lernt',
+      paragraphs: [
+        'Ein Mock bringt nur etwas, wenn danach etwas passiert. Notiere dir, welche Fragen gezögert haben, nicht nur welche falsch waren — Zögern ist im echten Superday genauso ein Signal wie ein Fehler.',
+        'Geh dann gezielt zurück zur Lektion des schwächsten Themas und wiederhole nur die Drills dort, nicht den ganzen Block. Der Weak-Area-Tracker zählt für jedes Thema mit — er zeigt dir, wo sich das am meisten lohnt.',
+      ],
+    },
+    {
+      kind: 'retention',
+      doneLabel: 'Lektion 16 abgeschlossen.',
+      marcus: {
+        subject: 'Re: Der ganze fortgeschrittene Pfad, unter Druck',
+        body: 'Accounting-Kanten, Beta, Multiples-Feinheiten, Goodwill, LBO-Mechanik, Value Creation Bridge, Pitch-Struktur, ehrliche Fit-Geschichten — neun Fragen, ein Durchgang durch den ganzen fortgeschrittenen Pfad. Von hier aus: schwache Themen gezielt wiederholen.',
+      },
+      next: { title: 'Zurück zur Übersicht', meta: 'Schwache Themen wiederholen' },
+    },
+  ],
+};
