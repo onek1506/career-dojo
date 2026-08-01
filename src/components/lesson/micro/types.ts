@@ -59,6 +59,12 @@ export interface MiniCheckSlide {
   marcusCorrect?: string;
   marcusWrong?: string;
   baseXp?: number; // default 10
+  // Speed-run diagnosis (K3+): if answered correctly on the FIRST attempt,
+  // jump straight to this slide index instead of the next slide — skips
+  // the compact refresher section for learners who already know the topic.
+  // Any wrong or second-try-correct answer falls through to the refresher
+  // as normal. Index is 0-based into the lesson's `slides` array.
+  skipIfCorrectToIndex?: number;
 }
 
 export interface SummarySlide {

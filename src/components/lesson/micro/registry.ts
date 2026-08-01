@@ -37,6 +37,9 @@ import { k2LboMechanik } from './data/k2-lbo-2-mechanik';
 import { k2FitStory } from './data/k2-fit-1-story';
 import { k2FitWhyTough } from './data/k2-fit-2-why-und-tough';
 import { k2MockMixed } from './data/k2-mock-1-mixed';
+import { k3AccAdvancedLinkages } from './data/k3-acc-1-advanced-linkages';
+import { k3AccEdgeCases } from './data/k3-acc-2-edge-cases';
+import { k3ValDcfAdvanced } from './data/k3-val-1-dcf-advanced';
 
 // Standalone Kategorie-1 tree (k1- prefixed ids) + its closing bridge.
 const k1Lessons: MicroLessonData[] = [
@@ -79,7 +82,15 @@ const k2Lessons: MicroLessonData[] = [
   k2MockMixed,
 ];
 
-const ALL: MicroLessonData[] = [...incomeStatementMicroLessons, ...k1Lessons, ...k2Lessons];
+// Kategorie-3 tree (k3- prefixed ids): advanced/full-time interview drills.
+// Only lessons 1-3 exist so far; more are added after niveau/ton review.
+const k3Lessons: MicroLessonData[] = [
+  k3AccAdvancedLinkages,
+  k3AccEdgeCases,
+  k3ValDcfAdvanced,
+];
+
+const ALL: MicroLessonData[] = [...incomeStatementMicroLessons, ...k1Lessons, ...k2Lessons, ...k3Lessons];
 
 export const MICRO_LESSONS: Record<string, MicroLessonData> = Object.fromEntries(
   ALL.map((lesson) => [lesson.id, lesson]),

@@ -108,6 +108,25 @@ export const ibTrack: Track = {
         engineLesson('k2-interview-training', 'k2-mock-1-mixed', 'The Mixed Mock', 'Der Mixed Mock', 50, 8),
       ],
     },
+    // ========== UNIT 0c: K3 ADVANCED TRAINING (micro-lesson engine) ==========
+    // Only lessons 1-3 exist so far; more are appended after niveau/ton review.
+    {
+      id: 'k3-advanced-training',
+      title: 'Advanced Training',
+      titleDe: 'Advanced Training',
+      description: 'Full-time and superday depth: the gaps between "pass the first call" and "survive the room"',
+      descriptionDe: 'Full-Time- und Superday-Tiefe: die Lücken zwischen erstem Call und echtem Interviewtag',
+      icon: '⚔️',
+      difficulty: 'advanced',
+      order: 2,
+      requiredXp: 0,
+      color: '#8B0000',
+      lessons: [
+        engineLesson('k3-advanced-training', 'k3-acc-1-advanced-linkages', 'Multiple Moves at Once', 'Mehrere Bewegungen gleichzeitig', 45, 9),
+        engineLesson('k3-advanced-training', 'k3-acc-2-edge-cases', 'The Topics K2 Skipped', 'Die ausgelassenen Themen', 45, 9),
+        engineLesson('k3-advanced-training', 'k3-val-1-dcf-advanced', 'DCF, the Finer Points', 'DCF, die Feinheiten', 45, 9),
+      ],
+    },
     // ========== UNIT 1: ACCOUNTING FUNDAMENTALS ==========
     {
       id: 'accounting-basics',

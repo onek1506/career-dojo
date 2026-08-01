@@ -351,6 +351,38 @@ export const LESSON_REGISTRY: LessonEntry[] = [
     module: 'K2 · BLOCK F · FIT & MOCK',
     trackAvailability: ['A', 'B', 'C'],
   },
+  // --- Kategorie 3: Der Fortgeschrittene (standalone tree, k3- prefix).
+  // Only lessons 1-3 so far; more are appended after niveau/ton review. ---
+  {
+    id: 'k3-acc-1-advanced-linkages',
+    title: 'Mehrere Bewegungen gleichzeitig',
+    titleDe: 'Mehrere Bewegungen gleichzeitig',
+    route: '/lesson/k3-acc-1-advanced-linkages',
+    duration: 9,
+    xp: 45,
+    module: 'K3 · BLOCK A · ACCOUNTING',
+    trackAvailability: ['A', 'B', 'C'],
+  },
+  {
+    id: 'k3-acc-2-edge-cases',
+    title: 'Die ausgelassenen Themen',
+    titleDe: 'Die ausgelassenen Themen',
+    route: '/lesson/k3-acc-2-edge-cases',
+    duration: 9,
+    xp: 45,
+    module: 'K3 · BLOCK A · ACCOUNTING',
+    trackAvailability: ['A', 'B', 'C'],
+  },
+  {
+    id: 'k3-val-1-dcf-advanced',
+    title: 'DCF, die Feinheiten',
+    titleDe: 'DCF, die Feinheiten',
+    route: '/lesson/k3-val-1-dcf-advanced',
+    duration: 9,
+    xp: 45,
+    module: 'K3 · BLOCK B · VALUATION',
+    trackAvailability: ['A', 'B', 'C'],
+  },
 ];
 
 export function getNextLesson(
