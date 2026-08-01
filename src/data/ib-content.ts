@@ -109,7 +109,6 @@ export const ibTrack: Track = {
       ],
     },
     // ========== UNIT 0c: K3 ADVANCED TRAINING (micro-lesson engine) ==========
-    // Only lessons 1-3 exist so far; more are appended after niveau/ton review.
     {
       id: 'k3-advanced-training',
       title: 'Advanced Training',
@@ -125,6 +124,19 @@ export const ibTrack: Track = {
         engineLesson('k3-advanced-training', 'k3-acc-1-advanced-linkages', 'Multiple Moves at Once', 'Mehrere Bewegungen gleichzeitig', 45, 9),
         engineLesson('k3-advanced-training', 'k3-acc-2-edge-cases', 'The Topics K2 Skipped', 'Die ausgelassenen Themen', 45, 9),
         engineLesson('k3-advanced-training', 'k3-val-1-dcf-advanced', 'DCF, the Finer Points', 'DCF, die Feinheiten', 45, 9),
+        engineLesson('k3-advanced-training', 'k3-val-2-wacc-deep', 'WACC, Under the Hood', 'WACC, unter der Haube', 45, 9),
+        engineLesson('k3-advanced-training', 'k3-val-3-terminal-value-deep', 'Terminal Value, Stress-Tested', 'Terminal Value, unter Druck getestet', 45, 9),
+        engineLesson('k3-advanced-training', 'k3-val-4-multiples-deep', 'Multiples, the Finer Points', 'Multiples, die Feinheiten', 45, 8),
+        engineLesson('k3-advanced-training', 'k3-ma-1-accretion-dilution-deep', 'The Full Merger Walkthrough', 'Der volle Merger-Walkthrough', 50, 9),
+        engineLesson('k3-advanced-training', 'k3-ma-2-deal-structure', 'Optimizing Deal Structure', 'Deal-Struktur optimieren', 45, 9),
+        engineLesson('k3-advanced-training', 'k3-lbo-1-full-model', 'The Full LBO Model', 'Der vollständige LBO', 50, 9),
+        engineLesson('k3-advanced-training', 'k3-lbo-2-returns-drivers', 'IRR, MOIC and the Value Creation Bridge', 'IRR, MOIC und die Value Creation Bridge', 50, 9),
+        engineLesson('k3-advanced-training', 'k3-lbo-3-edge-cases', 'The Uncomfortable LBO Questions', 'Die unbequemen LBO-Fragen', 50, 9),
+        engineLesson('k3-advanced-training', 'k3-brain-1-teasers', 'Brain Teasers, Solved with Structure', 'Brain Teaser, strukturiert gelöst', 40, 8),
+        engineLesson('k3-advanced-training', 'k3-market-1-why-now', 'Pitch a Stock, Frame a Deal', 'Eine Aktie pitchen, Deals einordnen', 45, 9),
+        engineLesson('k3-advanced-training', 'k3-fit-1-tough-behavioral', 'The Tough Behavioral Questions', 'Die harten Behavioral-Fragen', 45, 9),
+        engineLesson('k3-advanced-training', 'k3-fit-2-why-fulltime', 'Why Full-Time, Why This Group', 'Why Full-Time, Why this Group', 45, 9),
+        engineLesson('k3-advanced-training', 'k3-mock-1-superday', 'The Mixed Mock', 'Der Mixed Mock', 50, 8),
       ],
     },
     // ========== UNIT 1: ACCOUNTING FUNDAMENTALS ==========

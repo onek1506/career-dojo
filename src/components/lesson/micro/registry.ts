@@ -40,6 +40,19 @@ import { k2MockMixed } from './data/k2-mock-1-mixed';
 import { k3AccAdvancedLinkages } from './data/k3-acc-1-advanced-linkages';
 import { k3AccEdgeCases } from './data/k3-acc-2-edge-cases';
 import { k3ValDcfAdvanced } from './data/k3-val-1-dcf-advanced';
+import { k3ValWaccDeep } from './data/k3-val-2-wacc-deep';
+import { k3ValTerminalValueDeep } from './data/k3-val-3-terminal-value-deep';
+import { k3ValMultiplesDeep } from './data/k3-val-4-multiples-deep';
+import { k3MaAccretionDilutionDeep } from './data/k3-ma-1-accretion-dilution-deep';
+import { k3MaDealStructure } from './data/k3-ma-2-deal-structure';
+import { k3LboFullModel } from './data/k3-lbo-1-full-model';
+import { k3LboReturnsDrivers } from './data/k3-lbo-2-returns-drivers';
+import { k3LboEdgeCases } from './data/k3-lbo-3-edge-cases';
+import { k3BrainTeasers } from './data/k3-brain-1-teasers';
+import { k3MarketWhyNow } from './data/k3-market-1-why-now';
+import { k3FitToughBehavioral } from './data/k3-fit-1-tough-behavioral';
+import { k3FitWhyFulltime } from './data/k3-fit-2-why-fulltime';
+import { k3MockSuperday } from './data/k3-mock-1-superday';
 
 // Standalone Kategorie-1 tree (k1- prefixed ids) + its closing bridge.
 const k1Lessons: MicroLessonData[] = [
@@ -83,11 +96,23 @@ const k2Lessons: MicroLessonData[] = [
 ];
 
 // Kategorie-3 tree (k3- prefixed ids): advanced/full-time interview drills.
-// Only lessons 1-3 exist so far; more are added after niveau/ton review.
 const k3Lessons: MicroLessonData[] = [
   k3AccAdvancedLinkages,
   k3AccEdgeCases,
   k3ValDcfAdvanced,
+  k3ValWaccDeep,
+  k3ValTerminalValueDeep,
+  k3ValMultiplesDeep,
+  k3MaAccretionDilutionDeep,
+  k3MaDealStructure,
+  k3LboFullModel,
+  k3LboReturnsDrivers,
+  k3LboEdgeCases,
+  k3BrainTeasers,
+  k3MarketWhyNow,
+  k3FitToughBehavioral,
+  k3FitWhyFulltime,
+  k3MockSuperday,
 ];
 
 const ALL: MicroLessonData[] = [...incomeStatementMicroLessons, ...k1Lessons, ...k2Lessons, ...k3Lessons];

@@ -10,10 +10,7 @@ export const k3ValDcfAdvanced: MicroLessonData = {
   module: MODULE,
   titleDe: 'DCF, die Feinheiten',
   topicTag: 'dcf',
-  // k3-val-2-wacc-deep is built in the next batch, after niveau/ton review.
-  // Point at the course overview until then so the retention hub never
-  // dead-ends on a route that doesn't exist yet.
-  nextPath: '/course',
+  nextPath: '/lesson/k3-val-2-wacc-deep',
   slides: [
     {
       kind: 'hook',
