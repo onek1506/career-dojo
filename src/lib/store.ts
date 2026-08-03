@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 // IMPORTANT: import level helpers from content-core, NOT from @/data/content.
 // The latter pulls ~500 KB of track data (IB + Consulting + PE + VC) into
 // every chunk that imports useStore — and useStore is used on every page.
@@ -13,6 +13,14 @@ import {
   type Quality,
   QUALITY_GOOD,
 } from './spaced-repetition';
+import { useSupabaseAuth } from './supabase/useAuth';
+import {
+  pushProfile,
+  pushLessonProgress,
+  pullCloudProgress,
+  migrateLocalStorageIfNeeded,
+  cloudToProgressPartial,
+} from './supabase/sync';
 
 // ============================================================
 // CareerDojo Global Store — localStorage persistence
@@ -104,6 +112,8 @@ function isYesterday(dateStr: string): boolean {
 export function useStore() {
   const [progress, setProgress] = useState<UserProgress>(DEFAULT_PROGRESS);
   const [loaded, setLoaded] = useState(false);
+  const { user } = useSupabaseAuth();
+  const syncedForUserId = useRef<string | null>(null);
 
   useEffect(() => {
     const p = loadProgress();
@@ -124,13 +134,42 @@ export function useStore() {
     setLoaded(true);
   }, []);
 
+  // Cloud sync: once a Supabase session is present, migrate any existing
+  // local-only progress on the FIRST login for this browser, then pull the
+  // cloud state and let it win (it is a superset after migration). Runs
+  // once per user id per mount — localStorage stays the offline fallback
+  // and every write below still goes there first, unconditionally.
+  useEffect(() => {
+    if (!user || !loaded || syncedForUserId.current === user.id) return;
+    syncedForUserId.current = user.id;
+
+    (async () => {
+      await migrateLocalStorageIfNeeded(user.id, loadProgress());
+      const cloud = await pullCloudProgress(user.id);
+      if (!cloud) return;
+      const cloudPartial = cloudToProgressPartial(cloud);
+      setProgress((prev) => {
+        const next = {
+          ...prev,
+          ...cloudPartial,
+          completedLessons: Array.from(
+            new Set([...prev.completedLessons, ...(cloudPartial.completedLessons ?? [])]),
+          ),
+        };
+        saveProgress(next);
+        return next;
+      });
+    })();
+  }, [user, loaded]);
+
   const update = useCallback((partial: Partial<UserProgress>) => {
     setProgress(prev => {
       const next = { ...prev, ...partial };
       saveProgress(next);
+      if (user) void pushProfile(user.id, next);
       return next;
     });
-  }, []);
+  }, [user]);
 
   const completeLesson = useCallback((lessonId: string, xpEarned: number) => {
     setProgress(prev => {
@@ -161,9 +200,13 @@ export function useStore() {
           : 1,
       };
       saveProgress(next);
+      if (user) {
+        void pushLessonProgress(user.id, lessonId, alreadyCompleted ? undefined : xpEarned);
+        void pushProfile(user.id, next);
+      }
       return next;
     });
-  }, []);
+  }, [user]);
 
   const recordQuizAnswer = useCallback((correct: boolean) => {
     setProgress(prev => {
@@ -244,21 +287,20 @@ export function useStore() {
     setProgress(prev => {
       const existing = prev.completedQuizzes[lessonId];
       const pct = Math.round((score / total) * 100);
+      const bestScore = Math.max(existing?.bestScore ?? 0, pct);
+      const attempts = (existing?.attempts ?? 0) + 1;
       const next: UserProgress = {
         ...prev,
         completedQuizzes: {
           ...prev.completedQuizzes,
-          [lessonId]: {
-            score: pct,
-            bestScore: Math.max(existing?.bestScore ?? 0, pct),
-            attempts: (existing?.attempts ?? 0) + 1,
-          },
+          [lessonId]: { score: pct, bestScore, attempts },
         },
       };
       saveProgress(next);
+      if (user) void pushLessonProgress(user.id, lessonId, 0, bestScore, attempts);
       return next;
     });
-  }, []);
+  }, [user]);
 
   const resetProgress = useCallback(() => {
     const fresh = { ...DEFAULT_PROGRESS };
