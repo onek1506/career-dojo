@@ -15,7 +15,12 @@
 
 import { getSupabaseClient } from './client';
 import type { UserProgress } from '../store';
-import { getProfile as getOnboardingProfile, type UserProfile as OnboardingProfile } from '../onboarding/profile';
+import {
+  getProfile as getOnboardingProfile,
+  saveProfile as saveOnboardingProfile,
+  type UserProfile as OnboardingProfile,
+  type EntryCategory,
+} from '../onboarding/profile';
 
 const MIGRATION_FLAG_KEY = 'career-dojo-migrated';
 
@@ -42,6 +47,7 @@ interface ProfileRow {
   interview_date: string | null;
   onboarding_completed_at: string | null;
   knowledge: Record<string, unknown> | null;
+  entry_category: string | null;
 }
 
 interface LessonProgressRow {
@@ -86,6 +92,7 @@ function progressToProfileRow(userId: string, progress: UserProgress, onboarding
     interview_date: onboarding.interviewDate,
     onboarding_completed_at: onboarding.onboardingCompletedAt,
     knowledge: onboarding.knowledge,
+    entry_category: onboarding.entryCategory,
   };
 }
 
@@ -220,6 +227,23 @@ export async function migrateLocalStorageIfNeeded(userId: string, localProgress:
   } catch (err) {
     console.error('[supabase] migrateLocalStorageIfNeeded threw', err);
   }
+}
+
+/**
+ * Bridges the cloud-stored onboarding outcome (entry category, completion)
+ * back into the LOCAL onboarding-profile store (a separate localStorage key
+ * from useStore's progress). Without this, a returning user on a new
+ * device/browser would pass the auth check but still get bounced back into
+ * onboarding, since `/` and AppShell decide that from local state only.
+ */
+export function applyCloudOnboardingState(cloud: { profile: ProfileRow | null }): void {
+  if (!cloud.profile) return;
+  const p = cloud.profile;
+  const partial: Partial<OnboardingProfile> = {};
+  if (p.entry_category) partial.entryCategory = p.entry_category as EntryCategory;
+  if (p.onboarding_completed_at) partial.onboardingCompletedAt = p.onboarding_completed_at;
+  if (Object.keys(partial).length === 0) return;
+  saveOnboardingProfile(partial);
 }
 
 /** Reshapes cloud rows back into the shape `useStore` expects. */

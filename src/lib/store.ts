@@ -20,6 +20,7 @@ import {
   pullCloudProgress,
   migrateLocalStorageIfNeeded,
   cloudToProgressPartial,
+  applyCloudOnboardingState,
 } from './supabase/sync';
 
 // ============================================================
@@ -150,6 +151,7 @@ export function useStore() {
       await migrateLocalStorageIfNeeded(user.id, loadProgress());
       const cloud = await pullCloudProgress(user.id);
       if (!cloud) return;
+      applyCloudOnboardingState(cloud);
       const cloudPartial = cloudToProgressPartial(cloud);
       setProgress((prev) => {
         const next = { ...prev, ...cloudPartial };

@@ -1,37 +1,26 @@
 'use client';
 
-import { useEffect, useState, type ComponentType } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   getProfile,
   saveProfile,
   isOnboardingComplete,
   type UserProfile,
+  type EntryCategory,
 } from '@/lib/onboarding/profile';
-import Slide01ColdOpen from '@/components/onboarding/Slide01ColdOpen';
-import Slide02ProblemDiagnosis from '@/components/onboarding/Slide02ProblemDiagnosis';
-import Slide03StatusSelection from '@/components/onboarding/Slide03StatusSelection';
-import Slide04GoalSelection from '@/components/onboarding/Slide04GoalSelection';
-import Slide05KnowledgeCheck from '@/components/onboarding/Slide05KnowledgeCheck';
-import Slide06Diagnosis from '@/components/onboarding/Slide06Diagnosis';
-import Slide07IdentityAnchor from '@/components/onboarding/Slide07IdentityAnchor';
-import Slide08StreakCommit from '@/components/onboarding/Slide08StreakCommit';
-import Slide09FirstLessonHook from '@/components/onboarding/Slide09FirstLessonHook';
-import type { OnboardingSlideProps } from '@/components/onboarding/types';
+import Welcome from '@/components/onboarding/entry/Welcome';
+import CategorySelect from '@/components/onboarding/entry/CategorySelect';
+import Ready from '@/components/onboarding/entry/Ready';
+import K4Orientation from '@/components/onboarding/entry/K4Orientation';
 
-const SLIDES: ComponentType<OnboardingSlideProps>[] = [
-  Slide01ColdOpen,
-  Slide02ProblemDiagnosis,
-  Slide03StatusSelection,
-  Slide04GoalSelection,
-  Slide05KnowledgeCheck,
-  Slide06Diagnosis,
-  Slide07IdentityAnchor,
-  Slide08StreakCommit,
-  Slide09FirstLessonHook,
-];
+const TOTAL_STEPS = 3;
 
-const FIRST_LESSON_PATH = '/lesson/k1-orient-1-spielfeld';
+const CATEGORY_FIRST_LESSON: Record<Exclude<EntryCategory, 'k4'>, string> = {
+  k1: '/lesson/k1-orient-1-spielfeld',
+  k2: '/lesson/k2-acc-1-bridge',
+  k3: '/lesson/k3-acc-1-advanced-linkages',
+};
 
 export default function OnboardingStartPage() {
   const router = useRouter();
@@ -40,13 +29,14 @@ export default function OnboardingStartPage() {
   const [hydrated, setHydrated] = useState(false);
 
   // Refresh profile from localStorage on mount (SSR returns empty profile)
-  // and short-circuit if onboarding was already completed.
+  // and short-circuit if onboarding was already completed — send them to
+  // /home, not a hardcoded lesson, since the entry category now varies.
   useEffect(() => {
     const fresh = getProfile();
     setProfileState(fresh);
     setHydrated(true);
     if (isOnboardingComplete(fresh)) {
-      router.replace(FIRST_LESSON_PATH);
+      router.replace('/home');
     }
   }, [router]);
 
@@ -55,18 +45,28 @@ export default function OnboardingStartPage() {
     setProfileState(merged);
   };
 
+  const finishOnboarding = (destination: string) => {
+    const today = new Date().toISOString().slice(0, 10);
+    saveProfile({ onboardingCompletedAt: new Date().toISOString(), streakStarted: today });
+    router.push(destination);
+  };
+
   const goNext = () => {
-    if (currentStep < SLIDES.length - 1) {
-      setCurrentStep((s) => s + 1);
+    if (currentStep === 0) {
+      setCurrentStep(1);
       return;
     }
-    // Last slide: lock in completion + streak start, then route to lesson.
-    const today = new Date().toISOString().slice(0, 10);
-    saveProfile({
-      onboardingCompletedAt: new Date().toISOString(),
-      streakStarted: today,
-    });
-    router.push(FIRST_LESSON_PATH);
+    if (currentStep === 1) {
+      setCurrentStep(2);
+      return;
+    }
+    // Step 2 (final): route depends on the chosen category.
+    const category = profile.entryCategory ?? 'k1';
+    if (category === 'k4') {
+      finishOnboarding('/home');
+    } else {
+      finishOnboarding(CATEGORY_FIRST_LESSON[category]);
+    }
   };
 
   const goBack = () => {
@@ -77,18 +77,17 @@ export default function OnboardingStartPage() {
   // Avoid flicker between SSR-empty profile and hydrated profile.
   if (!hydrated) return null;
 
-  const Slide = SLIDES[currentStep];
+  const stepProps = {
+    currentStep: currentStep + 1,
+    totalSteps: TOTAL_STEPS,
+    profile,
+    updateProfile,
+    onNext: goNext,
+    onBack: goBack,
+    isFirst: currentStep === 0,
+  };
 
-  return (
-    <Slide
-      key={currentStep}
-      currentStep={currentStep + 1}
-      totalSteps={SLIDES.length}
-      profile={profile}
-      updateProfile={updateProfile}
-      onNext={goNext}
-      onBack={goBack}
-      isFirst={currentStep === 0}
-    />
-  );
+  if (currentStep === 0) return <Welcome {...stepProps} />;
+  if (currentStep === 1) return <CategorySelect {...stepProps} />;
+  return profile.entryCategory === 'k4' ? <K4Orientation {...stepProps} /> : <Ready {...stepProps} />;
 }

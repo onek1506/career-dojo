@@ -12,6 +12,12 @@ export type ExplorerMotivation = 'money' | 'learning' | 'network' | 'unsure';
 export type LearningTime = 'morning' | 'lunch' | 'evening' | 'flexible';
 export type SkillProfile = 'A' | 'B' | 'C'; // A=Beginner, B=BWL-Vorkenntnisse, C=Profi-Drill
 
+// Self-placed entry point into the lesson tree, chosen on the entry
+// onboarding flow (separate from the old 9-slide skillProfile diagnosis
+// above, which no longer drives routing). k4 gets orientation only, no
+// lesson access.
+export type EntryCategory = 'k1' | 'k2' | 'k3' | 'k4';
+
 export type KnowledgeAnswer<T extends string> = T | null;
 export type BalanceAnswer = 'correct' | 'wrong' | 'never_heard';
 export type EbitdaAnswer = 'correct' | 'wrong' | 'never_heard';
@@ -34,6 +40,7 @@ export interface UserProfile {
   // message and the interview countdown.
   interviewDate: string | null;
   onboardingCompletedAt: string | null;
+  entryCategory: EntryCategory | null;
 }
 
 export const STORAGE_KEY = 'career_dojo_profile';
@@ -50,6 +57,7 @@ export function getEmptyProfile(): UserProfile {
     streakStarted: null,
     interviewDate: null,
     onboardingCompletedAt: null,
+    entryCategory: null,
   };
 }
 
