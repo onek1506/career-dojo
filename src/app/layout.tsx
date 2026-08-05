@@ -4,6 +4,7 @@ import "./globals.css";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import InstallBanner from "@/components/InstallBanner";
 import ThemeInit from "@/components/ThemeInit";
+import { AuthProvider } from "@/lib/supabase/AuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -89,7 +90,7 @@ export default function RootLayout({
         <ThemeInit />
         <ServiceWorkerRegister />
         <InstallBanner />
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

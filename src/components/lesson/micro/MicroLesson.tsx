@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { recordWeakAreaAnswer } from '@/lib/weak-areas';
-import { useSupabaseAuth } from '@/lib/supabase/useAuth';
+import { useAuth } from '@/lib/supabase/AuthProvider';
 import { shouldShowSignupGate, markSignupGateSeen } from '@/lib/auth-gate';
 import LessonSidePanel from '../LessonSidePanel';
 import { LessonSidePanelProvider } from '../LessonSidePanelContext';
@@ -31,7 +31,7 @@ function slideLabel(slide: MicroSlide, index: number): string {
 export default function MicroLesson({ data }: { data: MicroLessonData }) {
   const router = useRouter();
   const { progress, completeLesson } = useStore();
-  const { user, loading: authLoading } = useSupabaseAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [quizResults, setQuizResults] = useState<Record<string, QuizResult | null>>(() => {
@@ -94,7 +94,7 @@ export default function MicroLesson({ data }: { data: MicroLessonData }) {
     if (currentStep >= totalSteps - 1) {
       if (!authLoading && shouldShowSignupGate(data.id, progress.completedLessons, !!user)) {
         markSignupGateSeen();
-        router.push(`/auth/gate?next=${encodeURIComponent(data.nextPath)}`);
+        router.push(`/auth/gate?reason=gate&next=${encodeURIComponent(data.nextPath)}`);
       } else {
         router.push(data.nextPath);
       }

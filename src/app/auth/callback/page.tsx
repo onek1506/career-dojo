@@ -2,12 +2,12 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useSupabaseAuth } from '@/lib/supabase/useAuth';
+import { useAuth } from '@/lib/supabase/AuthProvider';
 
 function CallbackContent() {
   const router = useRouter();
   const params = useSearchParams();
-  const { user, loading } = useSupabaseAuth();
+  const { user, loading } = useAuth();
   const [timedOut, setTimedOut] = useState(false);
 
   useEffect(() => {

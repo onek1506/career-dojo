@@ -13,7 +13,7 @@ import {
   type Quality,
   QUALITY_GOOD,
 } from './spaced-repetition';
-import { useSupabaseAuth } from './supabase/useAuth';
+import { useAuth } from './supabase/AuthProvider';
 import {
   pushProfile,
   pushLessonProgress,
@@ -112,7 +112,7 @@ function isYesterday(dateStr: string): boolean {
 export function useStore() {
   const [progress, setProgress] = useState<UserProgress>(DEFAULT_PROGRESS);
   const [loaded, setLoaded] = useState(false);
-  const { user } = useSupabaseAuth();
+  const { user } = useAuth();
   const syncedForUserId = useRef<string | null>(null);
 
   useEffect(() => {
@@ -135,10 +135,13 @@ export function useStore() {
   }, []);
 
   // Cloud sync: once a Supabase session is present, migrate any existing
-  // local-only progress on the FIRST login for this browser, then pull the
-  // cloud state and let it win (it is a superset after migration). Runs
-  // once per user id per mount — localStorage stays the offline fallback
-  // and every write below still goes there first, unconditionally.
+  // local-only progress on the FIRST login for this browser (pushes local
+  // -> cloud exactly once), then pull the cloud state and let it REPLACE
+  // local completely — cloud is the source of truth for every logged-in
+  // session from then on, so a different browser's stale/test localStorage
+  // can never re-pollute the account on a later login. Runs once per user
+  // id per mount — localStorage stays the offline fallback and every write
+  // below still goes there first, unconditionally.
   useEffect(() => {
     if (!user || !loaded || syncedForUserId.current === user.id) return;
     syncedForUserId.current = user.id;
@@ -149,13 +152,7 @@ export function useStore() {
       if (!cloud) return;
       const cloudPartial = cloudToProgressPartial(cloud);
       setProgress((prev) => {
-        const next = {
-          ...prev,
-          ...cloudPartial,
-          completedLessons: Array.from(
-            new Set([...prev.completedLessons, ...(cloudPartial.completedLessons ?? [])]),
-          ),
-        };
+        const next = { ...prev, ...cloudPartial };
         saveProgress(next);
         return next;
       });

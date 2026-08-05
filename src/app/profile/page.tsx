@@ -10,6 +10,7 @@ import IdentityHeader from '@/components/profile/IdentityHeader';
 import MarcusTestimonials from '@/components/profile/MarcusTestimonials';
 import InterviewDateEditor from '@/components/profile/InterviewDateEditor';
 import SettingsSection from '@/components/profile/SettingsSection';
+import AccountSection from '@/components/profile/AccountSection';
 
 export default function ProfilePage() {
   const [state, setState] = useState<UserState | null>(null);
@@ -53,6 +54,7 @@ export default function ProfilePage() {
           />
           <MarcusTestimonials testimonials={testimonials} />
           <InterviewDateEditor currentDate={state.interviewDate} onSave={handleInterviewDate} />
+          <AccountSection />
           <SettingsSection />
         </div>
       </main>

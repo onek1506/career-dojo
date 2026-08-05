@@ -1,8 +1,8 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useSupabaseAuth } from '@/lib/supabase/useAuth';
+import { useAuth } from '@/lib/supabase/AuthProvider';
 import { markSignupGateSeen } from '@/lib/auth-gate';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -11,11 +11,17 @@ function GateContent() {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get('next') || '/course';
-  const { signInWithEmail, supabaseConfigured } = useSupabaseAuth();
+  const fromLessonGate = params.get('reason') === 'gate';
+  const { user, loading: authLoading, signInWithEmail, supabaseConfigured } = useAuth();
 
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [error, setError] = useState('');
+
+  // Already logged in (e.g. reached this route by mistake, or a stale link) — nothing to do here.
+  useEffect(() => {
+    if (!authLoading && user) router.replace(next);
+  }, [authLoading, user, next, router]);
 
   const continueWithoutAccount = () => {
     markSignupGateSeen();
@@ -49,10 +55,12 @@ function GateContent() {
         <div className="w-full max-w-md flex flex-col gap-6">
           <div className="flex flex-col gap-2">
             <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted tracking-wider uppercase">
-              Drei Lektionen geschafft
+              {fromLessonGate ? 'Drei Lektionen geschafft' : 'Anmelden'}
             </span>
             <h1 className="font-[family-name:var(--font-is-serif)] text-2xl sm:text-3xl font-medium leading-tight">
-              Dein Fortschritt lebt bisher nur in diesem Browser.
+              {fromLessonGate
+                ? 'Dein Fortschritt lebt bisher nur in diesem Browser.'
+                : 'Melde dich an, um deinen Fortschritt zu sichern.'}
             </h1>
             <p className="font-[family-name:var(--font-is-sans)] text-base text-is-text-secondary leading-relaxed">
               Lösch den Cache, wechsle das Gerät oder öffne ein Inkognito-Fenster — und alles ist
@@ -108,7 +116,7 @@ function GateContent() {
             onClick={continueWithoutAccount}
             className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted hover:text-is-text-primary transition-colors self-center"
           >
-            Ohne Account weiter
+            {fromLessonGate ? 'Ohne Account weiter' : 'Zurück'}
           </button>
         </div>
       </main>

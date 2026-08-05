@@ -1,6 +1,8 @@
 'use client';
 
 import { Zap } from 'lucide-react';
+import Link from 'next/link';
+import { useAuth } from '@/lib/supabase/AuthProvider';
 
 interface TopBarProps {
   xp: number;
@@ -13,11 +15,13 @@ export default function TopBar({
   streak,
   levelTitle,
 }: TopBarProps) {
+  const { user, loading } = useAuth();
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg-card)] border-b-2 border-[var(--border)]">
       <div className="max-w-lg mx-auto flex items-center justify-between h-14 px-4">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-sm font-bold text-[var(--text-primary)] truncate max-w-[120px] sm:max-w-none">
+          <span className="text-sm font-bold text-[var(--text-primary)] truncate max-w-[90px] sm:max-w-none">
             {levelTitle}
           </span>
         </div>
@@ -30,6 +34,15 @@ export default function TopBar({
             <Zap size={16} className="text-[var(--accent-xp)]" fill="var(--accent-xp)" />
             <span className="text-sm font-bold text-[var(--accent-xp)]">{xp} XP</span>
           </div>
+          {!loading && (
+            <Link
+              href={user ? '/profile' : '/auth/gate'}
+              className="text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              title={user?.email ?? undefined}
+            >
+              {user ? (user.email ?? 'Account').split('@')[0] : 'Anmelden'}
+            </Link>
+          )}
         </div>
       </div>
     </header>
