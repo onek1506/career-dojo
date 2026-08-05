@@ -50,7 +50,7 @@ export default function ProfilePage() {
             statusTitle={levelInfo.title}
             streakDays={state.streakDays}
             totalXp={state.totalXp}
-            completedLessons={state.completedLessons.length}
+            completedLessons={(state.completedLessons ?? []).length}
           />
           <MarcusTestimonials testimonials={testimonials} />
           <InterviewDateEditor currentDate={state.interviewDate} onSave={handleInterviewDate} />

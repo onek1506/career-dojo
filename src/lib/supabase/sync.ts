@@ -139,7 +139,13 @@ export async function pushLessonProgress(
   }
 }
 
-/** Reads the cloud state for the logged-in user (profile + all completed lessons). */
+/**
+ * Reads the cloud state for the logged-in user (profile + all completed
+ * lessons). Returns null on ANY read failure — never a partially-empty
+ * success object. `useStore` treats null as "skip the merge, keep local
+ * state" — a permission/network error must never be read as "the cloud
+ * genuinely has zero lessons" and wipe out real local progress.
+ */
 export async function pullCloudProgress(
   userId: string,
 ): Promise<{ profile: ProfileRow | null; lessons: LessonProgressRow[] } | null> {
@@ -150,8 +156,14 @@ export async function pullCloudProgress(
       supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
       supabase.from('lesson_progress').select('lesson_id, completed_at, xp_earned, best_score, attempts').eq('user_id', userId),
     ]);
-    if (profileError) console.error('[supabase] pull profile failed', profileError.message);
-    if (lessonsError) console.error('[supabase] pull lesson_progress failed', lessonsError.message);
+    if (profileError) {
+      console.error('[supabase] pull profile failed', profileError.message);
+      return null;
+    }
+    if (lessonsError) {
+      console.error('[supabase] pull lesson_progress failed', lessonsError.message);
+      return null;
+    }
     return { profile: (profile as ProfileRow) ?? null, lessons: (lessons as LessonProgressRow[]) ?? [] };
   } catch (err) {
     console.error('[supabase] pullCloudProgress threw', err);
