@@ -8,16 +8,16 @@ import type { OnboardingSlideProps } from '../types';
 
 const COPY: Record<'k1' | 'k2' | 'k3', { heading: string; body: string }> = {
   k1: {
-    heading: 'Du startest ganz am Anfang.',
-    body: 'Wir bauen die Basics sauber auf — Accounting, Bewertung, die ersten Fit-Fragen. Kein Vorwissen nötig, keine Eile.',
+    heading: 'Dann fangen wir sauber von vorn an.',
+    body: 'Wir bauen die Basics in Ruhe auf — Accounting, Bewertung, die ersten Fit-Fragen. Kein Vorwissen nötig, keine Eile.',
   },
   k2: {
-    heading: 'Du steigst direkt bei der Interview-Vorbereitung ein.',
-    body: 'Die Grundlagen setzen wir voraus — hier geht es direkt an echte Interviewfragen: Accounting-Drills, DCF, M&A, LBO.',
+    heading: 'Gut, dann überspringen wir die Grundlagen.',
+    body: 'Du steigst direkt bei der Interview-Logik ein — echte Fragen, Accounting-Drills, DCF, M&A, LBO. Die Basics setzen wir voraus.',
   },
   k3: {
-    heading: 'Du steigst direkt beim Fortgeschrittenen-Drill ein.',
-    body: 'Hohes Tempo, volle Tiefe — die Fragen, an denen sich Full-Time-Kandidaten unterscheiden.',
+    heading: 'Dann direkt volles Tempo.',
+    body: 'Du steigst beim Fortgeschrittenen-Drill ein — die Fragen, an denen sich Full-Time-Kandidaten unterscheiden.',
   },
 };
 

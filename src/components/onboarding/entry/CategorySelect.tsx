@@ -17,26 +17,26 @@ const OPTIONS: CategoryOption[] = [
   {
     id: 'k1',
     number: '01',
-    label: 'ORIENTIERTER EINSTEIGER',
-    description: '1.–2. Semester, noch keine Bewerbung, Spring Week liegt 6+ Monate weg.',
+    label: 'Früh im Studium',
+    description: '1.–3. Semester, IB interessiert mich, noch nicht beworben.',
   },
   {
     id: 'k2',
     number: '02',
-    label: 'VORBEREITENDER',
-    description: '3.–5. Semester, erste Bewerbungen laufen oder stehen kurz bevor, Summer Internship im Blick.',
+    label: 'Mitten drin',
+    description: '3.–5. Semester, bewerbe mich gerade auf Praktika oder kurz davor.',
   },
   {
     id: 'k3',
     number: '03',
-    label: 'FORTGESCHRITTENER',
-    description: 'Höheres Semester oder Master, schon Praktika gemacht, Full-Time oder mehrere Interviews anstehend.',
+    label: 'Fortgeschritten',
+    description: 'Praktika gemacht, ziele auf Full-Time oder war schon in Interviews.',
   },
   {
     id: 'k4',
     number: '04',
-    label: 'NOCH ORIENTIERUNGSLOS',
-    description: 'Kein Wirtschaftsstudium oder kaum IB-Bezug, keine konkrete Deadline in Sicht.',
+    label: 'Anderer Weg',
+    description: 'Studiere was anderes, kenne IB kaum.',
   },
 ];
 
@@ -66,7 +66,7 @@ export default function CategorySelect({
       <div className="flex flex-col gap-5 sm:gap-6">
         <div className="flex flex-col gap-2">
           <h2 className="font-[family-name:var(--font-is-serif)] text-2xl sm:text-4xl text-is-text-primary leading-tight">
-            Wo stehst du gerade?
+            Damit ich dich nicht mit dem Falschen langweile oder überfordere — wo stehst du gerade?
           </h2>
           <p className="font-[family-name:var(--font-is-sans)] text-is-text-secondary">
             Wähl, was am besten passt — danach startest du direkt an der richtigen Stelle.
@@ -92,7 +92,7 @@ export default function CategorySelect({
                 <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-accent tracking-wider">
                   {opt.number}
                 </span>
-                <span className="font-[family-name:var(--font-is-mono)] text-sm sm:text-base text-is-text-primary tracking-wider uppercase">
+                <span className="font-[family-name:var(--font-is-sans)] text-base sm:text-lg font-semibold text-is-text-primary">
                   {opt.label}
                 </span>
                 <span className="font-[family-name:var(--font-is-sans)] text-sm text-is-text-secondary">

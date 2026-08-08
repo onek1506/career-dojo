@@ -55,16 +55,17 @@ function GateContent() {
         <div className="w-full max-w-md flex flex-col gap-6">
           <div className="flex flex-col gap-2">
             <span className="font-[family-name:var(--font-is-mono)] text-xs text-is-text-muted tracking-wider uppercase">
-              {fromLessonGate ? 'Drei Lektionen geschafft' : 'Anmelden'}
+              {fromLessonGate ? 'Fortschritt sichern' : 'Anmelden'}
             </span>
             <h1 className="font-[family-name:var(--font-is-serif)] text-2xl sm:text-3xl font-medium leading-tight">
               {fromLessonGate
-                ? 'Dein Fortschritt lebt bisher nur in diesem Browser.'
+                ? 'Du hast drei Lektionen drauf und eine Serie am Laufen — sichern wir das.'
                 : 'Melde dich an, um deinen Fortschritt zu sichern.'}
             </h1>
             <p className="font-[family-name:var(--font-is-sans)] text-base text-is-text-secondary leading-relaxed">
-              Lösch den Cache, wechsle das Gerät oder öffne ein Inkognito-Fenster — und alles ist
-              weg. Ein Account braucht kein Passwort: E-Mail eintragen, Link öffnen, fertig.
+              {fromLessonGate
+                ? 'Dauert zehn Sekunden. Ohne Account lebt dein Fortschritt nur in diesem Browser — lösch den Cache oder wechsle das Gerät, und er ist weg. Kein Passwort nötig: E-Mail eintragen, Link öffnen, fertig.'
+                : 'Lösch den Cache, wechsle das Gerät oder öffne ein Inkognito-Fenster — und alles ist weg. Ein Account braucht kein Passwort: E-Mail eintragen, Link öffnen, fertig.'}
             </p>
           </div>
 

@@ -22,7 +22,7 @@ export default function Welcome({ currentStep, totalSteps, onNext }: OnboardingS
 
         <MarcusNote
           subject="Re: Bevor wir loslegen"
-          body="Career-Dojo bringt dir die Technik-Fragen bei, an denen IB-Interviews scheitern — Accounting, Bewertung, M&A, LBO. Kurze Lektionen, echte Interviewfragen, kein Vorwissen nötig. Zwei kurze Fragen, dann weißt du, wo du einsteigst."
+          body="Die meisten fallen im IB-Interview nicht durch, weil sie dumm sind — sondern weil ihnen niemand gezeigt hat, wie man die Fragen wirklich beantwortet. Genau das machen wir hier."
         />
       </div>
     </OnboardingLayout>

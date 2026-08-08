@@ -10,11 +10,12 @@ import {
   type EntryCategory,
 } from '@/lib/onboarding/profile';
 import Welcome from '@/components/onboarding/entry/Welcome';
+import EarlyWin from '@/components/onboarding/entry/EarlyWin';
 import CategorySelect from '@/components/onboarding/entry/CategorySelect';
 import Ready from '@/components/onboarding/entry/Ready';
 import K4Orientation from '@/components/onboarding/entry/K4Orientation';
 
-const TOTAL_STEPS = 3;
+const TOTAL_STEPS = 4;
 
 const CATEGORY_FIRST_LESSON: Record<Exclude<EntryCategory, 'k4'>, string> = {
   k1: '/lesson/k1-orient-1-spielfeld',
@@ -52,15 +53,15 @@ export default function OnboardingStartPage() {
   };
 
   const goNext = () => {
-    if (currentStep === 0) {
-      setCurrentStep(1);
+    if (currentStep < 2) {
+      setCurrentStep((s) => s + 1);
       return;
     }
-    if (currentStep === 1) {
-      setCurrentStep(2);
+    if (currentStep === 2) {
+      setCurrentStep(3);
       return;
     }
-    // Step 2 (final): route depends on the chosen category.
+    // Step 3 (final): route depends on the chosen category.
     const category = profile.entryCategory ?? 'k1';
     if (category === 'k4') {
       finishOnboarding('/home');
@@ -88,6 +89,7 @@ export default function OnboardingStartPage() {
   };
 
   if (currentStep === 0) return <Welcome {...stepProps} />;
-  if (currentStep === 1) return <CategorySelect {...stepProps} />;
+  if (currentStep === 1) return <EarlyWin {...stepProps} />;
+  if (currentStep === 2) return <CategorySelect {...stepProps} />;
   return profile.entryCategory === 'k4' ? <K4Orientation {...stepProps} /> : <Ready {...stepProps} />;
 }
