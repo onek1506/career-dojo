@@ -46,6 +46,10 @@ export interface MiniCheckContent {
 export interface MiniCheckSlide {
   kind: 'minicheck';
   id: string; // unique quiz key within the lesson
+  // Fine-grained mastery tag, overrides the lesson's topicTag when set —
+  // lets individual questions be tagged (e.g. 'wacc') more precisely than
+  // the lesson-level topicTag (e.g. 'dcf') once that content pass happens.
+  conceptTag?: string;
   // Static question…
   prompt?: string;
   options?: string[];
@@ -65,6 +69,19 @@ export interface MiniCheckSlide {
   // Any wrong or second-try-correct answer falls through to the refresher
   // as normal. Index is 0-based into the lesson's `slides` array.
   skipIfCorrectToIndex?: number;
+}
+
+// Active-recall slide (Langzeit-Layer Etappe 1): a bare question, no
+// options. The learner recalls silently or into a scratch field (never
+// graded), reveals the model answer, then self-rates — that rating
+// drives the spaced-repetition engine, not a right/wrong check.
+export interface RecallSlide {
+  kind: 'recall';
+  id: string; // unique, doubles as quiz_attempts.question_id
+  conceptTag?: string; // overrides the lesson's topicTag when set
+  prompt: string;
+  modelAnswer: string;
+  hint?: string; // only ever rendered for k1 (see mastery/config.ts)
 }
 
 export interface SummarySlide {
@@ -87,6 +104,7 @@ export type MicroSlide =
   | HookSlide
   | ConceptSlide
   | MiniCheckSlide
+  | RecallSlide
   | SummarySlide
   | RetentionSlide;
 

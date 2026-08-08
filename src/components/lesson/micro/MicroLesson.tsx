@@ -6,6 +6,10 @@ import { useStore } from '@/lib/store';
 import { recordWeakAreaAnswer } from '@/lib/weak-areas';
 import { useAuth } from '@/lib/supabase/AuthProvider';
 import { shouldShowSignupGate, markSignupGateSeen } from '@/lib/auth-gate';
+import { getProfile } from '@/lib/onboarding/profile';
+import { toMasteryCategory, RECALL_HARDNESS } from '@/lib/mastery/config';
+import { recordConceptAttempt } from '@/lib/mastery/engine';
+import type { SelfRating } from './slides/RecallSlide';
 import LessonSidePanel from '../LessonSidePanel';
 import { LessonSidePanelProvider } from '../LessonSidePanelContext';
 import MicroSlideView from './MicroSlideView';
@@ -19,6 +23,8 @@ function slideLabel(slide: MicroSlide, index: number): string {
       return `${n} Briefing`;
     case 'minicheck':
       return `${n} Mini-Check`;
+    case 'recall':
+      return `${n} Wiederholung`;
     case 'summary':
       return `${n} Zusammenfassung`;
     case 'retention':
@@ -32,6 +38,8 @@ export default function MicroLesson({ data }: { data: MicroLessonData }) {
   const router = useRouter();
   const { progress, completeLesson } = useStore();
   const { user, loading: authLoading } = useAuth();
+  const [category] = useState(() => toMasteryCategory(getProfile().entryCategory));
+  const recallHardness = RECALL_HARDNESS[category];
 
   const [currentStep, setCurrentStep] = useState(0);
   const [quizResults, setQuizResults] = useState<Record<string, QuizResult | null>>(() => {
@@ -87,7 +95,36 @@ export default function MicroLesson({ data }: { data: MicroLessonData }) {
 
   const handleAnswer = (key: string, result: QuizResult) => {
     if (data.topicTag) recordWeakAreaAnswer(data.topicTag, result.correct);
+    if (user) {
+      const answeredSlide = data.slides.find((s) => s.kind === 'minicheck' && s.id === key);
+      const conceptTag = (answeredSlide?.kind === 'minicheck' ? answeredSlide.conceptTag : undefined) ?? data.topicTag;
+      if (conceptTag) {
+        void recordConceptAttempt({
+          userId: user.id,
+          conceptTag,
+          questionId: key,
+          lessonId: data.id,
+          outcome: result.correct ? 'correct' : 'wrong',
+          category,
+        });
+      }
+    }
     setQuizResults((prev) => ({ ...prev, [key]: result }));
+  };
+
+  const handleRecall = (slideId: string, conceptTag: string | undefined, rating: SelfRating) => {
+    if (!user) return;
+    const resolvedTag = conceptTag ?? data.topicTag;
+    if (!resolvedTag) return;
+    void recordConceptAttempt({
+      userId: user.id,
+      conceptTag: resolvedTag,
+      questionId: slideId,
+      lessonId: data.id,
+      outcome: rating === 'knew' ? 'correct' : rating === 'partial' ? 'partial' : 'wrong',
+      category,
+      selfRating: rating,
+    });
   };
 
   const goNext = () => {
@@ -154,6 +191,8 @@ export default function MicroLesson({ data }: { data: MicroLessonData }) {
         quizIndex={quizIndex}
         quizTotal={quizOrder.length}
         results={results}
+        recallHardness={recallHardness}
+        onRecall={handleRecall}
       />
     </LessonSidePanelProvider>
   );
