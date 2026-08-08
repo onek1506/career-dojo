@@ -277,6 +277,17 @@ body {
   100% { box-shadow: 0 0 24px 0 rgba(255, 107, 0, 0.3); }
 }
 
+/* Onboarding info-circle — a single gentle pulse on first mount, then
+   still. No infinite loop, no alarm-red — low-opacity accent glow. */
+@keyframes is-info-pulse-once {
+  0% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.35); }
+  60% { box-shadow: 0 0 0 8px rgba(255, 107, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0); }
+}
+.is-info-pulse-once {
+  animation: is-info-pulse-once 2.4s ease-out 1;
+}
+
 /* Streak fire */
 @keyframes flame-flicker {
   0%, 100% { transform: scaleY(1) scaleX(1); }

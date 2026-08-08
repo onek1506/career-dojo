@@ -18,6 +18,12 @@ export type SkillProfile = 'A' | 'B' | 'C'; // A=Beginner, B=BWL-Vorkenntnisse, 
 // lesson access.
 export type EntryCategory = 'k1' | 'k2' | 'k3' | 'k4';
 
+// Phase 5b (post-login goal commitment) — deliberately separate from the
+// old InterviewGoal/TimeFrame fields above, which belong to the unused
+// 9-slide diagnosis and don't line up 1:1 with these value sets.
+export type Goal = 'spring_week' | 'summer_internship' | 'full_time';
+export type GoalTimeframe = '3_months' | '6_months' | '1_year' | 'later';
+
 export type KnowledgeAnswer<T extends string> = T | null;
 export type BalanceAnswer = 'correct' | 'wrong' | 'never_heard';
 export type EbitdaAnswer = 'correct' | 'wrong' | 'never_heard';
@@ -41,6 +47,13 @@ export interface UserProfile {
   interviewDate: string | null;
   onboardingCompletedAt: string | null;
   entryCategory: EntryCategory | null;
+  goal: Goal | null;
+  goalTimeframe: GoalTimeframe | null;
+  // Set when the user hits "Später" on the goal-commitment step, so we
+  // don't re-prompt on every login in this browser. Local-only — not
+  // synced to the cloud, a repeat prompt on a new device is an
+  // acceptable edge case for a low-stakes UI dismissal.
+  goalPromptDismissedAt: string | null;
 }
 
 export const STORAGE_KEY = 'career_dojo_profile';
@@ -58,6 +71,9 @@ export function getEmptyProfile(): UserProfile {
     interviewDate: null,
     onboardingCompletedAt: null,
     entryCategory: null,
+    goal: null,
+    goalTimeframe: null,
+    goalPromptDismissedAt: null,
   };
 }
 

@@ -20,6 +20,8 @@ import {
   saveProfile as saveOnboardingProfile,
   type UserProfile as OnboardingProfile,
   type EntryCategory,
+  type Goal,
+  type GoalTimeframe,
 } from '../onboarding/profile';
 
 const MIGRATION_FLAG_KEY = 'career-dojo-migrated';
@@ -48,6 +50,8 @@ interface ProfileRow {
   onboarding_completed_at: string | null;
   knowledge: Record<string, unknown> | null;
   entry_category: string | null;
+  goal: string | null;
+  goal_timeframe: string | null;
 }
 
 interface LessonProgressRow {
@@ -93,6 +97,8 @@ function progressToProfileRow(userId: string, progress: UserProgress, onboarding
     onboarding_completed_at: onboarding.onboardingCompletedAt,
     knowledge: onboarding.knowledge,
     entry_category: onboarding.entryCategory,
+    goal: onboarding.goal,
+    goal_timeframe: onboarding.goalTimeframe,
   };
 }
 
@@ -242,6 +248,8 @@ export function applyCloudOnboardingState(cloud: { profile: ProfileRow | null })
   const partial: Partial<OnboardingProfile> = {};
   if (p.entry_category) partial.entryCategory = p.entry_category as EntryCategory;
   if (p.onboarding_completed_at) partial.onboardingCompletedAt = p.onboarding_completed_at;
+  if (p.goal) partial.goal = p.goal as Goal;
+  if (p.goal_timeframe) partial.goalTimeframe = p.goal_timeframe as GoalTimeframe;
   if (Object.keys(partial).length === 0) return;
   saveOnboardingProfile(partial);
 }

@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/supabase/AuthProvider';
+import { getProfile } from '@/lib/onboarding/profile';
 
 function CallbackContent() {
   const router = useRouter();
@@ -14,7 +15,16 @@ function CallbackContent() {
     if (loading) return;
     const next = params.get('next') || '/course';
     if (user) {
-      router.replace(next);
+      // First successful login this browser has seen a goal/timeframe or a
+      // dismissal for: ask once, framed as a motivational step, before
+      // continuing on. Skippable, never blocks reaching `next`.
+      const profile = getProfile();
+      const alreadyAskedOrAnswered = Boolean(profile.goal || profile.goalPromptDismissedAt);
+      if (!alreadyAskedOrAnswered) {
+        router.replace(`/auth/goal?next=${encodeURIComponent(next)}`);
+      } else {
+        router.replace(next);
+      }
       return;
     }
     const t = setTimeout(() => setTimedOut(true), 5000);
